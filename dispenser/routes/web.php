@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -12,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('college/import', [App\Http\Controllers\CollegeController::class, 'index']);
+Route::post('college/import', [App\Http\Controllers\CollegeController::class, 'importExcelData']);
+
 
 Route::get('/', function () {
     return view('welcome');
