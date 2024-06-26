@@ -324,6 +324,11 @@ return [
         ],
         ['header' => 'account_settings'],
         [
+            'text' => 'College Upload',
+            'url' => 'college/import',
+            'icon' => 'fas fa-fw fa-upload',
+        ],
+        [
             'text' => 'profile',
             'url' => 'admin/settings',
             'icon' => 'fas fa-fw fa-user',
