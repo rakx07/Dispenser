@@ -339,6 +339,11 @@ return [
                     'url' => 'department/import',
                     'icon' => 'fas fa-fw',
                 ],
+                [
+                    'text' => 'Course Upload',
+                    'url' => 'course/import',
+                    'icon' => 'fas fa-fw',
+                ],
             ],
         ],
 

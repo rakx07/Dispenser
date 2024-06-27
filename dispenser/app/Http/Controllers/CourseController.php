@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\College;
+use App\Models\Course;
 use App\Models\Department;
 use Illuminate\Http\Request;
-use App\Imports\DepartmentImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\CourseImport;
 
-class DepartmentController extends Controller
+class CourseController extends Controller
 {
     public function index()
     {
-        $departments = Department::all();
-        return view('department.index', compact('departments'));
+        $courses = Course::all();
+        return view('course.index', compact('courses'));
     }
 
     public function import(Request $request)
@@ -22,17 +22,17 @@ class DepartmentController extends Controller
             'import_file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
-        Excel::import(new DepartmentImport, $request->file('import_file'));
+        Excel::import(new CourseImport, $request->file('import_file'));
 
         return redirect()->back()->with('status', 'File imported successfully!');
     }
 
     public function edit($id)
     {
-        $department = Department::findOrFail($id);
-        $colleges = College::where('status', '1')->get();
+        $course = Course::findOrFail($id);
+        $departments = Department::where('status', '1')->get();
         // dd($colleges);
-        return view('department.edit', compact('department', 'colleges'));
+        return view('course.edit', compact('department', 'course'));
     }
 
     public function update(Request $request, $id)
@@ -40,27 +40,27 @@ class DepartmentController extends Controller
         $request->validate([
             'code' => 'required',
             'name' => 'required',
-            'college_id' => 'required|exists:colleges,id',
+            'department_id' => 'required|exists:department,id',
             'status' => 'required|boolean',
         ]);
 
-        $department = Department::findOrFail($id);
-        $department->code = $request->code;
-        $department->name = $request->name;
-        $department->college_id = $request->college_id;
-        //dd($department);
-        $department->status = $request->status;
-        $department->save();
+        $course = Department::findOrFail($id);
+        $course->code = $request->code;
+        $course->name = $request->name;
+        $course->department_id = $request->department_id;
+        //dd($course);
+        $course->status = $request->status;
+        $course->save();
 
         return redirect()->route('departments.index')->with('status', 'Department updated successfully!');
     }
 
     public function destroy($id)
     {
-        $department = Department::findOrFail($id);
-        $department->delete();
+        $course = Course::findOrFail($id);
+        $course->delete();
 
-        return redirect()->back()->with('status', 'Department deleted successfully!');
+        return redirect()->back()->with('status', 'Course deleted successfully!');
     }
 
     public function importExcelData(Request $request)
@@ -69,7 +69,7 @@ class DepartmentController extends Controller
             'import_file' => 'required|file',
         ]);
 
-        Excel::import(new DepartmentImport, $request->file('import_file'));
+        Excel::import(new CourseImport, $request->file('import_file'));
         
         return redirect()->back()->with('status', 'Excel import successful!');
     }
