@@ -323,11 +323,29 @@ return [
             'label_color' => 'success',
         ],
         ['header' => 'account_settings'],
+
+        ///added multi level
         [
-            'text' => 'College Upload',
-            'url' => 'college/import',
-            'icon' => 'fas fa-fw fa-upload',
+            'text' => 'Uploads',
+            'icon' => 'fas fa-fw fa-share',
+            'submenu' => [
+                [
+                    'text' => 'College Upload',
+                    'url' => 'college/import',
+                    'icon' => 'fas fa-fw',
+                ],
+                [
+                    'text' => 'Department Upload',
+                    'url' => 'department/import',
+                    'icon' => 'fas fa-fw',
+                ],
+            ],
         ],
+
+
+
+        ///end multilelve
+        
         [
             'text' => 'profile',
             'url' => 'admin/settings',
