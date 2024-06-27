@@ -30,7 +30,11 @@ class DepartmentController extends Controller
     public function edit($id)
     {
         $department = Department::find($id);
-        return view('department.edit', compact('department'));
+        $department = Department::findOrFail($id);
+
+        $colleges = College::where('status', 'active')->get();
+
+        return view('department.edit', compact('department','colleges'));
     }
    
 

@@ -25,8 +25,6 @@
                                 <td>{{ $department->id }}</td>
                                 <td>{{ $department->code }}</td>
                                 <td>{{ $department->name }}</td>
-                                <!-- <td>{{$department->college_id}}</td> -->
-                                <!-- <td>{{ $department->id }}</td> -->
                                  <td>
                                     @if ($department->college_id == 1)
                                         @php
