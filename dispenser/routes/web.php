@@ -22,8 +22,11 @@ Route::delete('college/delete/{id}', [App\Http\Controllers\CollegeController::cl
 //department import
  Route::get('department/import', [App\Http\Controllers\DepartmentController::class, 'index']);
 Route::post('department/import', [App\Http\Controllers\DepartmentController::class, 'importExcelData']);
-Route::get('department/edit/{id}', [App\Http\Controllers\DepartmentController::class, 'edit']);
-Route::post('department/update/{id}', [App\Http\Controllers\DepartmentController::class, 'update']);
+// Route::get('department/edit/{id}', [App\Http\Controllers\DepartmentController::class, 'edit']);
+// Route::post('department/update/{id}', [App\Http\Controllers\DepartmentController::class, 'update']);
+Route::get('department/edit/{id}', [App\Http\Controllers\DepartmentController::class, 'edit'])->name('department.edit');
+Route::put('department/update/{id}', [App\Http\Controllers\DepartmentController::class, 'update'])->name('department.update');
+
 Route::delete('department/delete/{id}', [App\Http\Controllers\DepartmentController::class, 'destroy']);
 
 
