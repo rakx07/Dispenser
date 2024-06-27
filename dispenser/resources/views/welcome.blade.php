@@ -40,6 +40,7 @@
     <main class="container mt-5">
         <h1 class="mb-4"><b>Student Information</b></h1>
         
+        
         <form>
             <div class="mb-3">
                 <label for="courseSelect" class="form-label"><b>Select Course</b></label>
