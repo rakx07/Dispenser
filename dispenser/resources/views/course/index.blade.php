@@ -14,7 +14,7 @@
                             <th>ID</th>
                             <th>Code</th>
                             <th>Name</th>
-                            <th>College ID</th>
+                            <th>Department</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
