@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('college/import', [App\Http\Controllers\CollegeController::class, 'index']);
 Route::post('college/import', [App\Http\Controllers\CollegeController::class, 'importExcelData']);
+Route::get('college/edit/{id}', [App\Http\Controllers\CollegeController::class, 'edit']);
+Route::post('college/update/{id}', [App\Http\Controllers\CollegeController::class, 'update']);
+Route::delete('college/delete/{id}', [App\Http\Controllers\CollegeController::class, 'destroy']);
 
 
 Route::get('/', function () {
