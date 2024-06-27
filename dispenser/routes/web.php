@@ -31,14 +31,13 @@ Route::post('course/import', [App\Http\Controllers\CourseController::class, 'imp
 Route::get('course/edit/{id}', [App\Http\Controllers\CourseController::class, 'edit'])->name('department.edit');
 Route::put('course/update/{id}', [App\Http\Controllers\CourseController::class, 'update'])->name('department.update');
 Route::delete('course/delete/{id}', [App\Http\Controllers\CourseController::class, 'destroy']);
+// Example route in routes/web.php
+Route::get('/', [App\Http\Controllers\CourseController::class, 'getCourses']);
 
 
-
-
-
-Route::get('/', function () {
-    return view('welcome');
-});
+// // Route::get('/', function () {
+// //     return view('welcome');
+// });
 
 Auth::routes();
 

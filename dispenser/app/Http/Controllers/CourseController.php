@@ -15,6 +15,11 @@ class CourseController extends Controller
         $courses = Course::all();
         return view('course.index', compact('courses'));
     }
+    public function getCourses()
+    {
+    $courses = Course::all(); // Fetch all courses from the database
+    return view('welcome', compact('courses')); // Pass $courses to the view
+}
 
     public function import(Request $request)
     {
@@ -73,4 +78,5 @@ class CourseController extends Controller
         
         return redirect()->back()->with('status', 'Excel import successful!');
     }
+   
 }
