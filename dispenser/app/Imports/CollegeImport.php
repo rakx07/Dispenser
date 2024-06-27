@@ -49,6 +49,5 @@ class CollegeImport implements ToCollection, WithHeadingRow
             ]);
         }
 
-
     }
 }
