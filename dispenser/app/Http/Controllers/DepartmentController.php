@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\College;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Imports\DepartmentImport;
@@ -31,6 +32,7 @@ class DepartmentController extends Controller
         $department = Department::find($id);
         return view('department.edit', compact('department'));
     }
+   
 
     public function update(Request $request, $id)
     {

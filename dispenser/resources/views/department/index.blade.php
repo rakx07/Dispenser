@@ -25,7 +25,19 @@
                                 <td>{{ $department->id }}</td>
                                 <td>{{ $department->code }}</td>
                                 <td>{{ $department->name }}</td>
-                                <td>{{$department->college_id}}</td>
+                                <!-- <td>{{$department->college_id}}</td> -->
+                                <!-- <td>{{ $department->id }}</td> -->
+                                 <td>
+                                    @if ($department->college_id == 1)
+                                        @php
+                                            $college1Code = \App\Models\College::where('id', 1)->value('code');
+                                        @endphp
+                                        {{ $college1Code }}
+                                    @else
+                                        {{ $department->code }}
+                                    @endif
+                                </td> 
+                                <!-- added end -->
                                 <td>{{ $department->status == 1 ? 'Active' : 'Inactive' }}</td>
                                 <td>
                                     <a href="{{ url('department/edit/' . $department->id) }}" class="btn btn-warning btn-sm">Edit</a>
