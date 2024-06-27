@@ -161,7 +161,7 @@
     <nav class="navbar sticky-top" style="background-color: darkgreen">
         <div class="container-fluid">
             <a class="navbar-brand fs-7 text-white">
-                <img src="./images/NDMU-Logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top" />
+                <img src="{{ asset('ndmulogo.png') }}" alt="Logo" alt="Logo" width="30" height="30" class="d-inline-block align-text-top" />
                 Notre Dame of Marbel University
             </a>
             <span class="navbar-text text-white">
@@ -175,14 +175,14 @@
         <h1 class="mb-4">Student Information</h1>
         
         <form>
-            <div class="mb-3">
+            {{-- <div class="mb-3">
                 <label for="courseSelect" class="form-label">Select Course</label>
                 <select class="form-select" id="courseSelect">
-                    <option value="course1">Course 1</option>
-                    <option value="course2">Course 2</option>
-                    <option value="course3">Course 3</option>
+                    @foreach ($courses as $course)
+                        <option value="{{ $course->id }}">{{ $course->name }}</option>
+                    @endforeach
                 </select>
-            </div>
+            </div> --}}
             
             <div class="mb-3">
                 <label for="idNumber" class="form-label">ID Number</label>
