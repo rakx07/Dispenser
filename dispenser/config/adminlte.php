@@ -323,7 +323,11 @@ return [
             'label_color' => 'success',
         ],
         ['header' => 'account_settings'],
-
+        [
+            'text' => 'Main Dashboard',
+            'url' => '/',
+            'icon' => 'far fa-fw fa-file',
+        ],
         ///added multi level
         [
             'text' => 'Uploads',
