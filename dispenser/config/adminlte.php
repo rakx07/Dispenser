@@ -260,7 +260,7 @@ return [
     'dashboard_url' => 'home',
     'logout_url' => 'logout',
     'login_url' => 'login',
-    'register_url' => 'register',
+    // 'register_url' => 'register',
     'password_reset_url' => 'password/reset',
     'password_email_url' => 'password/email',
     'profile_url' => false,
@@ -324,7 +324,7 @@ return [
         ],
         ['header' => 'account_settings'],
         [
-            'text' => 'Main Dashboard',
+            'text' => 'Landing Page',
             'url' => '/',
             'icon' => 'far fa-fw fa-file',
         ],
