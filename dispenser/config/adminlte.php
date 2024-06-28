@@ -327,7 +327,7 @@ return [
         ///added multi level
         [
             'text' => 'Uploads',
-            'icon' => 'fas fa-fw fa-share',
+            'icon' => 'fas fa-fw fa-upload',
             'submenu' => [
                 [
                     'text' => 'College Upload',

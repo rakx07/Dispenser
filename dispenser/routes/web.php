@@ -34,7 +34,6 @@ Route::delete('course/delete/{id}', [App\Http\Controllers\CourseController::clas
 // Example route in routes/web.php
 Route::get('/', [App\Http\Controllers\CourseController::class, 'getCourses']);
 
-
 // // Route::get('/', function () {
 // //     return view('welcome');
 // });
