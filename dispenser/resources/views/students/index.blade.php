@@ -66,9 +66,25 @@
                 </div>
 
                 <!-- Pagination Links -->
-                <div class="d-flex justify-content-center mt-4">
-                    {{ $students->links() }}
-                </div>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center mt-5">
+                        <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        </li>
+                        <li class="page-item"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
@@ -77,6 +93,17 @@
 @push('styles')
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    
+    <style>
+        /* Custom styles for pagination */
+        .pagination {
+            margin-top: 20px; /* Adjust margin as needed */
+        }
+        .pagination > .page-item > .page-link {
+            padding: 8px 16px; /* Adjust padding as needed */
+            font-size: 14px; /* Adjust font size as needed */
+        }
+    </style>
 @endpush
 
 @push('scripts')
@@ -88,12 +115,12 @@
     <script>
         $(document).ready(function() {
             $('#student-table').DataTable({
-                paging: false, // Disable DataTable default pagination
+                paging: true, // Enable pagination
                 lengthChange: false, // Disable length change
                 searching: false, // Disable search feature
                 ordering: true, // Enable ordering (sorting)
                 info: false, // Disable info display (handled by Laravel pagination)
-                autoWidth: false, // Disable auto width calculation
+                autoWidth: true, // Disable auto width calculation
                 responsive: true // Enable responsiveness
             });
         });
