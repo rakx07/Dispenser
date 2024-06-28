@@ -1,15 +1,15 @@
+<!-- resources/views/student/import.blade.php -->
+
 @extends('adminlte::page')
 
-@section('title', 'Students')
+@section('title', 'Student Import')
 
 @section('content_header')
-    <h1>Students</h1>
-@endsection
-
-@section('content')
     <div class="container">
         <div class="row">
             <div class="col-md-12 mt-5">
+                <h3>Student Table</h3>
+                <hr>
                 <table id="student-table" class="table table-bordered table-hover">
                     <thead>
                         <tr>
@@ -36,8 +36,8 @@
                                 <td>{{ $student->birthday }}</td>
                                 <td>{{ $student->status == 1 ? 'Active' : 'Inactive' }}</td>
                                 <td>
-                                    <a href="{{ url('students/edit/' . $student->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                    <form action="{{ url('students/delete/' . $student->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirmDelete()">
+                                    <a href="{{ url('student/edit/' . $student->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                    <form action="{{ url('student/delete/' . $student->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirmDelete()">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>

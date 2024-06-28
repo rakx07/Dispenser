@@ -36,11 +36,11 @@ Route::delete('course/delete/{id}', [App\Http\Controllers\CourseController::clas
 // Example route in routes/web.php
 Route::get('/', [App\Http\Controllers\CourseController::class, 'getCourses']);
 
-Route::get('students/students', [App\Http\Controllers\StudentController::class, 'index'])->name('students.index');
-Route::post('students/import', [App\Http\Controllers\StudentController::class, 'import'])->name('students.import');
-Route::get('students/edit/{id}', [App\Http\Controllers\StudentController::class, 'edit']);
-Route::post('students/update/{id}', [App\Http\Controllers\StudentController::class, 'update']);
-Route::delete('students/delete/{id}', [App\Http\Controllers\StudentController::class, 'destroy']);
+Route::get('students/import', [StudentController::class, 'index'])->name('students.index');
+Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
+Route::get('student/edit/{id}', [StudentController::class, 'edit']);
+Route::post('student/update/{id}', [StudentController::class, 'update']);
+Route::delete('student/delete/{id}', [StudentController::class, 'destroy']);
 
 Auth::routes();
 

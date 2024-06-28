@@ -67,15 +67,4 @@ class StudentController extends Controller
 
         return redirect()->back()->with('status', 'Student deleted successfully!');
     }
-
-    public function importExcelData(Request $request)
-    {
-        $request->validate([
-            'import_file' => 'required|file',
-        ]);
-
-        Excel::import(new StudentImport, $request->file('import_file'));
-        
-        return redirect()->back()->with('status', 'Excel import successful!');
-    }
 }
