@@ -36,8 +36,8 @@ Route::delete('course/delete/{id}', [App\Http\Controllers\CourseController::clas
 // Example route in routes/web.php
 Route::get('/', [App\Http\Controllers\CourseController::class, 'getCourses']);
 
-Route::get('students/import', [StudentController::class, 'index'])->name('students.index');
-Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
+Route::get('students/import', [StudentController::class, 'index']);//->name('students.index');
+Route::post('students/import', [StudentController::class, 'import']);//->name('students.import');
 Route::get('student/edit/{id}', [StudentController::class, 'edit']);
 Route::post('student/update/{id}', [StudentController::class, 'update']);
 Route::delete('student/delete/{id}', [StudentController::class, 'destroy']);

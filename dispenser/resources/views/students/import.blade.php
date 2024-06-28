@@ -82,7 +82,25 @@
     <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#student-table').DataTable();
+            $('#student-table').DataTable({
+                paging: true, // Enable pagination
+                pageLength: 20, // Display 20 items per page
+                lengthChange: false, // Disable length change
+                searching: false, // Disable search feature
+                ordering: true, // Enable ordering (sorting)
+                info: true, // Enable info display
+                autoWidth: false, // Disable auto width calculation
+                responsive: true, // Enable responsiveness
+                language: {
+                    paginate: {
+                        next: '&raquo;', // Custom pagination icon for next page
+                        previous: '&laquo;' // Custom pagination icon for previous page
+                    }
+                },
+                dom: '<"row"<"col-sm-6"l><"col-sm-6"f>>' + // Customizing the layout of DataTables elements
+                     '<"row"<"col-sm-12"tr>>' +
+                     '<"row"<"col-sm-5"i><"col-sm-7"p>>' // Adding information and pagination control in separate rows
+            });
         });
 
         function confirmDelete() {
