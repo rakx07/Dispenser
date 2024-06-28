@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -31,24 +32,17 @@ Route::post('course/import', [App\Http\Controllers\CourseController::class, 'imp
 Route::get('course/edit/{id}', [App\Http\Controllers\CourseController::class, 'edit'])->name('department.edit');
 Route::put('course/update/{id}', [App\Http\Controllers\CourseController::class, 'update'])->name('department.update');
 Route::delete('course/delete/{id}', [App\Http\Controllers\CourseController::class, 'destroy']);
+
 // Example route in routes/web.php
 Route::get('/', [App\Http\Controllers\CourseController::class, 'getCourses']);
 
-// // Route::get('/', function () {
-// //     return view('welcome');
-// });
+Route::get('students/students', [App\Http\Controllers\StudentController::class, 'index'])->name('students.index');
+Route::post('students/import', [App\Http\Controllers\StudentController::class, 'import'])->name('students.import');
+Route::get('students/edit/{id}', [App\Http\Controllers\StudentController::class, 'edit']);
+Route::post('students/update/{id}', [App\Http\Controllers\StudentController::class, 'update']);
+Route::delete('students/delete/{id}', [App\Http\Controllers\StudentController::class, 'destroy']);
 
 Auth::routes();
-
-
-// Route for displaying the import form
-Route::get('/students/import-form', function () {
-    return view('students.import');})->name('students.import-form');
-
-// Route for handling the import
-Route::post('/students/import', [StudentController::class, 'import'])->name('students.import');
-
-
 
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

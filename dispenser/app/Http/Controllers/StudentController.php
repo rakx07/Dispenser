@@ -2,20 +2,80 @@
 
 namespace App\Http\Controllers;
 
+namespace App\Http\Controllers;
+
+use App\Models\Student;
+use App\Models\Course;
 use Illuminate\Http\Request;
-use App\Imports\StudentsImport;
+use App\Imports\StudentImport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends Controller
 {
+    public function index()
+    {
+        $students = Student::all();
+        return view('students.index', compact('students'));
+    }
+
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
+            'import_file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
-        Excel::import(new StudentsImport, $request->file('file'));
+        Excel::import(new StudentImport, $request->file('import_file'));
 
-        return redirect()->back()->with('success', 'Students imported successfully.');
+        return redirect()->back()->with('status', 'File imported successfully!');
+    }
+
+    public function edit($id)
+    {
+        $student = Student::findOrFail($id);
+        $courses = Course::where('status', '1')->get();
+        return view('student.edit', compact('student', 'courses'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'school_id' => 'required',
+            'lastname' => 'required',
+            'firstname' => 'required',
+            'course_id' => 'required|exists:courses,id',
+            'birthday' => 'required|date',
+            'status' => 'required|boolean',
+        ]);
+
+        $student = Student::findOrFail($id);
+        $student->school_id = $request->school_id;
+        $student->lastname = $request->lastname;
+        $student->firstname = $request->firstname;
+        $student->middlename = $request->middlename;
+        $student->course_id = $request->course_id;
+        $student->birthday = $request->birthday;
+        $student->status = $request->status;
+        $student->save();
+
+        return redirect()->route('students.index')->with('status', 'Student updated successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $student = Student::findOrFail($id);
+        $student->delete();
+
+        return redirect()->back()->with('status', 'Student deleted successfully!');
+    }
+
+    public function importExcelData(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file',
+        ]);
+
+        Excel::import(new StudentImport, $request->file('import_file'));
+        
+        return redirect()->back()->with('status', 'Excel import successful!');
     }
 }

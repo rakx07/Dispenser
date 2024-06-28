@@ -9,22 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::dropIfExists('students'); // Ensure the students table does not already exist
-
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('school_id');
+            $table->string('school_id');
             $table->string('lastname');
             $table->string('firstname');
             $table->string('middlename')->nullable();
-            $table->unsignedBigInteger('course_id');
-            $table->date('birthday'); // Add the birthday column
-            $table->string('status');
+            $table->foreignId('course_id')->constrained('course');
+            $table->date('birthday');
+            $table->boolean('status');
             $table->timestamps();
-
-            $table->foreign('course_id')->references('id')->on('course')->onDelete('cascade');
         });
     }
 
