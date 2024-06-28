@@ -6,6 +6,7 @@ use App\Models\Student;
 use App\Models\Course;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Carbon\Carbon;
 
 class StudentImport implements ToModel, WithHeadingRow
 {
@@ -19,7 +20,9 @@ class StudentImport implements ToModel, WithHeadingRow
             'firstname'  => $row['firstname'],
             'middlename' => $row['middlename'],
             'course_id'  => $course->id,
-            'birthday'   => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['birthday']),
+            // 'birthday'   => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['birthday']),
+            // 'birthday' => Carbon::createFromFormat('Y-d-m', $row['birthday'])->format('Y-d-m'),
+            'birthday' => $row['birthday'],
             'status'     => $row['status'],
         ]);
     }
