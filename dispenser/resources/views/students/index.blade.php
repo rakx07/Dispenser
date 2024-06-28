@@ -126,6 +126,12 @@
         .pagination > .page-item > .page-link span {
             font-size: 1em; /* Adjust font size as needed */
         }
+        /* Custom styles for table cell height */
+        .table td,
+        .table th {
+        padding: 0.2rem; /* Adjust padding to make cells smaller */
+        vertical-align: middle; /* Align content vertically */
+}
     </style>
 @endpush
 
