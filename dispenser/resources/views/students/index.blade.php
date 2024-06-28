@@ -65,24 +65,37 @@
                     </div>
                 </div>
 
-                <!-- Pagination Links -->
+                <!-- Bootstrap Pagination Links -->
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-center mt-5">
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                        </li>
-                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                                <span class="sr-only">Next</span>
-                            </a>
-                        </li>
+                        {{-- Previous Page Link --}}
+                        @if ($students->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-disabled="true">&laquo;</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $students->previousPageUrl() }}" rel="prev" aria-label="Previous">&laquo;</a>
+                            </li>
+                        @endif
+
+                        {{-- Pagination Elements --}}
+                        @foreach ($students as $student)
+                            <li class="page-item {{ $students->currentPage() == $loop->iteration ? 'active' : '' }}">
+                                <a class="page-link" href="{{ $students->url($loop->iteration) }}">{{ $loop->iteration }}</a>
+                            </li>
+                        @endforeach
+
+                        {{-- Next Page Link --}}
+                        @if ($students->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $students->nextPageUrl() }}" rel="next" aria-label="Next">&raquo;</a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-disabled="true">&raquo;</span>
+                            </li>
+                        @endif
                     </ul>
                 </nav>
             </div>
@@ -103,6 +116,16 @@
             padding: 8px 16px; /* Adjust padding as needed */
             font-size: 14px; /* Adjust font size as needed */
         }
+        /* Adjust SVG icon size */
+        .pagination > .page-item > .page-link svg {
+            width: 1em; /* Set desired width */
+            height: 1em; /* Set desired height */
+            vertical-align: middle; /* Align vertically */
+        }
+        /* Adjust icon size for Previous and Next arrows */
+        .pagination > .page-item > .page-link span {
+            font-size: 1em; /* Adjust font size as needed */
+        }
     </style>
 @endpush
 
@@ -115,12 +138,12 @@
     <script>
         $(document).ready(function() {
             $('#student-table').DataTable({
-                paging: true, // Enable pagination
+                paging: false, // Disable front-end pagination (handled by Laravel)
                 lengthChange: false, // Disable length change
                 searching: false, // Disable search feature
                 ordering: true, // Enable ordering (sorting)
                 info: false, // Disable info display (handled by Laravel pagination)
-                autoWidth: true, // Disable auto width calculation
+                autoWidth: false, // Disable auto width calculation
                 responsive: true // Enable responsiveness
             });
         });
