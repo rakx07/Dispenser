@@ -1,5 +1,3 @@
-<!-- resources/views/student/import.blade.php -->
-
 @extends('adminlte::page')
 
 @section('title', 'Student Import')
