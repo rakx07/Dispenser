@@ -64,6 +64,11 @@
                         </form>
                     </div>
                 </div>
+
+                <!-- Pagination Links -->
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $students->links() }}
+                </div>
             </div>
         </div>
     </div>
@@ -83,7 +88,7 @@
     <script>
         $(document).ready(function() {
             $('#student-table').DataTable({
-                paging: true, // Enable pagination
+                paging: false, // Disable DataTable default pagination
                 lengthChange: false, // Disable length change
                 searching: false, // Disable search feature
                 ordering: true, // Enable ordering (sorting)

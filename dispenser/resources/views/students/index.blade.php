@@ -1,15 +1,13 @@
 @extends('adminlte::page')
 
-@section('title', 'Students')
+@section('title', 'Student Import')
 
 @section('content_header')
-    <h1>Students</h1>
-@endsection
-
-@section('content')
     <div class="container">
         <div class="row">
             <div class="col-md-12 mt-5">
+                <h3>Student Table</h3>
+                <hr>
                 <table id="student-table" class="table table-bordered table-hover">
                     <thead>
                         <tr>
@@ -66,6 +64,11 @@
                         </form>
                     </div>
                 </div>
+
+                <!-- Pagination Links -->
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $students->links() }}
+                </div>
             </div>
         </div>
     </div>
@@ -84,7 +87,15 @@
     <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#student-table').DataTable();
+            $('#student-table').DataTable({
+                paging: false, // Disable DataTable default pagination
+                lengthChange: false, // Disable length change
+                searching: false, // Disable search feature
+                ordering: true, // Enable ordering (sorting)
+                info: false, // Disable info display (handled by Laravel pagination)
+                autoWidth: false, // Disable auto width calculation
+                responsive: true // Enable responsiveness
+            });
         });
 
         function confirmDelete() {

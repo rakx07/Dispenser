@@ -16,7 +16,7 @@ class StudentController extends Controller
     {
         // $students = Student::all();
         // return view('students.index', compact('students'));
-        $students = Student::paginate(10); // Adjust the number per page as needed
+        $students = Student::paginate(20); // Adjust the number per page as needed
         return view('students.index', compact('students'));
     }
 
