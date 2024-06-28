@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\StudentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,5 +39,5 @@ Route::get('/', [App\Http\Controllers\CourseController::class, 'getCourses']);
 // });
 
 Auth::routes();
-
+Route::post('/students/import', [StudentController::class, 'import'])->name('students.import');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
