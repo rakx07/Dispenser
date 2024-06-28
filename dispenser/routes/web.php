@@ -39,5 +39,16 @@ Route::get('/', [App\Http\Controllers\CourseController::class, 'getCourses']);
 // });
 
 Auth::routes();
+
+
+// Route for displaying the import form
+Route::get('/students/import-form', function () {
+    return view('students.import');})->name('students.import-form');
+
+// Route for handling the import
 Route::post('/students/import', [StudentController::class, 'import'])->name('students.import');
+
+
+
+
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
