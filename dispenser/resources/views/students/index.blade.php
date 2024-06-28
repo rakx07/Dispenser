@@ -1,13 +1,15 @@
 @extends('adminlte::page')
 
-@section('title', 'Student Import')
+@section('title', 'Students')
 
 @section('content_header')
+    <h1>Students</h1>
+@endsection
+
+@section('content')
     <div class="container">
         <div class="row">
             <div class="col-md-12 mt-5">
-                <h3>Student Table</h3>
-                <hr>
                 <table id="student-table" class="table table-bordered table-hover">
                     <thead>
                         <tr>
@@ -55,7 +57,7 @@
                         <h4>Import to Database</h4>
                     </div>
                     <div class="card-body">
-                        <form action="{{ url('student/import') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ url('students/import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="input-group">
                                 <input type="file" name="import_file" class="form-control" />
@@ -82,25 +84,7 @@
     <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#student-table').DataTable({
-                paging: true, // Enable pagination
-                pageLength: 20, // Display 20 items per page
-                lengthChange: false, // Disable length change
-                searching: false, // Disable search feature
-                ordering: true, // Enable ordering (sorting)
-                info: true, // Enable info display
-                autoWidth: false, // Disable auto width calculation
-                responsive: true, // Enable responsiveness
-                language: {
-                    paginate: {
-                        next: '&raquo;', // Custom pagination icon for next page
-                        previous: '&laquo;' // Custom pagination icon for previous page
-                    }
-                },
-                dom: '<"row"<"col-sm-6"l><"col-sm-6"f>>' + // Customizing the layout of DataTables elements
-                     '<"row"<"col-sm-12"tr>>' +
-                     '<"row"<"col-sm-5"i><"col-sm-7"p>>' // Adding information and pagination control in separate rows
-            });
+            $('#student-table').DataTable();
         });
 
         function confirmDelete() {
