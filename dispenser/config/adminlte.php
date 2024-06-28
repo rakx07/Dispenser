@@ -346,7 +346,7 @@ return [
                 ],
                 [
                     'text' => 'Student Upload',
-                    'url' => 'student/import',
+                    'url' => 'students/import',
                     'icon' => 'fas fa-fw',
                 ],
             ],

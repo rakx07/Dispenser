@@ -84,7 +84,15 @@
     <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#student-table').DataTable();
+            $('#student-table').DataTable({
+                paging: true, // Enable pagination
+                lengthChange: false, // Disable length change
+                searching: false, // Disable search feature
+                ordering: true, // Enable ordering (sorting)
+                info: true, // Enable info display
+                autoWidth: false, // Disable auto width calculation
+                responsive: true // Enable responsiveness
+            });
         });
 
         function confirmDelete() {
