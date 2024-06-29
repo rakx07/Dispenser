@@ -43,9 +43,9 @@
         
         <form>
             <div class="mb-3">
-                <label for="courseSelect" class="form-label"><b>Select Course</b></label>
+                <label for="courseSelect" class="form-label"><b>Select Your Course</b></label>
                 <select class="form-select" id="courseSelect">
-                    <option value="">Select a course...</option> <!-- Blank default option -->
+                    <option value=""><small>Select your course...</small></option><!-- Blank default option -->
                     @foreach ($courses as $course)
                         <option value="{{ $course->code }}">{{ $course->name }}</option>
                     @endforeach
@@ -58,9 +58,17 @@
                 <input type="text" placeholder="Enter your ID number" class="form-control form-control-sm" id="idNumber" placeholder="Enter your ID number" style="width: 200px;">
             </div>
             <div class="mb-3">
+                <label for="lastname" class="form-label"><b>Last Name</b></label>
+                <input type="text" placeholder="Enter your Last name" class="form-control form-control-sm" id="idNumber" placeholder="Enter your ID number" style="width: 200px;">
+            </div>
+            <div class="mb-3">
+                <label for="birthday" class="form-label"><b>Birthday<small> e.g. 2001-01-29 (2001-01-29)</small></b></label>
+                <input type="text" placeholder="Enter your birtdhay" class="form-control form-control-sm" id="idNumber" placeholder="Enter your ID number" style="width: 200px;">
+            </div>
+            {{-- <div class="mb-3">
                 <label for="password" class="form-label"><b>Password</b><br><small> e.g. Lastname2001-01-29 (Delacruz2001-01-29)</small></label>
                 <input type="password" placeholder="Enter your password" class="form-control form-control-sm" id="password" placeholder="Enter your password" style="width: 200px;">
-            </div>
+            </div> --}}
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </main>
