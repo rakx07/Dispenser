@@ -8,8 +8,8 @@
             <div class="col-md-12 mt-5">
                 <h3>Student Table</h3>
                 <hr>
-                <table id="student-table" class="table table-bordered table-hover">
-                    <thead>
+                <table id="student-table" class="table table-bordered table-hover table-striped">
+                    <thead class="thead-dark">
                         <tr>
                             <th>ID</th>
                             <th>School ID</th>
@@ -80,9 +80,9 @@
                         @endif
 
                         {{-- Pagination Elements --}}
-                        @foreach ($students as $student)
-                            <li class="page-item {{ $students->currentPage() == $loop->iteration ? 'active' : '' }}">
-                                <a class="page-link" href="{{ $students->url($loop->iteration) }}">{{ $loop->iteration }}</a>
+                        @foreach ($students->links()->elements[0] as $page => $url)
+                            <li class="page-item {{ $students->currentPage() == $page ? 'active' : '' }}">
+                                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
                             </li>
                         @endforeach
 
@@ -129,9 +129,20 @@
         /* Custom styles for table cell height */
         .table td,
         .table th {
-        padding: 0.2rem; /* Adjust padding to make cells smaller */
-        vertical-align: middle; /* Align content vertically */
-}
+            padding: 0.4rem; /* Adjust padding to make cells smaller */
+            vertical-align: middle; /* Align content vertically */
+        }
+        /* Add border and hover effects */
+        .table-bordered {
+            border: 1px solid #dee2e6;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        .thead-dark th {
+            background-color: #343a40;
+            color: white;
+        }
     </style>
 @endpush
 
