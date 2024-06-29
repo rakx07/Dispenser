@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('firstname');
             $table->string('middlename')->nullable();
             $table->foreignId('course_id')->constrained('course');
-            $table->date('birthday');
+            $table->string('birthday');
             $table->boolean('status');
             $table->timestamps();
         });
