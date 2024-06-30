@@ -104,7 +104,8 @@ class StudentController extends Controller
 
         // Return the appropriate response
         if ($studentExists) {
-            return back()->with('message', 'Student exists.');
+            // return back()->with('message', 'Student exists.');
+            return back()->with(['showModal' => true, 'school_id' => $idNumber]);
         } else {
             return back()->with('message', 'Student does not exist.');
         }
