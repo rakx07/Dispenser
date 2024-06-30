@@ -44,7 +44,15 @@ Route::delete('student/delete/{id}', [StudentController::class, 'destroy']);
 
 //verifystudent
 Route::post('/check-student', [StudentController::class, 'checkStudent'])->name('check.student');
+//added for modal
+Route::post('/check-student', [StudentController::class, 'checkStudent'])->name('check.student');
+Route::post('/create-student-account', [StudentController::class, 'createStudentAccount'])->name('create.student.account');
+Route::get('/voucher', function () {
+    return view('voucher');
+})->name('voucher.page');
 
+
+///end
 Auth::routes();
 
 Route::view('/voucher', 'voucher');

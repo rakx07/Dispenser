@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\StudentUser;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use App\Imports\StudentImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Hash;
+
 
 class StudentController extends Controller
 {
@@ -105,5 +108,24 @@ class StudentController extends Controller
         } else {
             return back()->with('message', 'Student does not exist.');
         }
+        
+    }
+    public function createStudentAccount(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'schoolId' => 'required',
+            'password' => 'required|min:8|confirmed',
+            'password_confirmation' => 'required|same:password',
+        ]);
+
+        // Create the student account
+        $studentUser = new StudentUser();
+        $studentUser->school_id = $request->input('schoolId');
+        $studentUser->password = Hash::make($request->input('password'));
+        $studentUser->status = 1; // Active status
+        $studentUser->save();
+
+        return redirect()->route('voucher.page')->with('message', 'Account created successfully.');
     }
 }
