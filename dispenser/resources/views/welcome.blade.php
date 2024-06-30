@@ -122,20 +122,22 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        @if(session('showModal'))
-            var myModal = new bootstrap.Modal(document.getElementById('accountCreationModal'), {
-                keyboard: false
-            });
-            document.getElementById('schoolId').value = '{{ session('school_id') }}';
-            myModal.show();
-        @endif
+        document.addEventListener('DOMContentLoaded', function () {
+            @if(session('showModal'))
+                var myModal = new bootstrap.Modal(document.getElementById('accountCreationModal'), {
+                    keyboard: false
+                });
+                document.getElementById('schoolId').value = '{{ session('school_id') }}';
+                myModal.show();
+            @endif
 
-        // Show success message and redirect after modal hidden
-        $('#accountCreationModal').on('hidden.bs.modal', function () {
-            // Alert dialog box
-            alert('Student user account created successfully!');
-            // Redirect to voucher page
-            window.location.href = "{{ route('signin') }}";
+            // Show success message and redirect after modal hidden
+            $('#accountCreationModal').on('hidden.bs.modal', function () {
+                // Alert dialog box
+                alert('Student user account created successfully!');
+                // Redirect to voucher page
+                window.location.href = "{{ route('signin') }}";
+            });
         });
     </script>
 </body>
