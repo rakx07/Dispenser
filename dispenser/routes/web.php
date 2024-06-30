@@ -51,6 +51,9 @@ Route::get('/voucher', function () {
     return view('voucher');
 })->name('voucher');
 
+Route::get('/signin', function () {
+    return view('signin');
+});
 
 ///end
 Auth::routes();
