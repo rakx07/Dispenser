@@ -1,3 +1,5 @@
+<!-- resources/views/signin.blade.php -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,8 +132,10 @@
 
         // Show success message and redirect after modal hidden
         $('#accountCreationModal').on('hidden.bs.modal', function () {
+            // Alert dialog box
             alert('Student user account created successfully!');
-            window.location.href = "{{ route('signin') }}"; // Redirect to voucher page after successful creation
+            // Redirect to voucher page
+            window.location.href = "{{ route('signin') }}";
         });
     </script>
 </body>
