@@ -128,8 +128,8 @@
             myModal.show();
         @endif
 
-          // Show success message and redirect after modal hidden
-          $('#accountCreationModal').on('hidden.bs.modal', function () {
+        // Show success message and redirect after modal hidden
+        $('#accountCreationModal').on('hidden.bs.modal', function () {
             alert('Student user account created successfully!');
             window.location.href = "{{ route('signin') }}"; // Redirect to voucher page after successful creation
         });
