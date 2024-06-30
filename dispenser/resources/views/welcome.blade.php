@@ -121,6 +121,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert@2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             @if(session('showModal'))
@@ -133,19 +134,19 @@
 
             // Show success message and redirect after modal hidden
             $('#accountCreationModal').on('hidden.bs.modal', function () {
-                // Using sweetalert for better user experience
-                swal({
-                    title: "Success!",
-                    text: "Student user account created successfully!",
-                    icon: "success",
-                    button: "OK",
+                // Using SweetAlert for success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Student user account created successfully!',
+                    showConfirmButton: false,
+                    timer: 2000  // Close after 2 seconds
                 }).then(() => {
-                    // Redirect to signin page after alert is closed
+                    // Redirect to signin page
                     window.location.href = "{{ route('signin') }}";
                 });
             });
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert@2"></script>
 </body>
 </html>
