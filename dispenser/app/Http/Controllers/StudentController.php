@@ -127,6 +127,7 @@ class StudentController extends Controller
         $studentUser->status = 1; // Active status
         $studentUser->save();
 
-        return redirect()->route('voucher.page')->with('message', 'Account created successfully.');
+        // return redirect()->route('voucher')->with('message', 'Account created successfully.');
+        return redirect()->route('voucher');
     }
 }

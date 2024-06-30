@@ -49,11 +49,10 @@ Route::post('/check-student', [StudentController::class, 'checkStudent'])->name(
 Route::post('/create-student-account', [StudentController::class, 'createStudentAccount'])->name('create.student.account');
 Route::get('/voucher', function () {
     return view('voucher');
-})->name('voucher.page');
+})->name('voucher');
 
 
 ///end
 Auth::routes();
 
-Route::view('/voucher', 'voucher');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
