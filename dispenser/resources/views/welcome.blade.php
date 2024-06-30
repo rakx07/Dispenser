@@ -133,12 +133,19 @@
 
             // Show success message and redirect after modal hidden
             $('#accountCreationModal').on('hidden.bs.modal', function () {
-                // Alert dialog box
-                alert('Student user account created successfully!');
-                // Redirect to voucher page
-                window.location.href = "{{ route('signin') }}";
+                // Using sweetalert for better user experience
+                swal({
+                    title: "Success!",
+                    text: "Student user account created successfully!",
+                    icon: "success",
+                    button: "OK",
+                }).then(() => {
+                    // Redirect to signin page after alert is closed
+                    window.location.href = "{{ route('signin') }}";
+                });
             });
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert@2"></script>
 </body>
 </html>
