@@ -128,6 +128,6 @@ class StudentController extends Controller
         $studentUser->save();
 
         // return redirect()->route('voucher')->with('message', 'Account created successfully.');
-        return redirect()->route('signin');
+        return redirect()->route('signin')->with('message', 'Account created successfully.');
     }
 }
