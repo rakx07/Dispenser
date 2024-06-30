@@ -42,21 +42,15 @@ Route::get('student/edit/{id}', [StudentController::class, 'edit']);
 Route::post('student/update/{id}', [StudentController::class, 'update']);
 Route::delete('student/delete/{id}', [StudentController::class, 'destroy']);
 
-//verifystudent
-// Route::post('/check-student', [StudentController::class, 'checkStudent'])->name('check.student');
-//added for modal
+
 Route::post('/check-student', [StudentController::class, 'checkStudent'])->name('check.student');
 Route::post('/create-student-account', [StudentController::class, 'createStudentAccount'])->name('create.student.account');
-//voucher
-// Route::get('/voucher', function () {
-//     return view('voucher');
-// })->name('voucher');
+
 
 Route::get('/signin', function () {
     return view('signin');
 })->name('signin');
 
-///end
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
