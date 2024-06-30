@@ -42,6 +42,9 @@ Route::get('student/edit/{id}', [StudentController::class, 'edit']);
 Route::post('student/update/{id}', [StudentController::class, 'update']);
 Route::delete('student/delete/{id}', [StudentController::class, 'destroy']);
 
+//verifystudent
+Route::post('/check-student', [StudentController::class, 'checkStudent'])->name('check.student');
+
 Auth::routes();
 
 Route::view('/voucher', 'voucher');

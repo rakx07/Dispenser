@@ -67,4 +67,43 @@ class StudentController extends Controller
 
         return redirect()->back()->with('status', 'Student deleted successfully!');
     }
+
+    //added check
+    public function checkStudent(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'courseSelect' => 'required',
+            'idNumber' => 'required',
+            'lastname' => 'required',
+            'birthday' => 'required|date_format:Y-m-d',
+        ]);
+
+        // Retrieve form data
+        $courseCode = $request->input('courseSelect');
+        $idNumber = $request->input('idNumber');
+        $lastname = $request->input('lastname');
+        $birthday = $request->input('birthday');
+
+        // Fetch the course ID from the course code
+        $course = Course::where('code', $courseCode)->first();
+
+        if (!$course) {
+            return back()->withErrors(['courseSelect' => 'Invalid course selected.']);
+        }
+
+        // Check if the student exists
+        $studentExists = Student::where('school_id', $idNumber)
+            ->where('lastname', $lastname)
+            ->where('birthday', $birthday)
+            ->where('course_id', $course->id)
+            ->exists();
+
+        // Return the appropriate response
+        if ($studentExists) {
+            return back()->with('message', 'Student exists.');
+        } else {
+            return back()->with('message', 'Student does not exist.');
+        }
+    }
 }

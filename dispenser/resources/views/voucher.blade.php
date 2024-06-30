@@ -27,7 +27,7 @@
     <nav class="navbar sticky-top" style="background-color: darkgreen">
         <div class="container-fluid">
             <a class="navbar-brand fs-7 text-white">
-                <img src="{{ asset('ndmulogo.png') }}" alt="Logo" alt="Logo" width="30" height="30" class="d-inline-block align-text-top" />
+                <img src="{{ asset('ndmulogo.png') }}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top" />
                 <b>Notre Dame of Marbel University</b>
             </a>
             <span class="navbar-text text-white">
@@ -40,29 +40,27 @@
     <main class="container mt-5">
         <h1 class="mb-4"><b>Student Information</b></h1>
         
-        
-        <form>
-            {{-- <div class="mb-3">
-                <label for="courseSelect" class="form-label"><b>Select Course</b></label>
-                <select class="form-select" id="courseSelect">
-                    <option value="">Select a course...</option> <!-- Blank default option -->
-                    @foreach ($courses as $course)
-                        <option value="{{ $course->code }}">{{ $course->name }}</option>
+        <!-- Student Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Student Name</th>
+                        <th scope="col">Course</th>
+                        <th scope="col">Voucher Code</th>
+                    </tr>
+                </thead>
+                {{-- <tbody>
+                    @foreach($students as $student)
+                        <tr>
+                            <td>{{ $student->lastname }}, {{ $student->firstname }} {{ $student->middlename }}</td>
+                            <td>{{ $student->course->name }}</td>
+                            <td>{{ $student->voucher_code }}</td>
+                        </tr>
                     @endforeach
-                </select>
-            </div>
-            
-            
-            <div class="mb-3">
-                <label for="idNumber" class="form-label"><b>ID Number</b></label>
-                <input type="text" placeholder="Enter your ID number" class="form-control form-control-sm" id="idNumber" placeholder="Enter your ID number" style="width: 200px;">
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label"><b>Password</b><br><small> e.g. Lastname2001-01-29 (Delacruz2001-01-29)</small></label>
-                <input type="password" placeholder="Enter your password" class="form-control form-control-sm" id="password" placeholder="Enter your password" style="width: 200px;">
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button> --}}
-        </form>
+                </tbody> --}}
+            </table>
+        </div>
     </main>
 
     <!-- Footer -->
@@ -73,5 +71,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
