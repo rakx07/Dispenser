@@ -47,13 +47,14 @@ Route::delete('student/delete/{id}', [StudentController::class, 'destroy']);
 //added for modal
 Route::post('/check-student', [StudentController::class, 'checkStudent'])->name('check.student');
 Route::post('/create-student-account', [StudentController::class, 'createStudentAccount'])->name('create.student.account');
-Route::get('/voucher', function () {
-    return view('voucher');
-})->name('voucher');
+//voucher
+// Route::get('/voucher', function () {
+//     return view('voucher');
+// })->name('voucher');
 
 Route::get('/signin', function () {
     return view('signin');
-});
+})->name('signin');
 
 ///end
 Auth::routes();
