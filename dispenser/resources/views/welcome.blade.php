@@ -58,7 +58,7 @@
             </div>
         @endif
 
-        <form id="studentInfoForm" method="POST" action="{{ route('check.student') }}">
+        <form method="POST" action="{{ route('check.student') }}">
             @csrf
             <div class="mb-3">
                 <label for="courseSelect" class="form-label"><b>Select Your Course</b></label>
@@ -122,7 +122,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert@2"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             @if(session('showModal'))
@@ -133,57 +132,22 @@
                 myModal.show();
             @endif
 
-            // Handle form submission for student information
-            $('#studentInfoForm').on('submit', function (event) {
-                event.preventDefault();
-                var form = $(this);
-                $.ajax({
-                    url: form.attr('action'),
-                    type: 'POST',
-                    data: form.serialize(),
-                    success: function (response) {
-                        // Show account creation modal
-                        var myModal = new bootstrap.Modal(document.getElementById('accountCreationModal'), {
-                            keyboard: false
-                        });
-                        document.getElementById('schoolId').value = response.school_id;
-                        myModal.show();
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle errors if necessary
-                        console.error(xhr.responseText);
-                    }
-                });
-            });
-
             // Show success message and redirect after modal hidden
-            $('#accountCreationForm').on('submit', function (event) {
-                event.preventDefault();
-                var form = $(this);
-                $.ajax({
-                    url: form.attr('action'),
-                    type: 'POST',
-                    data: form.serialize(),
-                    success: function (response) {
-                        // Show success message using SweetAlert
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success!',
-                            text: 'Student user account created successfully!',
-                            showConfirmButton: false,
-                            timer: 2000  // Close after 2 seconds
-                        }).then(() => {
-                            // Redirect to signin page
-                            window.location.href = "{{ route('signin') }}";
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle errors if necessary
-                        console.error(xhr.responseText);
-                    }
+            $('#accountCreationModal').on('hidden.bs.modal', function () {
+                // Using SweetAlert for success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Student user account created successfully!',
+                    showConfirmButton: false,
+                    timer: 2000  // Close after 2 seconds
+                }).then(() => {
+                    // Redirect to signin page
+                    window.location.href = "{{ route('signin') }}";
                 });
             });
         });
     </script>
 </body>
 </html>
+{{-- //orig --}}
