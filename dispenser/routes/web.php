@@ -19,7 +19,7 @@ use App\Http\Controllers\CourseController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
 
     Route::get('college/import', [CollegeController::class, 'index']);
     Route::post('college/import', [CollegeController::class, 'importExcelData']);
@@ -57,4 +57,5 @@ Route::get('/signin', function () {
 })->name('signin');
 
 Auth::routes();
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
