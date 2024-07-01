@@ -21,7 +21,6 @@ use App\Http\Controllers\CourseController;
 */
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::middleware(['admin'])->group(function () {
     Route::get('college/import', [CollegeController::class, 'index']);
     Route::post('college/import', [CollegeController::class, 'importExcelData']);
     Route::get('college/edit/{id}', [CollegeController::class, 'edit']);
@@ -47,7 +46,6 @@ Route::middleware(['admin'])->group(function () {
     Route::get('student/edit/{id}', [StudentController::class, 'edit']);
     Route::post('student/update/{id}', [StudentController::class, 'update']);
     Route::delete('student/delete/{id}', [StudentController::class, 'destroy']);
-});
 
 
 Route::post('/check-student', [StudentController::class, 'checkStudent'])->name('check.student');
