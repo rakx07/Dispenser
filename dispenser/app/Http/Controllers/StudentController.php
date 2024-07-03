@@ -48,6 +48,7 @@ class StudentController extends Controller
             'course_id' => 'required|exists:courses,id',
             'birthday' => 'required',
             'status' => 'required|boolean',
+            
         ]);
 
         $student = Student::findOrFail($id);
@@ -58,6 +59,8 @@ class StudentController extends Controller
         $student->course_id = $request->course_id;
         $student->birthday = $request->birthday;
         $student->status = $request->status;
+        $student->voucher = $request->voucher_id;
+        // $student->email = $request->email_id;
         $student->save();
 
         return redirect()->route('students.index')->with('status', 'Student updated successfully!');

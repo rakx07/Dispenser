@@ -18,6 +18,8 @@ class Student extends Model
         'course_id',
         'birthday',
         'status',
+        'voucher_id',
+        'email_id',
     ];
 
     public function course()
