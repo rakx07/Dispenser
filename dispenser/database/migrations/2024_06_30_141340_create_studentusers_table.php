@@ -7,15 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     public function up()
-    {
-        Schema::create('studentusers', function (Blueprint $table) {
-            $table->id();
-            $table->string('school_id')->unique();
-            $table->string('password');
-            $table->boolean('status')->default(1); // 1 for active, 0 for inactive
-            $table->timestamps();
-        });
-    }
+{
+    Schema::create('studentusers', function (Blueprint $table) {
+        $table->id();
+        $table->string('school_id')->unique();
+        $table->string('email')->nullable(); // Making email nullable
+        $table->string('voucher_id')->nullable(); // Making voucher_id nullable
+        $table->string('password');
+        $table->boolean('status')->default(1); // 1 for active, 0 for inactive
+        $table->timestamps();
+    });
+}
 
     public function down()
     {
