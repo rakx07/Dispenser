@@ -15,3 +15,5 @@ require('./bootstrap');
 $(document).ready(function() {
     $('.datatable').DataTable();
 });
+import Swal from 'sweetalert2';
+window.Swal = Swal;
