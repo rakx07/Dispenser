@@ -122,15 +122,24 @@ class StudentController extends Controller
             'password' => 'required|min:8|confirmed',
             'password_confirmation' => 'required|same:password',
         ]);
-
+    
+        // Check if the student account already exists
+        if (StudentUser::where('school_id', $request->input('schoolId'))->exists()) {
+            return redirect()->route('welcome')->with('error', 'Student Account already exists.');
+        }
+    
         // Create the student account
         $studentUser = new StudentUser();
         $studentUser->school_id = $request->input('schoolId');
         $studentUser->password = Hash::make($request->input('password'));
         $studentUser->status = 1; // Active status
         $studentUser->save();
-
-       
+    
         return redirect()->route('signin')->with('message', 'Account created successfully.');
     }
+    public function welcomeview()
+    {
+    $courses = Course::all(); // Fetch all courses from the database
+    return view('welcome', compact('courses')); // Pass $courses to the view
+}
 }

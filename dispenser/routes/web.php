@@ -41,6 +41,9 @@ Route::delete('course/delete/{id}', [App\Http\Controllers\CourseController::clas
 
 // Example route in routes/web.php
 Route::get('/', [App\Http\Controllers\CourseController::class, 'getCourses']);
+Route::get('/', [StudentController::class, 'welcomeview'])->name('welcome');
+// Route::get('/', [App\Http\Controllers\StudentController::class, 'welcomeview']);
+
 
 Route::get('students/import', [StudentController::class, 'index'])->name('students.index');
 Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
@@ -55,6 +58,12 @@ Route::post('/create-student-account', [StudentController::class, 'createStudent
 Route::get('/signin', function () {
     return view('signin');
 })->name('signin');
+
+// Route::get('/', function () {
+//     return view('welcome');
+// })->name('welcome');
+
+
 
 Auth::routes();
 
