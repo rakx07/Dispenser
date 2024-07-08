@@ -11,4 +11,9 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    build: {
+        rollupOptions: {
+            external: ['sweetalert2']
+        }
+    }
 });

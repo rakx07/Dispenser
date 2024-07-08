@@ -143,17 +143,30 @@
                 myModal.show();
             @endif
 
+            document.getElementById('accountCreationForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thank You!',
+                    text: 'Thank you for creating your account. Redirecting...',
+                    showConfirmButton: false,
+                    timer: 2000  // Close after 2 seconds
+                }).then(() => {
+                    this.submit();  // Submit the form after showing the SweetAlert message
+                });
+            });
+
             // Show success message and redirect after modal hidden
             $('#accountCreationModal').on('hidden.bs.modal', function () {
                 // Using SweetAlert for success message
                 Swal.fire({
                     icon: 'success',
-                    title: 'Success!',
+                    title: 'Account Created!',
                     text: 'Student user account created successfully!',
                     showConfirmButton: false,
                     timer: 2000  // Close after 2 seconds
                 }).then(() => {
-                    // Redirect to signin page
+                    // Redirect to voucher page
                     window.location.href = "{{ route('signin') }}";
                 });
             });
