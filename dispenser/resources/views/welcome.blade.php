@@ -23,7 +23,18 @@
             padding: 1rem;
         }
         .large-selectpicker {
-            width: 1500%; /* Adjust width as needed */
+            width: 100% !important;
+        }
+        .bootstrap-select .dropdown-menu {
+            max-height: 300px !important;
+            overflow-y: auto !important;
+            white-space: normal !important;
+        }
+        .bootstrap-select .dropdown-menu .inner {
+            white-space: normal !important;
+        }
+        .bootstrap-select .dropdown-menu li {
+            white-space: normal !important;
         }
     </style>
 </head>
@@ -78,7 +89,7 @@
             <div class="mb-3">
                 <label for="courseSelect" class="form-label"><b>Select Your Course</b></label>
                 <div class="w-100 mt-2">
-                <select class="form-select selectpicker large-selectpicker" id="courseSelect" name="courseSelect" data-live-search="true">
+                    <select class="form-select selectpicker large-selectpicker" id="courseSelect" name="courseSelect" data-live-search="true">
                         <option value=""><small>Select your course...</small></option>
                         @foreach ($courses as $course)
                             <option value="{{ $course->code }}">{{ $course->name }}</option>
@@ -96,7 +107,7 @@
                 <input type="text" name="lastname" placeholder="Enter your Last name" class="form-control form-control-sm" id="lastname" style="width: 200px;">
             </div>
             <div class="mb-3">
-                <label for="birthday" class="form-label"><b>Birthday<small> (e.g. 2001-01-29) </small></b></label>
+                <label for="birthday" class="form-label"><b>Birthday<small> (e.g. 2001-01-29 / yyyy-mm-dd) </small></b></label>
                 <input type="text" name="birthday" placeholder="Enter your birthday" class="form-control form-control-sm" id="birthday" style="width: 200px;">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
