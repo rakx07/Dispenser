@@ -59,9 +59,9 @@ Route::get('/signin', function () {
     return view('signin');
 })->name('signin');
 
-// Route::get('/', function () {
-//     return view('welcome');
-// })->name('welcome');
+ Route::get('/voucher', function () {
+    return view('voucher');
+})->name('voucher');
 
 
 

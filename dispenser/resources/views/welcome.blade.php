@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Voucher Allocator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
@@ -20,6 +21,9 @@
             color: white;
             text-align: center;
             padding: 1rem;
+        }
+        .large-selectpicker {
+            width: 1500%; /* Adjust width as needed */
         }
     </style>
 </head>
@@ -73,13 +77,16 @@
             @csrf
             <div class="mb-3">
                 <label for="courseSelect" class="form-label"><b>Select Your Course</b></label>
-                <select class="form-select" id="courseSelect" name="courseSelect">
-                    <option value=""><small>Select your course...</small></option>
-                    @foreach ($courses as $course)
-                        <option value="{{ $course->code }}">{{ $course->name }}</option>
-                    @endforeach
-                </select>
+                <div class="w-100 mt-2">
+                <select class="form-select selectpicker large-selectpicker" id="courseSelect" name="courseSelect" data-live-search="true">
+                        <option value=""><small>Select your course...</small></option>
+                        @foreach ($courses as $course)
+                            <option value="{{ $course->code }}">{{ $course->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
+
             <div class="mb-3">
                 <label for="idNumber" class="form-label"><b>ID Number</b></label>
                 <input type="text" name="idNumber" placeholder="Enter your ID number" class="form-control form-control-sm" id="idNumber" style="width: 200px;">
@@ -96,80 +103,30 @@
         </form>
     </main>
 
-    <!-- Account Creation Modal -->
-    <div class="modal fade" id="accountCreationModal" tabindex="-1" aria-labelledby="accountCreationModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="accountCreationModalLabel">Create Account</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="accountCreationForm" method="POST" action="{{ route('create.student.account') }}">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="schoolId" class="form-label">School ID</label>
-                            <input type="text" class="form-control" id="schoolId" name="schoolId" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password_confirmation" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Create Account</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Footer -->
     <footer>
         NDMU © 2024 | Developed by MIS Department
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             @if(session('showModal'))
-                var myModal = new bootstrap.Modal(document.getElementById('accountCreationModal'), {
-                    keyboard: false
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Student Found',
+                    text: 'Student found with ID: {{ session('school_id') }}',
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    window.location.href = "{{ route('voucher') }}"; // Adjust this route as needed
                 });
-                document.getElementById('schoolId').value = '{{ session('school_id') }}';
-                myModal.show();
             @endif
 
-            document.getElementById('accountCreationForm').addEventListener('submit', function (event) {
-                event.preventDefault();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Thank You!',
-                    text: 'Thank you for creating your account. Redirecting...',
-                    showConfirmButton: false,
-                    timer: 2000  // Close after 2 seconds
-                }).then(() => {
-                    this.submit();  // Submit the form after showing the SweetAlert message
-                });
-            });
-
-            // Show success message and redirect after modal hidden
-            $('#accountCreationModal').on('hidden.bs.modal', function () {
-                // Using SweetAlert for success message
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Account Created!',
-                    text: 'Student user account created successfully!',
-                    showConfirmButton: false,
-                    timer: 2000  // Close after 2 seconds
-                }).then(() => {
-                    // Redirect to voucher page
-                    window.location.href = "{{ route('signin') }}";
-                });
-            });
+            // Initialize Bootstrap-Select
+            $('.selectpicker').selectpicker();
         });
     </script>
 </body>
