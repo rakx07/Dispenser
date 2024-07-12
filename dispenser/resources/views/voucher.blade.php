@@ -20,6 +20,17 @@
             text-align: center;
             padding: 1rem;
         }
+        .student-info {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .student-info h2 {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -40,10 +51,13 @@
     <main class="container mt-5">
         <h1 class="mb-4"><b>Student Information</b></h1>
         
-        <!-- Student Table -->
-        <div class="table-responsive">
-           <!--Data should be showed here-->
-            </table>
+        <!-- Student Information -->
+        <div class="student-info">
+            <h2>John Doe</h2>
+            <h4>ID number: 20231213</h4>
+            <p><strong>Course:</strong> Computer Science</p>
+            <p><strong>Email:</strong> TBA</p>
+            <p><strong>Voucher Code:</strong> VCHR1234</p>
         </div>
     </main>
 
