@@ -17,9 +17,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                      <!--add the voucher-->  
+                        @foreach ($vouchers as $voucher)
+                            <tr>
+                                <td>{{ $voucher->id }}</td>
+                                <td>{{ $voucher->voucher_code }}</td>
+                                <td>{{ $voucher->is_given ? 'Taken' : 'Given' }}</td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
+
+                {{ $vouchers->links() }}
 
                 @if (session('status'))
                     <div class="alert alert-success">{{ session('status') }}</div>
@@ -47,6 +55,7 @@
 @push('styles')
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 @endpush
 
 @push('scripts')

@@ -13,7 +13,7 @@ class Voucher extends Model
 
     protected $fillable =
     [
-        'code',
+        'voucher_code',
         'is_given',
     ];
 

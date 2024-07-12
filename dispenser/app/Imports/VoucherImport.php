@@ -16,8 +16,7 @@ class VoucherImport implements ToCollection, WithHeadingRow
     {
         foreach ($rows as $row) {
             Voucher::create([
-                'code' => $row['code'],
-                'name' => $row['name'],
+                'voucher_code' => $row['voucher_code'],
                 'is_given' => isset($row['is_given']) ? $row['is_given'] : 0,
             ]);
         }

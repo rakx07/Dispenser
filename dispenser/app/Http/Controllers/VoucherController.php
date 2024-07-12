@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Imports\VoucherImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Voucher;
 
 class VoucherController extends Controller
 {
     //
     public function index()
     {
-        return view('voucher.index');
+        $vouchers = Voucher::paginate(20);
+    return view('voucher.index', compact('vouchers'));
     }
     public function importExcelData(Request $request)
     {
