@@ -65,7 +65,9 @@ Route::get('/signin', function () {
 
 
 
-Auth::routes();
+// Auth::routes();
+//This will allow me to change the register
+Auth::routes(['register' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 

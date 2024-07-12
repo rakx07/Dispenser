@@ -42,23 +42,7 @@
         
         <!-- Student Table -->
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">Student Name</th>
-                        <th scope="col">Course</th>
-                        <th scope="col">Voucher Code</th>
-                    </tr>
-                </thead>
-                {{-- <tbody>
-                    @foreach($students as $student)
-                        <tr>
-                            <td>{{ $student->lastname }}, {{ $student->firstname }} {{ $student->middlename }}</td>
-                            <td>{{ $student->course->name }}</td>
-                            <td>{{ $student->voucher_code }}</td>
-                        </tr>
-                    @endforeach
-                </tbody> --}}
+           <!--Data should be showed here-->
             </table>
         </div>
     </main>
