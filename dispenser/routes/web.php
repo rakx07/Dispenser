@@ -68,6 +68,10 @@ Route::get('/signin', function () {
 // Auth::routes();
 //This will allow me to change the register
 Auth::routes(['register' => false]);
+Auth::routes(['password.reset' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+Route::get('register', function () {
+    return abort(404);
+});
