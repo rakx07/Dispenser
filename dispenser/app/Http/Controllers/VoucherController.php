@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Voucher;
 use App\Models\Student;
 use App\Models\Course;
+use Illuminate\Support\Str; // Import Str class
 
 class VoucherController extends Controller
 {
