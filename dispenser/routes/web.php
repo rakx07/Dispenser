@@ -45,6 +45,10 @@ Route::get('/', [StudentController::class, 'welcomeview'])->name('welcome');
 // Route::get('/', [App\Http\Controllers\StudentController::class, 'welcomeview']);
 
 
+//Added Route for Voucher
+Route::get('voucher/import', [App\Http\Controllers\VoucherController::class, 'index']);
+
+
 Route::get('students/import', [StudentController::class, 'index'])->name('students.index');
 Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
 Route::get('student/edit/{id}', [StudentController::class, 'edit']);
@@ -53,6 +57,10 @@ Route::delete('student/delete/{id}', [StudentController::class, 'destroy']);
 
 Route::post('/check-student', [StudentController::class, 'checkStudent'])->name('check.student');
 Route::post('/create-student-account', [StudentController::class, 'createStudentAccount'])->name('create.student.account');
+
+
+
+
 
 
 Route::get('/signin', function () {
