@@ -317,18 +317,18 @@ return [
             'url' => 'admin/blog',
             'can' => 'manage-blog',
         ],
-        [
-            'text' => 'pages',
-            'url' => 'admin/pages',
-            'icon' => 'far fa-fw fa-file',
-            'label' => 4,
-            'label_color' => 'success',
-        ],
+        // [
+        //     'text' => 'pages',
+        //     'url' => 'admin/pages',
+        //     'icon' => 'far fa-fw fa-file',
+        //     'label' => 4,
+        //     'label_color' => 'success',
+        // ],
         ['header' => 'account_settings'],
         [
             'text' => 'Landing Page',
             'url' => '/',
-            'icon' => 'far fa-fw fa-bars',
+            'icon' => 'fas fa-fw fa-globe',
         ],
         ///added multi level
         [
@@ -338,22 +338,27 @@ return [
                 [
                     'text' => 'College Upload',
                     'url' => 'college/import',
-                    'icon' => 'fas fa-fw',
+                    'icon' => 'fas fa-fw fa-paperclip',
                 ],
                 [
                     'text' => 'Department Upload',
                     'url' => 'department/import',
-                    'icon' => 'fas fa-fw',
+                    'icon' => 'fas fa-fw fa-paperclip',
                 ],
                 [
                     'text' => 'Course Upload',
                     'url' => 'course/import',
-                    'icon' => 'fas fa-fw',
+                    'icon' => 'fas fa-fw fa-paperclip',
                 ],
                 [
                     'text' => 'Student Upload',
                     'url' => 'students/import',
-                    'icon' => 'fas fa-fw',
+                    'icon' => 'fas fa-fw fa-paperclip',
+                ],
+                [
+                    'text' => 'Voucher Upload',
+                    'url' => 'students/import',
+                    'icon' => 'fas fa-fw fa-paperclip',
                 ],
             ],
         ],
