@@ -62,7 +62,7 @@
 
             <p><strong>ID Number: </strong>{{ $student->school_id }}</p>
             
-            <p><strong>Course:</strong> {{ ucfirst(Str::camel($student->course->name)) }}</p>
+            <p><strong>Course:</strong> {{ ($student->course->name) }}</p>
             
             <p><strong>Email:</strong> {{ ucfirst(Str::camel($student->email_id)) }}</p>
             
