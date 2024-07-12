@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Voucher Allocator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
     <style>
         body {
             display: flex;
@@ -31,6 +32,9 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
+        .done-button {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -54,16 +58,16 @@
         <!-- Student Information -->
         <div class="student-info">
             @if (isset($student))
-                <h2>{{ $student->firstname }} {{ $student->middlename }} {{ $student->lastname }}</h2>
-    
+                <h2>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->middlename[0]) }}. {{ ucfirst($student->lastname) }}</h2>
+        
                 <p><strong>ID Number: </strong>{{ $student->school_id }}</p>
-    
+        
                 <p><strong>Course:</strong> {{ $student->course->name }}</p>
-    
+        
                 <p><strong>Email:</strong> {{ $student->email_id }}</p>
-    
-                <p><strong>Temporary Email Password:</strong> TBA</p>
-    
+        
+                <p><strong>Temporary Email Password:</strong> TBA </p>
+        
                 <p><strong>Voucher Code:</strong> {{ $voucher->voucher_code }}</p>
             @else
                 <div class="alert alert-danger">
@@ -71,14 +75,39 @@
                 </div>
             @endif
         </div>
+
+        <!-- Done Button -->
+        <div class="text-center done-button">
+            <button id="doneButton" class="btn btn-primary btn-lg">Done</button>
+        </div>
+        
     </main>
     
-
     <!-- Footer -->
     <footer>
         NDMU © 2024 | Developed by MIS Department
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                window.location.href = "{{ route('welcome') }}";
+            }, 60000); // 90 seconds timeout
+
+            document.getElementById('doneButton').addEventListener('click', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thank you!',
+                    text: 'Have a nice day!',
+                    showConfirmButton: false,
+                    timer: 2000 // 2 seconds
+                }).then(() => {
+                    window.location.href = "{{ route('welcome') }}"; // Redirect to welcome page
+                });
+            });
+        });
+    </script>
 </body>
 </html>

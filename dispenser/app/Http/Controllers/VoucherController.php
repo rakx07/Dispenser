@@ -69,6 +69,6 @@ class VoucherController extends Controller
             $voucher->save();
         }
 
-        return view('voucher.show', compact('student', 'voucher'));
+        return view('voucher', compact('student', 'voucher'));
     }
 }
