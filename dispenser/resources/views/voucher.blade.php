@@ -54,9 +54,10 @@
         <!-- Student Information -->
         <div class="student-info">
             <h2>John Doe</h2>
-            <h4>ID number: 20231213</h4>
+            <p><strong>ID Number: </strong>20231213</p>
             <p><strong>Course:</strong> Computer Science</p>
             <p><strong>Email:</strong> TBA</p>
+            <p><strong>Temporary Email Password:</strong> TBA</p>
             <p><strong>Voucher Code:</strong> VCHR1234</p>
         </div>
     </main>

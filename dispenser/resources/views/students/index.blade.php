@@ -18,6 +18,8 @@
                             <th>Middlename</th>
                             <th>Course</th>
                             <th>Birthday</th>
+                            <th>Voucher</th>
+                            <th>Email</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>

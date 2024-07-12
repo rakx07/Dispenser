@@ -24,6 +24,9 @@ class StudentImport implements ToModel, WithHeadingRow
             // 'birthday' => Carbon::createFromFormat('Y-d-m', $row['birthday'])->format('Y-d-m'),
             'birthday' => $row['birthday'],
             'status'     => $row['status'],
+            'voucher_id'     => $row['voucher_id'],
+            'email_id'     => $row['email_id'],
+            
         ]);
     }
 }
