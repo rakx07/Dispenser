@@ -64,9 +64,9 @@ Route::post('/create-student-account', [StudentController::class, 'createStudent
 
 
 
-Route::get('/signin', function () {
-    return view('signin');
-})->name('signin');
+// Route::get('/signin', function () {
+//     return view('signin');
+// })->name('signin');
 
  Route::get('/voucher', function () {
     return view('voucher');
