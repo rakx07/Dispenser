@@ -21,7 +21,7 @@
                             <tr>
                                 <td>{{ $voucher->id }}</td>
                                 <td>{{ $voucher->voucher_code }}</td>
-                                <td>{{ $voucher->is_given ? 'Taken' : 'Given' }}</td>
+                                <td>{{ $voucher->is_given ? 'Taken' : 'Available' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
