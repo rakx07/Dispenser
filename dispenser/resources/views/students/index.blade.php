@@ -18,7 +18,7 @@
                             <th>Middlename</th>
                             <th>Course</th>
                             <th>Birthday</th>
-                            <th>Voucher</th>
+                            <th>Voucher ID</th>
                             <th>Email</th>
                             <th>Status</th>
                             <th>Actions</th>
