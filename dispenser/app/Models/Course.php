@@ -15,6 +15,10 @@ class Course extends Model
         'name',
         'department_id',
         'status',
-
     ];
+
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'course_id');
+    }
 }

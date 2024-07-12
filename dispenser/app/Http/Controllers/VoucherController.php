@@ -1,32 +1,44 @@
 <?php
 
-namespace App\Http\Controllers;
-
-use App\Imports\VoucherImport;
+use App\Models\Student;
+use App\Models\Voucher;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\Voucher;
 
 class VoucherController extends Controller
 {
-    //
-    public function index()
+    // ...
+
+    public function show(Request $request)
     {
-        $vouchers = Voucher::paginate(20);
-    return view('voucher.index', compact('vouchers'));
+        $idNumber = $request->input('idNumber');
+        $courseCode = $request->input('courseSelect');
+
+        // Fetch the student data based on ID number and course code
+        $student = Student::where('school_id', $idNumber)
+                          ->whereHas('course', function($query) use ($courseCode) {
+                              $query->where('code', $courseCode);
+                          })
+                          ->first();
+
+        // Fetch a voucher code that has not been given
+        $voucher = Voucher::where('is_given', 0)->first();
+
+        if ($student && $voucher) {
+            // Assign the voucher_id to the student
+            $student->voucher_id = $voucher->id;
+            $student->save();
+
+            // Mark the voucher as given
+            $voucher->is_given = 1;
+            $voucher->save();
+
+            return view('voucher', compact('student', 'voucher'));
+        } else {
+            return redirect()->back()->with('error', 'Student or voucher not found');
+        }
     }
-    public function importExcelData(Request $request)
-    {
-            $request->validate(
-                [
-                    'import_file'=> [
-                        'required',
-                        'file',
-                    ]
-                ]
-                );
-                Excel::import(new VoucherImport, $request->file('import_file'));
-        //\Maatwebsite\Excel\Facades\Excel::import(new CollegeImport, $request->file('import_file'));
-        return redirect()->back()->with('status','Excel import successful!');
-    }
+
+    // ...
 }

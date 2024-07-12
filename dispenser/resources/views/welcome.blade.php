@@ -84,7 +84,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('check.student') }}">
+        <form method="POST" action="{{ route('voucher.show') }}">
             @csrf
             <div class="mb-3">
                 <label for="courseSelect" class="form-label"><b>Select Your Course</b></label>

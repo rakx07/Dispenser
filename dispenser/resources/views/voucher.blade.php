@@ -50,17 +50,29 @@
     <!-- Main Content -->
     <main class="container mt-5">
         <h1 class="mb-4"><b>Student Information</b></h1>
-        
+    
         <!-- Student Information -->
         <div class="student-info">
-            <h2>John Doe</h2>
-            <p><strong>ID Number: </strong>20231213</p>
-            <p><strong>Course:</strong> Computer Science</p>
-            <p><strong>Email:</strong> TBA</p>
-            <p><strong>Temporary Email Password:</strong> TBA</p>
-            <p><strong>Voucher Code:</strong> VCHR1234</p>
+            @if (isset($student))
+                <h2>{{ $student->firstname }} {{ $student->middlename }} {{ $student->lastname }}</h2>
+    
+                <p><strong>ID Number: </strong>{{ $student->school_id }}</p>
+    
+                <p><strong>Course:</strong> {{ $student->course->name }}</p>
+    
+                <p><strong>Email:</strong> {{ $student->email_id }}</p>
+    
+                <p><strong>Temporary Email Password:</strong> TBA</p>
+    
+                <p><strong>Voucher Code:</strong> {{ $voucher->voucher_code }}</p>
+            @else
+                <div class="alert alert-danger">
+                    Student information not found.
+                </div>
+            @endif
         </div>
     </main>
+    
 
     <!-- Footer -->
     <footer>
