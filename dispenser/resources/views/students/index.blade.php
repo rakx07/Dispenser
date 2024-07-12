@@ -34,6 +34,8 @@
                                 <td>{{ $student->middlename }}</td>
                                 <td>{{ $student->course->name }}</td>
                                 <td>{{ $student->birthday }}</td>
+                                <td>{{ $student->voucher_id }}</td>
+                                <td>{{ $student->email_id }}</td>
                                 <td>{{ $student->status == 1 ? 'Active' : 'Inactive' }}</td>
                                 <td>
                                     <a href="{{ url('student/edit/' . $student->id) }}" class="btn btn-warning btn-sm">Edit</a>

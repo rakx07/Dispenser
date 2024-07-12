@@ -20,6 +20,8 @@ return new class extends Migration
             $table->foreignId('course_id')->constrained('course');
             $table->string('birthday');
             $table->boolean('status');
+            $table->string('voucher_id')->nullable();
+            $table->string('email_id')->nullable();
             $table->timestamps();
         });
     }
