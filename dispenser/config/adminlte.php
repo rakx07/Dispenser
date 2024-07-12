@@ -357,7 +357,7 @@ return [
                 ],
                 [
                     'text' => 'Voucher Upload',
-                    'url' => 'students/import',
+                    'url' => 'voucher/import',
                     'icon' => 'fas fa-fw fa-paperclip',
                 ],
             ],

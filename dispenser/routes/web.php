@@ -47,6 +47,7 @@ Route::get('/', [StudentController::class, 'welcomeview'])->name('welcome');
 
 //Added Route for Voucher
 Route::get('voucher/import', [App\Http\Controllers\VoucherController::class, 'index']);
+Route::post('voucher/import', [App\Http\Controllers\VoucherController::class, 'importExcelData']);
 
 
 Route::get('students/import', [StudentController::class, 'index'])->name('students.index');

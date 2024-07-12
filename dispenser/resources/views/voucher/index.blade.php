@@ -8,7 +8,7 @@
             <div class="col-md-12 mt-5">
                 <h3>Voucher Table</h3>
                 <hr>
-                <table id="department-table" class="table table-bordered table-hover">
+                <table id="voucher-table" class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -17,21 +17,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- @foreach ($vouchers as $voucher)
-                            <tr>
-                                <td>{{ $voucher->id }}</td>
-                                <td>{{ $voucher->voucher_code }}</td>
-                                <td>{{ $voucher->status == 1 ? 'Available' : 'Not Available' }}</td>
-                                <td>
-                                    <a href="{{ url('voucher/edit/' . $voucher->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                    <form action="{{ url('voucher/delete/' . $voucher->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirmDelete()">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach -->
+                      <!--add the voucher-->  
                     </tbody>
                 </table>
 
@@ -44,7 +30,7 @@
                         <h4>Import to Database</h4>
                     </div>
                     <div class="card-body">
-                        <form action="{{ url('department/import') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ url('voucher/import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="input-group">
                                 <input type="file" name="import_file" class="form-control" />
