@@ -77,7 +77,6 @@
                 </ul>
             </div>
         @endif
-
         @if (session('showModal'))
             <div class="alert alert-info">
                 Student found with ID: {{ session('school_id') }}
@@ -124,96 +123,100 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Bootstrap-Select
+            $('.selectpicker').selectpicker();
+            
             @if(session('showModal'))
                 Swal.fire({
                     icon: 'success',
-                    title: 'Student Found',
-                    text: 'Student found with ID: {{ session('school_id') }}',
-                    showConfirmButton: false,
-                    timer: 2000
-                }).then(() => {
-                    window.location.href = "{{ route('voucher') }}"; // Adjust this route as needed
+                    title: 'Student Found!',
+                    html: '<p>Student found with ID: <b>{{ session('school_id') }}</b></p>',
+                    confirmButtonText: 'Great!',
+                    confirmButtonColor: '#3085d6',
+                    timer: 3000,
+                    showConfirmButton: true
+                }).then((result) => {
+                    if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                        window.location.href = "{{ route('voucher') }}"; // Adjust this route as needed
+                    }
                 });
             @endif
-
-            // Initialize Bootstrap-Select
-            $('.selectpicker').selectpicker();
         });
     </script>
     <script type="text/javascript">
-    (function (global) {
-        if(typeof (global) === "undefined") {
-            throw new Error("window is undefined");
-        }
-
-        var _hash = "!";
-        var noBackPlease = function () {
-            global.location.href += "#";
-
-            // Making sure we have the fruit available for juice (^__^)
-            global.setTimeout(function () {
-                global.location.href += "!";
-            }, 50);
-        };
-
-        global.onhashchange = function () {
-            if (global.location.hash !== _hash) {
-                global.location.hash = _hash;
+        (function (global) {
+            if(typeof (global) === "undefined") {
+                throw new Error("window is undefined");
             }
-        };
 
-        global.onload = function () {
-            noBackPlease();
+            var _hash = "!";
+            var noBackPlease = function () {
+                global.location.href += "#";
 
-            // Disables backspace on page except on input fields and textarea..
-            document.body.onkeydown = function (e) {
-                var elm = e.target.nodeName.toLowerCase();
-                if (e.which === 8 && (elm !== 'input' && elm  !== 'textarea')) {
-                    e.preventDefault();
-                }
-                // Stopping the event bubbling up the DOM tree...
-                e.stopPropagation();
+                // Making sure we have the fruit available for juice (^__^)
+                global.setTimeout(function () {
+                    global.location.href += "!";
+                }, 50);
             };
-        };
-    })(window);
-</script>
+
+            global.onhashchange = function () {
+                if (global.location.hash !== _hash) {
+                    global.location.hash = _hash;
+                }
+            };
+
+            global.onload = function () {
+                noBackPlease();
+
+                // Disables backspace on page except on input fields and textarea..
+                document.body.onkeydown = function (e) {
+                    var elm = e.target.nodeName.toLowerCase();
+                    if (e.which === 8 && (elm !== 'input' && elm  !== 'textarea')) {
+                        e.preventDefault();
+                    }
+                    // Stopping the event bubbling up the DOM tree...
+                    e.stopPropagation();
+                };
+            };
+        })(window);
+    </script>
+    <script type="text/javascript">
+        (function (global) {
+            if (typeof (global) === "undefined") {
+                throw new Error("window is undefined");
+            }
+
+            var _hash = "!";
+            var noBackPlease = function () {
+                global.location.href += "#";
+
+                // Ensures the back button doesn't work.
+                global.setTimeout(function () {
+                    global.location.href += "!";
+                }, 50);
+            };
+
+            global.onhashchange = function () {
+                if (global.location.hash !== _hash) {
+                    global.location.hash = _hash;
+                }
+            };
+
+            global.onload = function () {
+                noBackPlease();
+
+                // Disable backspace key except on input fields and textarea
+                document.body.onkeydown = function (e) {
+                    var elm = e.target.nodeName.toLowerCase();
+                    if (e.which === 8 && (elm !== 'input' && elm !== 'textarea')) {
+                        e.preventDefault();
+                    }
+                    // Stop the event from propagating up the DOM tree
+                    e.stopPropagation();
+                };
+            };
+        })(window);
+    </script>
+
 </body>
-<script type="text/javascript">
-    (function (global) {
-        if (typeof (global) === "undefined") {
-            throw new Error("window is undefined");
-        }
-
-        var _hash = "!";
-        var noBackPlease = function () {
-            global.location.href += "#";
-
-            // Ensures the back button doesn't work.
-            global.setTimeout(function () {
-                global.location.href += "!";
-            }, 50);
-        };
-
-        global.onhashchange = function () {
-            if (global.location.hash !== _hash) {
-                global.location.hash = _hash;
-            }
-        };
-
-        global.onload = function () {
-            noBackPlease();
-
-            // Disable backspace key except on input fields and textarea
-            document.body.onkeydown = function (e) {
-                var elm = e.target.nodeName.toLowerCase();
-                if (e.which === 8 && (elm !== 'input' && elm !== 'textarea')) {
-                    e.preventDefault();
-                }
-                // Stop the event from propagating up the DOM tree
-                e.stopPropagation();
-            };
-        };
-    })(window);
-</script>
-
 </html>
