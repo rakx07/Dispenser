@@ -110,6 +110,7 @@
                 <input type="text" name="birthday" placeholder="Enter your birthday" class="form-control form-control-sm" id="birthday" style="width: 200px;">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-secondary" id="clearButton">Clear</button>
         </form>
     </main>
 
@@ -141,6 +142,15 @@
                     }
                 });
             @endif
+
+            // Clear button functionality
+            document.getElementById('clearButton').addEventListener('click', function() {
+                document.getElementById('courseSelect').selectedIndex = 0;
+                $('.selectpicker').selectpicker('refresh');
+                document.getElementById('idNumber').value = '';
+                document.getElementById('lastname').value = '';
+                document.getElementById('birthday').value = '';
+            });
         });
     </script>
     <script type="text/javascript">
@@ -175,43 +185,6 @@
                         e.preventDefault();
                     }
                     // Stopping the event bubbling up the DOM tree...
-                    e.stopPropagation();
-                };
-            };
-        })(window);
-    </script>
-    <script type="text/javascript">
-        (function (global) {
-            if (typeof (global) === "undefined") {
-                throw new Error("window is undefined");
-            }
-
-            var _hash = "!";
-            var noBackPlease = function () {
-                global.location.href += "#";
-
-                // Ensures the back button doesn't work.
-                global.setTimeout(function () {
-                    global.location.href += "!";
-                }, 50);
-            };
-
-            global.onhashchange = function () {
-                if (global.location.hash !== _hash) {
-                    global.location.hash = _hash;
-                }
-            };
-
-            global.onload = function () {
-                noBackPlease();
-
-                // Disable backspace key except on input fields and textarea
-                document.body.onkeydown = function (e) {
-                    var elm = e.target.nodeName.toLowerCase();
-                    if (e.which === 8 && (elm !== 'input' && elm !== 'textarea')) {
-                        e.preventDefault();
-                    }
-                    // Stop the event from propagating up the DOM tree
                     e.stopPropagation();
                 };
             };

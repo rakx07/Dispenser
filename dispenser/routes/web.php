@@ -68,7 +68,7 @@ Auth::routes(['password.reset' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-// Optional route to handle custom registration logic
+//Optional route to handle custom registration logic
 // Route::get('register', function () {
 //     return abort(404);
 // });
