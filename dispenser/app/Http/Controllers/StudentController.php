@@ -45,7 +45,7 @@ class StudentController extends Controller
             'school_id' => 'required',
             'lastname' => 'required',
             'firstname' => 'required',
-            'course_id' => 'required|exists:courses,id',
+            'course_id' => 'required|exists:course,id',
             'birthday' => 'required',
             'status' => 'required|boolean',
             
@@ -59,7 +59,7 @@ class StudentController extends Controller
         $student->course_id = $request->course_id;
         $student->birthday = $request->birthday;
         $student->status = $request->status;
-        $student->voucher = $request->voucher_id;
+        // $student->voucher = $request->voucher_id;
         // $student->email = $request->email_id;
         $student->save();
 
