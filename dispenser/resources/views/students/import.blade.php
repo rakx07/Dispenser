@@ -34,7 +34,17 @@
                                 <td>{{ $student->birthday }}</td>
                                 <td>{{ $student->status == 1 ? 'Active' : 'Inactive' }}</td>
                                 <td>
-                                    <a href="{{ url('student/edit/' . $student->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="#" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editStudentModal" 
+                                       data-id="{{ $student->id }}"
+                                       data-school_id="{{ $student->school_id }}"
+                                       data-lastname="{{ $student->lastname }}"
+                                       data-firstname="{{ $student->firstname }}"
+                                       data-middlename="{{ $student->middlename }}"
+                                       data-course="{{ $student->course->name }}"
+                                       data-birthday="{{ $student->birthday }}"
+                                       data-status="{{ $student->status }}">
+                                       Edit
+                                    </a>
                                     <form action="{{ url('student/delete/' . $student->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirmDelete()">
                                         @csrf
                                         @method('DELETE')
@@ -149,6 +159,9 @@
 @push('scripts')
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
@@ -163,10 +176,76 @@
                 autoWidth: false, // Disable auto width calculation
                 responsive: true // Enable responsiveness
             });
-        });
 
-        function confirmDelete() {
-            return confirm('Are you sure you want to delete this student? This action cannot be undone.');
-        }
+            // Populate modal with student data
+            $('#editStudentModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var modal = $(this);
+                modal.find('#editStudentId').val(button.data('id'));
+                modal.find('#editSchoolId').val(button.data('school_id'));
+                modal.find('#editLastname').val(button.data('lastname'));
+                modal.find('#editFirstname').val(button.data('firstname'));
+                modal.find('#editMiddlename').val(button.data('middlename'));
+                modal.find('#editCourse').val(button.data('course'));
+                modal.find('#editBirthday').val(button.data('birthday'));
+                modal.find('#editStatus').val(button.data('status'));
+            });
+
+            // Confirm delete action
+            function confirmDelete() {
+                return confirm('Are you sure you want to delete this student? This action cannot be undone.');
+            }
+        });
     </script>
 @endpush
+
+<!-- Edit Student Modal -->
+<div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editStudentForm" action="{{ url('student/update') }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="id" id="editStudentId">
+                    <div class="mb-3">
+                        <label for="editSchoolId" class="form-label">School ID</label>
+                        <input type="text" class="form-control" id="editSchoolId" name="school_id" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editLastname" class="form-label">Lastname</label>
+                        <input type="text" class="form-control" id="editLastname" name="lastname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editFirstname" class="form-label">Firstname</label>
+                        <input type="text" class="form-control" id="editFirstname" name="firstname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editMiddlename" class="form-label">Middlename</label>
+                        <input type="text" class="form-control" id="editMiddlename" name="middlename">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCourse" class="form-label">Course</label>
+                        <input type="text" class="form-control" id="editCourse" name="course" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editBirthday" class="form-label">Birthday</label>
+                        <input type="date" class="form-control" id="editBirthday" name="birthday" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editStatus" class="form-label">Status</label>
+                        <select class="form-control" id="editStatus" name="status" required>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

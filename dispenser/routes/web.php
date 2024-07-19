@@ -43,9 +43,9 @@ Route::delete('course/delete/{id}', [CourseController::class, 'destroy']);
 // Student import routes
 Route::get('students/import', [StudentController::class, 'index'])->name('students.index');
 Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
-Route::get('student/edit/{id}', [StudentController::class, 'edit']);
-Route::post('student/update/{id}', [StudentController::class, 'update']);
-Route::delete('student/delete/{id}', [StudentController::class, 'destroy']);
+Route::get('student/edit/{id}', [StudentController::class, 'edit'])->name('student.edit');
+Route::put('student/update/{id}', [StudentController::class, 'update'])->name('student.update');
+Route::delete('student/delete/{id}', [StudentController::class, 'destroy'])->name('student.destroy');
 
 // Welcome page and check student routes
 Route::get('/', [StudentController::class, 'welcomeview'])->name('welcome');
@@ -68,7 +68,7 @@ Auth::routes(['password.reset' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-//Optional route to handle custom registration logic
+// Optional route to handle custom registration logic
 // Route::get('register', function () {
 //     return abort(404);
 // });
