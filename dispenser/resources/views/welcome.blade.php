@@ -91,7 +91,8 @@
                     <select class="form-select selectpicker large-selectpicker" id="courseSelect" name="courseSelect" data-live-search="true">
                         <option value=""><small>Select your course...</small></option>
                         @foreach ($courses as $course)
-                            <option value="{{ $course->code }}">{{ $course->name }}</option>
+                            <option data-subtext="{{ $course->code }}" value="{{ $course->code }}">{{ $course->name }}</option>
+
                         @endforeach
                     </select>
                 </div>
