@@ -36,7 +36,7 @@ class StudentController extends Controller
     {
         $student = Student::findOrFail($id);
         $courses = Course::where('status', '1')->get();
-        return view('student.edit', compact('student', 'courses'));
+        return view('students.edit', compact('student', 'courses'));
     }
 
     public function update(Request $request, $id)

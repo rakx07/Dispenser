@@ -8,7 +8,6 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Voucher;
 use App\Models\Student;
 use App\Models\Course;
-use Illuminate\Support\Str; // Import Str class
 
 class VoucherController extends Controller
 {
@@ -71,5 +70,42 @@ class VoucherController extends Controller
         }
 
         return view('voucher', compact('student', 'voucher'));
+    }
+
+    // Generate a new voucher code for a student
+    public function generateVoucher(Request $request, $id)
+    {
+        // Find the student by ID
+        $student = Student::find($id);
+
+        if (!$student) {
+            return response()->json(['success' => false, 'message' => 'Student not found']);
+        }
+
+        // Fetch a new voucher code that has not been given
+        $voucher = Voucher::where('is_given', 0)->first();
+
+        if (!$voucher) {
+            return response()->json(['success' => false, 'message' => 'No available vouchers']);
+        }
+
+        // Assign the new voucher to the student
+        $student->voucher_id = $voucher->id;
+        $student->save();
+
+        // Mark the new voucher as given
+        $voucher->is_given = 1;
+        $voucher->save();
+
+        // If the student had an old voucher, mark it as not given
+        if ($student->voucher_id != $voucher->id) {
+            $oldVoucher = Voucher::find($student->voucher_id);
+            if ($oldVoucher) {
+                $oldVoucher->is_given = 0;
+                $oldVoucher->save();
+            }
+        }
+
+        return response()->json(['success' => true, 'voucher_code' => $voucher->voucher_code]);
     }
 }
