@@ -64,7 +64,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="voucher">Voucher ID:</label>
+                                 <label for="voucher">Voucher ID:</label>
                                 <div class="input-group">
                                     <input type="text" id="voucher" name="voucher" class="form-control" value="{{ $student->voucher->voucher_code ?? '' }}" readonly>
                                     <button type="button" class="btn btn-secondary" onclick="generateVoucherCode()">Generate</button>

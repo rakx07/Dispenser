@@ -68,7 +68,7 @@ Auth::routes(['password.reset' => false]);
 
 Route::get('/student/{id}/generate-voucher', [VoucherController::class, 'generateVoucher'])->name('voucher.generate');
 
-
+ 
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
