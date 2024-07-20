@@ -45,7 +45,7 @@ class StudentController extends Controller
             'school_id' => 'required',
             'lastname' => 'required',
             'firstname' => 'required',
-            'course_id' => 'required|exists:course,id',
+            'course_id' => 'required|exists:courses,id',
             'birthday' => 'required',
             'status' => 'required|boolean',
             
