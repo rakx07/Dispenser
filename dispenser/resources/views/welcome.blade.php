@@ -54,65 +54,77 @@
 
     <!-- Main Content -->
     <main class="container mt-5">
-        <h1 class="mb-4"><b>Student Information</b></h1>
+        <div class="row">
+            <div class="col-md-6">
+                <h1 class="mb-4"><b>Student Information</b></h1>
 
-        @if (session('message'))
-            <div class="alert alert-info">
-                {{ session('message') }}
+                @if (session('message'))
+                    <div class="alert alert-info">
+                        {{ session('message') }}
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                @if (session('showModal'))
+                    <div class="alert alert-info">
+                        Student found with ID: {{ session('school_id') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('voucher.show') }}">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="courseSelect" class="form-label"><b>Select Your Course</b></label>
+                        <div class="w-100 mt-2">
+                            <select class="form-select selectpicker large-selectpicker" id="courseSelect" name="courseSelect" data-live-search="true">
+                                <option value=""><small>Select your course...</small></option>
+                                @foreach ($courses as $course)
+                                    <option data-subtext="{{ $course->code }}" value="{{ $course->code }}">{{ $course->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="idNumber" class="form-label"><b>ID Number</b></label>
+                        <input type="text" name="idNumber" placeholder="Enter your ID number" class="form-control form-control-sm" id="idNumber" style="width: 200px;">
+                    </div>
+                    <div class="mb-3">
+                        <label for="lastname" class="form-label"><b>Last Name</b></label>
+                        <input type="text" name="lastname" placeholder="Enter your Last name" class="form-control form-control-sm" id="lastname" style="width: 200px;">
+                    </div>
+                    <div class="mb-3">
+                        <label for="birthday" class="form-label"><b>Birthday<small> (e.g. 2001-01-29 / yyyy-mm-dd) </small></b></label>
+                        <input type="text" name="birthday" placeholder="Enter your birthday" class="form-control form-control-sm" id="birthday" style="width: 200px;">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" id="clearButton">Clear</button>
+                </form>
             </div>
-        @endif
-
-        @if (session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+            <div class="col-md-6">
+                <h2 class="mb-4"><b>Voucher Usage Guidelines</b></h2>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>• This voucher code is exclusively for enrolled students of Notre Dame of Marbel University.</strong></li>
+                    <li class="list-group-item"><strong>• Each student is entitled to use one voucher code.</strong></li>
+                    <li class="list-group-item"><strong>• The voucher code is valid for use with NDMUWLAN1, NDMUWDS, and similar WiFi access points.</strong></li>
+                    <li class="list-group-item"><strong>• The voucher code provides 2 hours of access; the connection will be automatically disconnected after this time, requiring you to reconnect using the same voucher code.</strong></li>
                 </ul>
             </div>
-        @endif
-        @if (session('showModal'))
-            <div class="alert alert-info">
-                Student found with ID: {{ session('school_id') }}
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('voucher.show') }}">
-            @csrf
-            <div class="mb-3">
-                <label for="courseSelect" class="form-label"><b>Select Your Course</b></label>
-                <div class="w-100 mt-2">
-                    <select class="form-select selectpicker large-selectpicker" id="courseSelect" name="courseSelect" data-live-search="true">
-                        <option value=""><small>Select your course...</small></option>
-                        @foreach ($courses as $course)
-                            <option data-subtext="{{ $course->code }}" value="{{ $course->code }}">{{ $course->name }}</option>
-
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="idNumber" class="form-label"><b>ID Number</b></label>
-                <input type="text" name="idNumber" placeholder="Enter your ID number" class="form-control form-control-sm" id="idNumber" style="width: 200px;">
-            </div>
-            <div class="mb-3">
-                <label for="lastname" class="form-label"><b>Last Name</b></label>
-                <input type="text" name="lastname" placeholder="Enter your Last name" class="form-control form-control-sm" id="lastname" style="width: 200px;">
-            </div>
-            <div class="mb-3">
-                <label for="birthday" class="form-label"><b>Birthday<small> (e.g. 2001-01-29 / yyyy-mm-dd) </small></b></label>
-                <input type="text" name="birthday" placeholder="Enter your birthday" class="form-control form-control-sm" id="birthday" style="width: 200px;">
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <button type="button" class="btn btn-secondary" id="clearButton">Clear</button>
-        </form>
+        </div>
     </main>
 
     <!-- Footer -->
