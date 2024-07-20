@@ -66,7 +66,7 @@ Auth::routes();
 Auth::routes(['register' => true]);
 Auth::routes(['password.reset' => false]);
 
-Route::get('/student/{id}/generate-voucher', [VoucherController::class, 'generateVoucher'])->name('voucher.generate');
+Route::get('/student/{id}/generate-voucher', [VoucherController::class, 'generateVoucherCode'])->name('voucher.generate');
 
  
 

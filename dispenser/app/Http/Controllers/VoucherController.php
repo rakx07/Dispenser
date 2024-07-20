@@ -73,7 +73,7 @@ class VoucherController extends Controller
     }
 
     // Generate a new voucher code for a student
-    public function generateVoucher(Request $request, $id)
+    public function generateVoucherCode(Request $request, $id)
     {
         // Find the student by ID
         $student = Student::find($id);
