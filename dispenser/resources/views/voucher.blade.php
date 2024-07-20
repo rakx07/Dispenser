@@ -46,7 +46,7 @@
                 <b>Notre Dame of Marbel University</b>
             </a>
             <span class="navbar-text text-white">
-               Voucher Account Allocator
+            WiFi Access Code Manager
             </span>
         </div>
     </nav>
