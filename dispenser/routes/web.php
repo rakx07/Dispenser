@@ -73,6 +73,6 @@ Route::get('/student/{id}/generate-voucher', [VoucherController::class, 'generat
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 // Optional route to handle custom registration logic
-// Route::get('register', function () {
-//     return abort(404);
-// });
+Route::get('register', function () {
+    return abort(404);
+});
