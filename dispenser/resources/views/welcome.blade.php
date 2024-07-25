@@ -90,7 +90,7 @@
                     <div class="mb-3">
                         <label for="courseSelect" class="form-label"><b>Select Your Course</b></label>
                         <div class="w-100 mt-2">
-                            <select class="form-select selectpicker large-selectpicker" id="courseSelect" name="courseSelect" data-live-search="true">
+                            <select class="form-control selectpicker" id="courseSelect" name="courseSelect" data-live-search="true">
                                 <option value=""><small>Select your course...</small></option>
                                 @foreach ($courses as $course)
                                     <option data-subtext="{{ $course->code }}" value="{{ $course->code }}">{{ $course->name }}</option>
@@ -101,15 +101,15 @@
 
                     <div class="mb-3">
                         <label for="idNumber" class="form-label"><b>ID Number</b></label>
-                        <input type="text" name="idNumber" placeholder="Enter your ID number" class="form-control form-control-sm" id="idNumber" style="width: 200px;">
+                        <input type="text" name="idNumber" placeholder="Enter your ID number" class="form-control" id="idNumber">
                     </div>
                     <div class="mb-3">
                         <label for="lastname" class="form-label"><b>Last Name</b></label>
-                        <input type="text" name="lastname" placeholder="Enter your Last name" class="form-control form-control-sm" id="lastname" style="width: 200px;">
+                        <input type="text" name="lastname" placeholder="Enter your Last name" class="form-control" id="lastname">
                     </div>
                     <div class="mb-3">
                         <label for="birthday" class="form-label"><b>Birthday<small> (e.g. 2001-01-29 / yyyy-mm-dd) </small></b></label>
-                        <input type="text" name="birthday" placeholder="Enter your birthday" class="form-control form-control-sm" id="birthday" style="width: 200px;">
+                        <input type="text" name="birthday" placeholder="Enter your birthday" class="form-control" id="birthday">
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                     <button type="button" class="btn btn-secondary" id="clearButton">Clear</button>
