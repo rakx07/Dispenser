@@ -64,7 +64,7 @@
             
             <p><strong>Course:</strong> {{ ($student->course->name) }}</p>
             
-            <p><strong>Email:</strong> {{ ucfirst(Str::camel($student->email_id)) }}</p>
+            <p><strong>Email:</strong> {{ ucfirst(Str::camel($student->email_id)) }}TBA</p>
             
             <p><strong>Temporary Email Password:</strong> TBA </p>
             
