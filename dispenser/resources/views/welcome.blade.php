@@ -118,7 +118,7 @@
             <div class="col-md-6">
                 <h1 class="mb-4"><b>Voucher Usage Guidelines</b></h1>
                 <ul class="list-group">
-                    <li class="list-group-item"><strong>• This voucher code is exclusively for enrolled 2nd year to 4th year students of Notre Dame of Marbel University.</strong></li>
+                    <li class="list-group-item"><strong>• This voucher code is exclusively for enrolled 2nd to 4th year students of Notre Dame of Marbel University.</strong></li>
                     <li class="list-group-item"><strong>• Account verification is ongoing for first-year students.</strong></li>
                     <li class="list-group-item"><strong>• Each student is entitled to use one voucher code.</strong></li>
                     <li class="list-group-item"><strong>• The voucher code is valid for use with NDMUWLAN1, NDMUWDS, and similar WiFi access points.</strong></li>
