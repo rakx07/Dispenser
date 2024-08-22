@@ -330,6 +330,12 @@ return [
             'url' => '/',
             'icon' => 'fas fa-fw fa-globe',
         ],
+        [
+            'text' => 'Add Student',
+            'url' => '',
+            'icon' => 'fas fa-fw fa-plus',
+        ],
+        
         ///added multi level
         [
             'text' => 'Uploads',
