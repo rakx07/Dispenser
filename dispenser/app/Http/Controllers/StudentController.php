@@ -139,4 +139,36 @@ class StudentController extends Controller
         $courses = Course::all(); // Fetch all courses from the database
         return view('welcome', compact('courses')); // Pass $courses to the view
     }
+
+    // New method for adding a student
+    public function create()
+    {
+        $courses = Course::where('status', '1')->get(); // Fetch active courses
+        return view('students.create', compact('courses'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'school_id' => 'required|unique:students,school_id',
+            'lastname' => 'required|string|max:255',
+            'firstname' => 'required|string|max:255',
+            'middlename' => 'nullable|string|max:255',
+            'course_id' => 'required|exists:course,id',
+            'birthday' => 'required|string',  // Treating birthday as a text field
+            'status' => 'required|boolean',
+        ]);
+
+        Student::create([
+            'school_id' => $request->school_id,
+            'lastname' => $request->lastname,
+            'firstname' => $request->firstname,
+            'middlename' => $request->middlename,
+            'course_id' => $request->course_id,
+            'birthday' => $request->birthday,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('students.index')->with('status', 'Student added successfully!');
+    }
 }

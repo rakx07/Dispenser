@@ -332,7 +332,7 @@ return [
         ],
         [
             'text' => 'Add Student',
-            'url' => '',
+            'url' => 'student/create',
             'icon' => 'fas fa-fw fa-plus',
         ],
         
