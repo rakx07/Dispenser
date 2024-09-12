@@ -147,6 +147,7 @@ class StudentController extends Controller
         return view('students.create', compact('courses'));
     }
 
+    // Updated store method with SweetAlert notifications for success or failure
     public function store(Request $request)
     {
         $request->validate([
@@ -159,16 +160,20 @@ class StudentController extends Controller
             'status' => 'required|boolean',
         ]);
 
-        Student::create([
-            'school_id' => $request->school_id,
-            'lastname' => $request->lastname,
-            'firstname' => $request->firstname,
-            'middlename' => $request->middlename,
-            'course_id' => $request->course_id,
-            'birthday' => $request->birthday,
-            'status' => $request->status,
-        ]);
+        try {
+            Student::create([
+                'school_id' => $request->school_id,
+                'lastname' => $request->lastname,
+                'firstname' => $request->firstname,
+                'middlename' => $request->middlename,
+                'course_id' => $request->course_id,
+                'birthday' => $request->birthday,
+                'status' => $request->status,
+            ]);
 
-        return redirect()->route('students.index')->with('status', 'Student added successfully!');
+            return redirect()->route('student.create')->with('success', 'Student added successfully!');
+        } catch (\Exception $e) {
+            return redirect()->route('student.create')->with('error', 'Failed to add student. Please try again.');
+        }
     }
 }

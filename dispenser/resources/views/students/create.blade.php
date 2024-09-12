@@ -15,7 +15,7 @@
                         <h3>Add Student</h3>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('student.store') }}" method="POST">
+                        <form action="{{ route('student.store') }}" method="POST" id="addStudentForm">
                             @csrf
 
                             <div class="form-group">
@@ -39,15 +39,14 @@
                             </div>
 
                             <div class="form-group">
-                             <label for="course_id">Course:</label>
-                                <select id="course_id" name="course_id" class="form-control" required>
-                                <option value="" disabled selected>Select a course</option>
-                                @foreach($courses as $course)
-                                    <option value="{{ $course->id }}">{{ $course->name }}</option>
-                                @endforeach
+                                <label for="course_id">Course:</label>
+                                <select id="course_id" name="course_id" class="form-control selectpicker" required>
+                                    <option value="" disabled selected>Select a course</option>
+                                    @foreach($courses as $course)
+                                        <option value="{{ $course->id }}">{{ $course->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
-
 
                             <div class="form-group">
                                 <label for="birthday">Birthday:</label>
@@ -63,6 +62,7 @@
                             </div>
 
                             <button type="submit" class="btn btn-primary">Add Student</button>
+                            <button type="button" class="btn btn-secondary" id="clearButton">Clear</button>
                         </form>
                     </div>
                 </div>
@@ -85,4 +85,35 @@
             border-color: #007bff;
         }
     </style>
+@endpush
+
+@push('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Clear button functionality
+            document.getElementById('clearButton').addEventListener('click', function() {
+                document.getElementById('addStudentForm').reset();
+                $('.selectpicker').selectpicker('refresh');  // Refresh the selectpicker dropdown
+            });
+
+            // SweetAlert for Success or Error messages
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '{{ session('success') }}',
+                    confirmButtonText: 'OK'
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '{{ session('error') }}',
+                    confirmButtonText: 'OK'
+                });
+            @endif
+        });
+    </script>
 @endpush
