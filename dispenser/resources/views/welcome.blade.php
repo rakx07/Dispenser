@@ -4,9 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Voucher Allocator</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Local Bootstrap CSS -->
+    <link href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    
+    <!-- Local Bootstrap Select CSS -->
+    <link href="{{ asset('assets/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
+    
+    <!-- Local SweetAlert2 JS -->
+    <script src="{{ asset('assets/sweetalert2/sweetalert2.min.js') }}"></script>
+    
     <style>
         body {
             display: flex;
@@ -133,9 +140,15 @@
         NDMU © 2024 | Developed by MIS Department
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
+    <!-- Local Bootstrap JS -->
+    <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    
+    <!-- Local jQuery (if required) -->
+    <script src="{{ asset('assets/jquery/jquery.min.js') }}"></script>
+    
+    <!-- Local Bootstrap Select JS -->
+    <script src="{{ asset('assets/bootstrap-select/js/bootstrap-select.min.js') }}"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Initialize Bootstrap-Select
@@ -167,6 +180,7 @@
             });
         });
     </script>
+
     <script type="text/javascript">
         (function (global) {
             if(typeof (global) === "undefined") {
@@ -204,6 +218,5 @@
             };
         })(window);
     </script>
-
 </body>
 </html>
