@@ -172,11 +172,11 @@
 
             // Clear button functionality
             document.getElementById('clearButton').addEventListener('click', function() {
-                document.getElementById('courseSelect').selectedIndex = 0;
-                $('.selectpicker').selectpicker('refresh');
-                document.getElementById('idNumber').value = '';
-                document.getElementById('lastname').value = '';
-                document.getElementById('birthday').value = '';
+                // Reset the form
+                document.querySelector('form').reset();
+                
+                // Clear the selectpicker
+                $('#courseSelect').selectpicker('val', '');
             });
         });
     </script>
