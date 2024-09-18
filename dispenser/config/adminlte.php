@@ -335,6 +335,11 @@ return [
             'url' => 'student/create',
             'icon' => 'fas fa-fw fa-plus',
         ],
+        [
+            'text' => 'Edit Student',
+            'url' => 'student/edit',
+            'icon' => 'fas fa-fw fa-edit',
+        ],
         
         ///added multi level
         [
