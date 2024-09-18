@@ -10,7 +10,7 @@
     
     <!-- Local SweetAlert2 CSS -->
     <link href="{{ asset('assets/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
-
+    <link href="{{ asset('assets/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
     <style>
         body {
             display: flex;
@@ -99,7 +99,7 @@
     
     <!-- Local SweetAlert2 JS -->
     <script src="{{ asset('assets/sweetalert2/sweetalert2.min.js') }}"></script>
-
+    <link href="{{ asset('assets/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             setTimeout(function () {
