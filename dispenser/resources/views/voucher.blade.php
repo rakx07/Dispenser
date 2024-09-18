@@ -8,7 +8,7 @@
     <!-- Local Bootstrap CSS -->
     <link href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     
-    <!-- Local SweetAlert2 CSS (if needed) -->
+    <!-- Local SweetAlert2 CSS -->
     <link href="{{ asset('assets/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
 
     <style>
@@ -119,43 +119,10 @@
             });
         });
     </script>
+
+    <!-- Check if SweetAlert2 is correctly initialized -->
+    <script>
+        console.log(Swal); // Should log the Swal object if correctly loaded
+    </script>
 </body>
-<script type="text/javascript">
-    (function (global) {
-        if (typeof (global) === "undefined") {
-            throw new Error("window is undefined");
-        }
-
-        var _hash = "!";
-        var noBackPlease = function () {
-            global.location.href += "#";
-
-            // Ensures the back button doesn't work.
-            global.setTimeout(function () {
-                global.location.href += "!";
-            }, 50);
-        };
-
-        global.onhashchange = function () {
-            if (global.location.hash !== _hash) {
-                global.location.hash = _hash;
-            }
-        };
-
-        global.onload = function () {
-            noBackPlease();
-
-            // Disable backspace key except on input fields and textarea
-            document.body.onkeydown = function (e) {
-                var elm = e.target.nodeName.toLowerCase();
-                if (e.which === 8 && (elm !== 'input' && elm !== 'textarea')) {
-                    e.preventDefault();
-                }
-                // Stop the event from propagating up the DOM tree
-                e.stopPropagation();
-            };
-        };
-    })(window);
-</script>
-
 </html>
