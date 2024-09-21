@@ -63,7 +63,8 @@
         <!-- Student Information -->
         <div class="student-info">
             @if (isset($student))
-            <h3>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->middlename[0]) }}. {{ ucfirst($student->lastname) }}</h3>
+          
+            <h3>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
 
             <p><strong>ID Number: </strong>{{ $student->school_id }}</p>
             
