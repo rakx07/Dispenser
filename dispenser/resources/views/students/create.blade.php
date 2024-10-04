@@ -53,7 +53,7 @@
                             <!-- Course Selection with Bootstrap Select -->
                             <div class="form-group">
                                 <label for="course_id">Course:</label>
-                                <select id="course_id" name="course_id" class="form-control selectpicker" data-live-search="true" required>
+                                <select id="course_id" name="course_id" class="form-control selectpicker" data-live-search="true" data-size="8" required>
                                     <option value="" disabled selected>Select a course</option>
                                     @foreach($courses as $course)
                                         <option value="{{ $course->id }}" data-subtext="{{ $course->code }}">{{ $course->name }}</option>
