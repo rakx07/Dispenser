@@ -78,3 +78,4 @@ Route::get('register', function () {
 });
 Route::get('/student/create', [StudentController::class, 'create'])->name('student.create');
 Route::post('/student/store', [StudentController::class, 'store'])->name('student.store');
+Route::get('/student/search', [StudentController::class, 'search'])->name('student.search');

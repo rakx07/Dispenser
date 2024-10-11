@@ -176,4 +176,15 @@ class StudentController extends Controller
             return redirect()->route('student.create')->with('error', 'Failed to add student. Please try again.');
         }
     }
+    public function search(Request $request)
+{
+    $query = $request->input('query');
+    $students = Student::where('firstname', 'LIKE', "%$query%")
+                        ->orWhere('lastname', 'LIKE', "%$query%")
+                        ->orWhere('school_id', 'LIKE', "%$query%")
+                        ->paginate(20); // Adjust pagination as needed
+
+    return view('students.search', compact('students'));
+}
+
 }

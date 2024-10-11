@@ -331,6 +331,11 @@ return [
             'icon' => 'fas fa-fw fa-globe',
         ],
         [
+            'text' => 'Search Student',
+            'url' => 'student/search',
+            'icon' => 'fas fa-fw fa-search',
+        ],
+        [
             'text' => 'Add Student',
             'url' => 'student/create',
             'icon' => 'fas fa-fw fa-plus',
