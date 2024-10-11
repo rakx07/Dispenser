@@ -21,25 +21,28 @@
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <!-- <th>ID</th> -->
                         <th>School ID</th>
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>Course</th>
                         <th>Birthday</th>
                         <th>Status</th>
+                        <th>Actions</th> <!-- Add this for the Edit button -->
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($students as $student)
                         <tr>
-                            <!-- <td>{{ $student->id }}</td> -->
                             <td>{{ $student->school_id }}</td>
                             <td>{{ $student->firstname }}</td>
                             <td>{{ $student->lastname }}</td>
                             <td>{{ $student->course->name }}</td>
                             <td>{{ $student->birthday }}</td>
                             <td>{{ $student->status ? 'Active' : 'Inactive' }}</td>
+                            <td>
+                                <!-- Edit button linking to the edit route -->
+                                <a href="{{ route('student.edit', $student->id) }}" class="btn btn-primary btn-sm">Edit</a>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

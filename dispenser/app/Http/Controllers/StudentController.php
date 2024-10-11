@@ -12,12 +12,14 @@ use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
+    // List students with pagination
     public function index()
     {
-        $students = Student::paginate(20); // Adjust the number per page as needed
+        $students = Student::paginate(20); // Adjust pagination as needed
         return view('students.index', compact('students'));
     }
 
+    // Import students from an Excel file
     public function import(Request $request)
     {
         $request->validate([
@@ -41,6 +43,7 @@ class StudentController extends Controller
         }
     }
 
+    // Edit a specific student by ID
     public function edit($id)
     {
         $student = Student::findOrFail($id);
@@ -48,14 +51,15 @@ class StudentController extends Controller
         return view('students.edit', compact('student', 'courses'));
     }
 
+    // Update student information
     public function update(Request $request, $id)
     {
         $request->validate([
             'school_id' => 'required',
             'lastname' => 'required',
             'firstname' => 'required',
-            'course_id' => 'required|exists:courses,id',
-            'birthday' => 'required',
+            'course_id' => 'required|exists:course,id',
+            'birthday' => 'required|string',  // Ensure birthday is treated as a text field
             'status' => 'required|boolean',
         ]);
 
@@ -69,9 +73,10 @@ class StudentController extends Controller
         $student->status = $request->status;
         $student->save();
 
-        return redirect()->route('students.index')->with('status', 'Student updated successfully!');
+        return redirect()->route('student.search')->with('status', 'Student updated successfully!');
     }
 
+    // Delete a student
     public function destroy($id)
     {
         $student = Student::findOrFail($id);
@@ -80,6 +85,7 @@ class StudentController extends Controller
         return redirect()->back()->with('status', 'Student deleted successfully!');
     }
 
+    // Check if a student exists
     public function checkStudent(Request $request)
     {
         $request->validate([
@@ -113,6 +119,7 @@ class StudentController extends Controller
         }
     }
 
+    // Create a new student account
     public function createStudentAccount(Request $request)
     {
         $request->validate([
@@ -134,20 +141,21 @@ class StudentController extends Controller
         return redirect()->route('signin')->with('message', 'Account created successfully.');
     }
 
+    // Show the welcome view
     public function welcomeview()
     {
         $courses = Course::all(); // Fetch all courses from the database
         return view('welcome', compact('courses')); // Pass $courses to the view
     }
 
-    // New method for adding a student
+    // Add a new student (create view)
     public function create()
     {
         $courses = Course::where('status', '1')->get(); // Fetch active courses
         return view('students.create', compact('courses'));
     }
 
-    // Updated store method with SweetAlert notifications for success or failure
+    // Store a new student
     public function store(Request $request)
     {
         $request->validate([
@@ -155,8 +163,8 @@ class StudentController extends Controller
             'lastname' => 'required|string|max:255',
             'firstname' => 'required|string|max:255',
             'middlename' => 'nullable|string|max:255',
-            'course_id' => 'required|exists:course,id',
-            'birthday' => 'required|string',  // Treating birthday as a text field
+            'course_id' => 'required|exists:courses,id',
+            'birthday' => 'required|string',  // Treat birthday as a text field
             'status' => 'required|boolean',
         ]);
 
@@ -171,20 +179,21 @@ class StudentController extends Controller
                 'status' => $request->status,
             ]);
 
-            return redirect()->route('student.create')->with('success', 'Student added successfully!');
+            return redirect()->route('students.index')->with('success', 'Student added successfully!');
         } catch (\Exception $e) {
-            return redirect()->route('student.create')->with('error', 'Failed to add student. Please try again.');
+            return redirect()->route('students.create')->with('error', 'Failed to add student. Please try again.');
         }
     }
+
+    // Search for students by first name, last name, or school ID
     public function search(Request $request)
-{
-    $query = $request->input('query');
-    $students = Student::where('firstname', 'LIKE', "%$query%")
-                        ->orWhere('lastname', 'LIKE', "%$query%")
-                        ->orWhere('school_id', 'LIKE', "%$query%")
-                        ->paginate(20); // Adjust pagination as needed
+    {
+        $query = $request->input('query');
+        $students = Student::where('firstname', 'LIKE', "%$query%")
+                            ->orWhere('lastname', 'LIKE', "%$query%")
+                            ->orWhere('school_id', 'LIKE', "%$query%")
+                            ->paginate(20); // Adjust pagination as needed
 
-    return view('students.search', compact('students'));
-}
-
+        return view('students.search', compact('students'));
+    }
 }
