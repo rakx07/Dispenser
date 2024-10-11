@@ -7,6 +7,15 @@
 @endsection
 
 @section('content')
+
+ <!-- Local Bootstrap CSS -->
+ <link href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    
+ <!-- Local Bootstrap Select CSS -->
+ <link href="{{ asset('assets/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet">
+ 
+ <!-- Local SweetAlert2 JS -->
+ <script src="{{ asset('assets/sweetalert2/sweetalert2.min.js') }}"></script>
     <div class="container">
         <div class="row">
             <div class="col-md-8 offset-md-2 mt-5">
@@ -41,11 +50,10 @@
 
                             <div class="form-group">
                                 <label for="course_id">Course:</label>
-                                <select id="course_id" name="course_id" class="form-control" required>
+                                <select id="course_id" name="course_id" class="form-control selectpicker" data-live-search="true" data-size="8" required>
+                                    <option value="" disabled selected>Select a course</option>
                                     @foreach($courses as $course)
-                                        <option value="{{ $course->id }}" {{ $student->course_id == $course->id ? 'selected' : '' }}>
-                                            {{ $course->name }}
-                                        </option>
+                                        <option value="{{ $course->id }}" data-subtext="{{ $course->code }}">{{ $course->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -112,5 +120,43 @@
                     console.error('Error fetching voucher:', error);
                 });
         }
+    </script>
+@endpush
+@push('js')
+    <!-- Include Bootstrap, jQuery, and Bootstrap Select JS -->
+    <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/bootstrap-select/js/bootstrap-select.min.js') }}"></script>
+    <script src="{{ asset('assets/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Bootstrap Selectpicker
+            $('.selectpicker').selectpicker();
+
+            // Clear button functionality
+            document.getElementById('clearButton').addEventListener('click', function() {
+                document.getElementById('addStudentForm').reset();
+                $('.selectpicker').selectpicker('refresh');  // Refresh the selectpicker dropdown
+            });
+
+            // SweetAlert for Success or Error messages
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '{{ session('success') }}',
+                    confirmButtonText: 'OK'
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '{{ session('error') }}',
+                    confirmButtonText: 'OK'
+                });
+            @endif
+        });
     </script>
 @endpush
