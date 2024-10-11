@@ -163,7 +163,7 @@ class StudentController extends Controller
             'lastname' => 'required|string|max:255',
             'firstname' => 'required|string|max:255',
             'middlename' => 'nullable|string|max:255',
-            'course_id' => 'required|exists:courses,id',
+            'course_id' => 'required|exists:course,id',
             'birthday' => 'required|string',  // Treat birthday as a text field
             'status' => 'required|boolean',
         ]);
