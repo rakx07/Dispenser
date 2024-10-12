@@ -1241,16 +1241,16 @@
         },
         {
             "name": "jeroennoten/laravel-adminlte",
-            "version": "v3.13.0",
+            "version": "v3.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeroennoten/Laravel-AdminLTE.git",
-                "reference": "b254870c3bc38616fbd45c8884712a34915ac774"
+                "reference": "9ce9ef65f309851883e6c44db1f2ae14b9ab2baf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeroennoten/Laravel-AdminLTE/zipball/b254870c3bc38616fbd45c8884712a34915ac774",
-                "reference": "b254870c3bc38616fbd45c8884712a34915ac774",
+                "url": "https://api.github.com/repos/jeroennoten/Laravel-AdminLTE/zipball/9ce9ef65f309851883e6c44db1f2ae14b9ab2baf",
+                "reference": "9ce9ef65f309851883e6c44db1f2ae14b9ab2baf",
                 "shasum": ""
             },
             "require": {
@@ -1294,9 +1294,9 @@
             ],
             "support": {
                 "issues": "https://github.com/jeroennoten/Laravel-AdminLTE/issues",
-                "source": "https://github.com/jeroennoten/Laravel-AdminLTE/tree/v3.13.0"
+                "source": "https://github.com/jeroennoten/Laravel-AdminLTE/tree/v3.14.0"
             },
-            "time": "2024-08-04T14:57:59+00:00"
+            "time": "2024-10-10T07:51:55+00:00"
         },
         {
             "name": "laravel/framework",
@@ -8806,5 +8806,5 @@
         "php": "^8.1"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
