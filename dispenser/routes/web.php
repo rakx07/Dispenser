@@ -76,6 +76,6 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('register', function () {
     return abort(404);
 });
-Route::get('/student/create', [StudentController::class, 'create'])->name('student.create');
-Route::post('/student/store', [StudentController::class, 'store'])->name('student.store');
-Route::get('/student/search', [StudentController::class, 'search'])->name('student.search');
+Route::get('/student/create', [StudentController::class, 'create'])->name('students.create');
+Route::post('/student/store', [StudentController::class, 'store'])->name('students.store');
+Route::get('/student/search', [StudentController::class, 'search'])->name('students.search');
