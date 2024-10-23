@@ -83,4 +83,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/student/create', [StudentController::class, 'create'])->name('student.create');
     Route::post('/student/store', [StudentController::class, 'store'])->name('student.store');
     Route::get('/student/search', [StudentController::class, 'search'])->name('student.search');
+
+    Route::get('satpaccount/import',[App\Http\Controllers\SatpController::class, 'index']);
+    Route::post('satpaccount/import',[App\Http\Controllers\SatpController::class, 'importExcelData']);
 });

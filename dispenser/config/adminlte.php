@@ -376,6 +376,11 @@ return [
                     'url' => 'voucher/import',
                     'icon' => 'fas fa-fw fa-paperclip',
                 ],
+                [
+                    'text' => 'SATP Account Upload',
+                    'url' => 'satpaccount/import',
+                    'icon' => 'fas fa-fw fa-paperclip',
+                ],
             ],
         ],
 
