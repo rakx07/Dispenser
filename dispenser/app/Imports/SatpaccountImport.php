@@ -23,7 +23,6 @@ class SatpaccountImport implements ToCollection , WithHeadingRow
                 'satp_password'=> $row['satp_password'],
 
             ]);
-
      
         }
     }

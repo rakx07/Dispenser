@@ -7,6 +7,7 @@ use App\Http\Controllers\CollegeController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\SatpController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,4 +87,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('satpaccount/import',[App\Http\Controllers\SatpController::class, 'index']);
     Route::post('satpaccount/import',[App\Http\Controllers\SatpController::class, 'importExcelData']);
+    Route::get('satpaccount/create', [App\Http\Controllers\SatpController::class, 'create'])->name('satpaccount.create');
+    Route::post('satpaccount/store', [App\Http\Controllers\SatpController::class, 'store'])->name('satpaccount.store'); 
 });
