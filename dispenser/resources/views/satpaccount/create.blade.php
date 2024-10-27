@@ -29,8 +29,8 @@
         @csrf
 
         <div class="form-group mb-3">
-            <label for="student_id" class="form-label">Student ID</label>
-            <input type="text" name="student_id" class="form-control" value="{{ old('student_id') }}" required>
+            <label for="school_id" class="form-label">Student ID</label>
+            <input type="text" name="school_id" class="form-control" value="{{ old('school_id') }}" required>
         </div>
 
         <div class="form-group mb-4">
