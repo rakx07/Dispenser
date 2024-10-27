@@ -3,8 +3,9 @@
 @section('title', 'Student Import')
 
 @section('content_header')
-<div class="container">
-    <h2>Add New SATP User</h2>
+<div class="container mt-5" style="max-width: 50%;">
+
+    <h2 class="text-center mb-4">Add New SATP User</h2>
 
     <!-- Display success message -->
     @if(session('status'))
@@ -24,20 +25,20 @@
         </div>
     @endif
 
-    <form action="{{ route('satpaccount.store') }}" method="POST">
+    <form action="{{ route('satpaccount.store') }}" method="POST" class="p-4 border rounded shadow-sm">
         @csrf
 
-        <div class="form-group">
-            <label for="student_id">Student ID</label>
-            <input type="text" name="student_id" class="form-control" style="width: 30%;" value="{{ old('student_id') }}" required>
+        <div class="form-group mb-3">
+            <label for="student_id" class="form-label">Student ID</label>
+            <input type="text" name="student_id" class="form-control" value="{{ old('student_id') }}" required>
         </div>
 
-        <div class="form-group">
-            <label for="satp_password">Password</label>
-            <input type="text" name="satp_password" class="form-control" style="width: 30%;" value="{{ old('satp_password') }}" required>
+        <div class="form-group mb-4">
+            <label for="satp_password" class="form-label">Password</label>
+            <input type="text" name="satp_password" class="form-control" value="{{ old('satp_password') }}" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">Add SATP Account</button>
+        <button type="submit" class="btn btn-primary w-100">Add SATP Account</button>
     </form>
 </div>
 @endsection
