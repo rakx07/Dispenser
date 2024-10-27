@@ -69,7 +69,8 @@
                 <p><strong>Email:</strong> {{ ucfirst(Str::camel($student->email_id)) }}TBA</p>
                 
                 <!-- New Satp Password Display -->
-                <p><strong>SATP Password:</strong> {{ $satp_password }}</p>
+                <p><strong>SATP/Kumosoft Username : </strong>{{ $student->school_id }}</p>
+                <p><strong>SATP/Kumosoft Password:</strong> {{ $satp_password }}</p>
                 
                 <p><strong>Voucher Code:</strong> {{ $voucher->voucher_code ?? 'Not available' }}</p>
             @else
