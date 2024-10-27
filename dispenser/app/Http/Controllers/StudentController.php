@@ -5,17 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Models\StudentUser;
 use App\Models\Course;
+use App\Models\Voucher;
+use App\Models\Satpaccount;
 use Illuminate\Http\Request;
 use App\Imports\StudentImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
     // List students with pagination
     public function index()
     {
-        $students = Student::paginate(20); // Adjust pagination as needed
+        $students = Student::paginate(20);
         return view('students.index', compact('students'));
     }
 
@@ -59,19 +62,14 @@ class StudentController extends Controller
             'lastname' => 'required',
             'firstname' => 'required',
             'course_id' => 'required|exists:course,id',
-            'birthday' => 'required|string',  // Ensure birthday is treated as a text field
+            'birthday' => 'required|string',
             'status' => 'required|boolean',
         ]);
 
         $student = Student::findOrFail($id);
-        $student->school_id = $request->school_id;
-        $student->lastname = $request->lastname;
-        $student->firstname = $request->firstname;
-        $student->middlename = $request->middlename;
-        $student->course_id = $request->course_id;
-        $student->birthday = $request->birthday;
-        $student->status = $request->status;
-        $student->save();
+        $student->update($request->only([
+            'school_id', 'lastname', 'firstname', 'middlename', 'course_id', 'birthday', 'status'
+        ]));
 
         return redirect()->route('student.search')->with('status', 'Student updated successfully!');
     }
@@ -95,28 +93,22 @@ class StudentController extends Controller
             'birthday' => 'required|date_format:Y-m-d',
         ]);
 
-        $courseCode = $request->input('courseSelect');
-        $idNumber = $request->input('idNumber');
-        $lastname = $request->input('lastname');
-        $birthday = $request->input('birthday');
-
-        $course = Course::where('code', $courseCode)->first();
+        $course = Course::where('code', $request->input('courseSelect'))->first();
 
         if (!$course) {
             return back()->withErrors(['courseSelect' => 'Invalid course selected.']);
         }
 
-        $studentExists = Student::where('school_id', $idNumber)
-            ->where('lastname', $lastname)
-            ->where('birthday', $birthday)
-            ->where('course_id', $course->id)
-            ->exists();
+        $studentExists = Student::where([
+            ['school_id', $request->input('idNumber')],
+            ['lastname', $request->input('lastname')],
+            ['birthday', $request->input('birthday')],
+            ['course_id', $course->id]
+        ])->exists();
 
-        if ($studentExists) {
-            return back()->with(['showModal' => true, 'school_id' => $idNumber]);
-        } else {
-            return back()->with('message', 'Student does not exist.');
-        }
+        return $studentExists
+            ? back()->with(['showModal' => true, 'school_id' => $request->input('idNumber')])
+            : back()->with('message', 'Student does not exist.');
     }
 
     // Create a new student account
@@ -132,11 +124,11 @@ class StudentController extends Controller
             return redirect()->route('welcome')->with('error', 'Student Account already exists.');
         }
 
-        $studentUser = new StudentUser();
-        $studentUser->school_id = $request->input('schoolId');
-        $studentUser->password = Hash::make($request->input('password'));
-        $studentUser->status = 1; // Active status
-        $studentUser->save();
+        StudentUser::create([
+            'school_id' => $request->input('schoolId'),
+            'password' => Hash::make($request->input('password')),
+            'status' => 1, // Active status
+        ]);
 
         return redirect()->route('signin')->with('message', 'Account created successfully.');
     }
@@ -144,14 +136,14 @@ class StudentController extends Controller
     // Show the welcome view
     public function welcomeview()
     {
-        $courses = Course::all(); // Fetch all courses from the database
-        return view('welcome', compact('courses')); // Pass $courses to the view
+        $courses = Course::all();
+        return view('welcome', compact('courses'));
     }
 
     // Add a new student (create view)
     public function create()
     {
-        $courses = Course::where('status', '1')->get(); // Fetch active courses
+        $courses = Course::where('status', '1')->get();
         return view('students.create', compact('courses'));
     }
 
@@ -164,20 +156,14 @@ class StudentController extends Controller
             'firstname' => 'required|string|max:255',
             'middlename' => 'nullable|string|max:255',
             'course_id' => 'required|exists:course,id',
-            'birthday' => 'required|string',  // Treat birthday as a text field
+            'birthday' => 'required|string',
             'status' => 'required|boolean',
         ]);
 
         try {
-            Student::create([
-                'school_id' => $request->school_id,
-                'lastname' => $request->lastname,
-                'firstname' => $request->firstname,
-                'middlename' => $request->middlename,
-                'course_id' => $request->course_id,
-                'birthday' => $request->birthday,
-                'status' => $request->status,
-            ]);
+            Student::create($request->only([
+                'school_id', 'lastname', 'firstname', 'middlename', 'course_id', 'birthday', 'status'
+            ]));
 
             return redirect()->route('students.search')->with('success', 'Student added successfully!');
         } catch (\Exception $e) {
@@ -192,8 +178,82 @@ class StudentController extends Controller
         $students = Student::where('firstname', 'LIKE', "%$query%")
                             ->orWhere('lastname', 'LIKE', "%$query%")
                             ->orWhere('school_id', 'LIKE', "%$query%")
-                            ->paginate(20); // Adjust pagination as needed
+                            ->paginate(20);
 
         return view('students.search', compact('students'));
     }
+
+    // Show a voucher for a student by ID
+    public function handleVoucherAndSatp(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'idNumber' => 'required|string',
+            'lastname' => 'required|string',
+            'birthday' => 'required|date_format:Y-m-d',
+            'courseSelect' => 'required|string',
+        ]);
+    
+        $school_id = $request->input('idNumber');
+    
+        // Find the student and SATP account data
+        $student = Student::where('school_id', $school_id)->first();
+        $satpAccount = Satpaccount::where('school_id', $school_id)->first();
+    
+        // Check if student and SATP account were found
+        if ($student && $satpAccount) {
+            $satp_password = $satpAccount->satp_password;
+    
+            // Check if the student has an assigned voucher
+            if ($student->voucher_id) {
+                // If a voucher exists, retrieve it
+                $voucher = Voucher::find($student->voucher_id);
+            } else {
+                // If no voucher is assigned, generate a new one
+                $voucher = $this->generateNewVoucherForStudent($student);
+            }
+    
+            return view('voucher', [
+                'student' => $student,
+                'satp_password' => $satp_password,
+                'voucher' => $voucher, // Pass the voucher to the view
+            ]);
+        } else {
+            return redirect()->back()->with('error', 'Student or SATP account not found.');
+        }
+    }
+    
+    private function generateNewVoucherForStudent($student)
+    {
+        // Start a transaction
+        DB::beginTransaction();
+    
+        try {
+            // Fetch a new voucher code that has not been given
+            $voucher = Voucher::where('is_given', 0)->first();
+    
+            if (!$voucher) {
+                return redirect()->back()->with('error', 'No available vouchers');
+            }
+    
+            // Assign the new voucher to the student
+            $student->voucher_id = $voucher->id;
+            $student->save();
+    
+            // Mark the new voucher as given
+            $voucher->is_given = 1;
+            $voucher->save();
+    
+            // Commit the transaction
+            DB::commit();
+    
+            return $voucher; // Return the newly generated voucher
+        } catch (\Exception $e) {
+            // Rollback the transaction if something goes wrong
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
+    
 }

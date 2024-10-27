@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Voucher;
 use App\Models\Student;
 use App\Models\Course;
+use Illuminate\Support\Facades\DB;
 
 class VoucherController extends Controller
 {
@@ -74,7 +75,11 @@ class VoucherController extends Controller
 
     // Generate a new voucher code for a student
     public function generateVoucherCode(Request $request, $id)
-    {
+{
+    // Start a transaction
+    DB::beginTransaction();
+
+    try {
         // Find the student by ID
         $student = Student::find($id);
 
@@ -106,6 +111,14 @@ class VoucherController extends Controller
             }
         }
 
+        // Commit the transaction
+        DB::commit();
+
         return response()->json(['success' => true, 'voucher_code' => $voucher->voucher_code]);
+    } catch (\Exception $e) {
+        // Rollback the transaction if something goes wrong
+        DB::rollback();
+        return response()->json(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
     }
+}
 }

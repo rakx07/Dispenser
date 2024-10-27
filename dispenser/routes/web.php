@@ -2,91 +2,87 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\StudentController;
-use App\Http\Controllers\CollegeController;
-use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\VoucherController;
-use App\Http\Controllers\SatpController;
+use App\Http\Controllers\{
+    StudentController, CollegeController, DepartmentController,
+    CourseController, VoucherController, SatpController, HomeController
+};
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
-// College import routes
-Route::get('college/import', [CollegeController::class, 'index']);
-Route::post('college/import', [CollegeController::class, 'importExcelData']);
-Route::get('college/edit/{id}', [CollegeController::class, 'edit']);
-Route::post('college/update/{id}', [CollegeController::class, 'update']);
-Route::delete('college/delete/{id}', [CollegeController::class, 'destroy']);
-
-// Department import routes
-Route::get('department/import', [DepartmentController::class, 'index']);
-Route::post('department/import', [DepartmentController::class, 'importExcelData']);
-Route::get('department/edit/{id}', [DepartmentController::class, 'edit'])->name('department.edit');
-Route::put('department/update/{id}', [DepartmentController::class, 'update'])->name('department.update');
-Route::delete('department/delete/{id}', [DepartmentController::class, 'destroy']);
-
-// Course import routes
-Route::get('course/import', [CourseController::class, 'index']);
-Route::post('course/import', [CourseController::class, 'importExcelData']);
-Route::get('course/edit/{id}', [CourseController::class, 'edit'])->name('course.edit');
-Route::put('course/update/{id}', [CourseController::class, 'update'])->name('course.update');
-Route::delete('course/delete/{id}', [CourseController::class, 'destroy']);
-
-// Student import routes
-Route::get('students/import', [StudentController::class, 'index'])->name('students.index');
-Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
-Route::get('student/edit/{id}', [StudentController::class, 'edit'])->name('student.edit');
-Route::put('student/update/{id}', [StudentController::class, 'update'])->name('student.update');
-Route::delete('student/delete/{id}', [StudentController::class, 'destroy'])->name('student.destroy');
-
-// Welcome page and check student routes
+// Home and welcome route
 Route::get('/', [StudentController::class, 'welcomeview'])->name('welcome');
-Route::post('/check-student', [StudentController::class, 'checkStudent'])->name('check.student');
-Route::post('/create-student-account', [StudentController::class, 'createStudentAccount'])->name('create.student.account');
+
+// College routes
+Route::prefix('college')->group(function () {
+    Route::get('/import', [CollegeController::class, 'index']);
+    Route::post('/import', [CollegeController::class, 'importExcelData']);
+    Route::get('/edit/{id}', [CollegeController::class, 'edit']);
+    Route::post('/update/{id}', [CollegeController::class, 'update']);
+    Route::delete('/delete/{id}', [CollegeController::class, 'destroy']);
+});
+
+// Department routes
+Route::prefix('department')->group(function () {
+    Route::get('/import', [DepartmentController::class, 'index']);
+    Route::post('/import', [DepartmentController::class, 'importExcelData']);
+    Route::get('/edit/{id}', [DepartmentController::class, 'edit'])->name('department.edit');
+    Route::put('/update/{id}', [DepartmentController::class, 'update'])->name('department.update');
+    Route::delete('/delete/{id}', [DepartmentController::class, 'destroy'])->name('department.destroy');
+});
+
+// Course routes
+Route::prefix('course')->group(function () {
+    Route::get('/import', [CourseController::class, 'index']);
+    Route::post('/import', [CourseController::class, 'importExcelData']);
+    Route::get('/edit/{id}', [CourseController::class, 'edit'])->name('course.edit');
+    Route::put('/update/{id}', [CourseController::class, 'update'])->name('course.update');
+    Route::delete('/delete/{id}', [CourseController::class, 'destroy'])->name('course.destroy');
+});
+
+// Student routes
+Route::prefix('students')->group(function () {
+    Route::post('/check-student', [StudentController::class, 'checkStudent'])->name('check.student');
+    Route::post('/voucher-and-satp', [StudentController::class, 'handleVoucherAndSatp'])->name('students.voucherAndSatp'); // Updated route for combined functionality
+});
 
 // Voucher routes
-Route::get('voucher/import', [VoucherController::class, 'index']);
-Route::post('voucher/import', [VoucherController::class, 'importExcelData']);
-Route::post('/voucher', [VoucherController::class, 'show'])->name('voucher.show');
+Route::prefix('voucher')->group(function () {
+    Route::get('/import', [VoucherController::class, 'index']);
+    Route::post('/import', [VoucherController::class, 'importExcelData']);
+    Route::post('/show', [VoucherController::class, 'show'])->name('voucher.show');
+    Route::get('/', function () {
+        return view('voucher');
+    })->name('voucher');
+    Route::get('/{id}/generate', [VoucherController::class, 'generateVoucherCode'])->name('voucher.generate');
+});
 
-Route::get('/voucher', function () {
-    return view('voucher');
-})->name('voucher');
+// SATP account routes (only accessible to authenticated users)
+Route::middleware(['auth'])->prefix('satpaccount')->group(function () {
+  
+});
 
 // Authentication routes
-Auth::routes();
-Auth::routes(['register' => true]);
-Auth::routes(['password.reset' => false]);
+Auth::routes(['register' => true, 'reset' => false]);
 
-Route::get('/student/{id}/generate-voucher', [VoucherController::class, 'generateVoucherCode'])->name('voucher.generate');
+// Home route for authenticated users
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
- 
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-// Optional route to handle custom registration logic
-Route::get('register', function () {
-    return abort(404);
-});
-// Route::get('/student/create', [StudentController::class, 'create'])->name('student.create');
-// Route::post('/student/store', [StudentController::class, 'store'])->name('student.store');
-// Route::get('/student/search', [StudentController::class, 'search'])->name('student.search');
+// Additional student routes requiring authentication
 Route::middleware(['auth'])->group(function () {
+    Route::get('/assign/{studentId}', [SatpController::class, 'assign'])->name('satpaccount.assign'); // Assign SATP account to a student
+    Route::post('/store/{studentId}', [SatpController::class, 'store'])->name('satpaccount.store'); // Store SATP account details for a student
+    // Route::get('/import', [StudentController::class, 'index'])->name('students.index');
+    // Route::post('/import', [StudentController::class, 'import'])->name('students.import');
+    Route::get('students/import', [StudentController::class, 'index']);
+    Route::post('students/import', [StudentController::class, 'import']);
+
+    Route::get('/edit/{id}', [StudentController::class, 'edit'])->name('student.edit');
+    Route::put('/update/{id}', [StudentController::class, 'update'])->name('student.update');
+    Route::delete('/delete/{id}', [StudentController::class, 'destroy'])->name('student.destroy');
+    Route::post('/create-student-account', [StudentController::class, 'createStudentAccount'])->name('create.student.account');
     Route::get('/student/create', [StudentController::class, 'create'])->name('student.create');
     Route::post('/student/store', [StudentController::class, 'store'])->name('student.store');
     Route::get('/student/search', [StudentController::class, 'search'])->name('student.search');
-
-    Route::get('satpaccount/import',[App\Http\Controllers\SatpController::class, 'index']);
-    Route::post('satpaccount/import',[App\Http\Controllers\SatpController::class, 'importExcelData']);
     Route::get('satpaccount/create', [App\Http\Controllers\SatpController::class, 'create'])->name('satpaccount.create');
     Route::post('satpaccount/store', [App\Http\Controllers\SatpController::class, 'store'])->name('satpaccount.store'); 
+    Route::get('satpaccount/import',[App\Http\Controllers\SatpController::class, 'index']);
+    Route::post('satpaccount/import',[App\Http\Controllers\SatpController::class, 'importExcelData']);
 });

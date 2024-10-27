@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('satpaccounts', function (Blueprint $table) {
             $table->id();
-            $table->string('student_id');
+            $table->string('school_id');
             $table->string('satp_password');
             $table->timestamps();
         });

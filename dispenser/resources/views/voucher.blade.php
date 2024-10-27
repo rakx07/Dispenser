@@ -63,19 +63,15 @@
         <!-- Student Information -->
         <div class="student-info">
             @if (isset($student))
-          
-            <h3>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
-
-            <p><strong>ID Number: </strong>{{ $student->school_id }}</p>
-            
-            <p><strong>Course:</strong> {{ ($student->course->name) }}</p>
-            
-            <p><strong>Email:</strong> {{ ucfirst(Str::camel($student->email_id)) }}TBA</p>
-            
-            <p><strong>Temporary Email Password:</strong> TBA </p>
-            
-            <p><strong>Voucher Code:</strong> {{ $voucher->voucher_code }}</p>
-            
+                <h3>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
+                <p><strong>ID Number: </strong>{{ $student->school_id }}</p>
+                <p><strong>Course:</strong> {{ $student->course->name }}</p>
+                <p><strong>Email:</strong> {{ ucfirst(Str::camel($student->email_id)) }}TBA</p>
+                
+                <!-- New Satp Password Display -->
+                <p><strong>SATP Password:</strong> {{ $satp_password }}</p>
+                
+                <p><strong>Voucher Code:</strong> {{ $voucher->voucher_code ?? 'Not available' }}</p>
             @else
                 <div class="alert alert-danger">
                     Student information not found.

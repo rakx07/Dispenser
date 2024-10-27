@@ -19,7 +19,7 @@ class SatpaccountImport implements ToCollection , WithHeadingRow
 
         foreach ($rows as $row){
             Satpaccount::create ([
-                'student_id' => $row['student_id'],
+                'school_id' => $row['school_id'],
                 'satp_password'=> $row['satp_password'],
 
             ]);

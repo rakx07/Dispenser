@@ -12,7 +12,7 @@ class Satpaccount extends Model
     protected $table ='satpaccounts';
 
     protected $fillable = [
-        'student_id',
+        'school_id',
         'satp_password',
     ];
 

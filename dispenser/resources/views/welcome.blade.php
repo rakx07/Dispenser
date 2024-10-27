@@ -92,7 +92,8 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('voucher.show') }}">
+                {{-- <form method="POST" action="{{ route('voucher.show') }}"> --}}
+                    <form method="POST" action="{{ route('students.voucherAndSatp') }}">
                     @csrf
                     <div class="mb-3">
                         <label for="courseSelect" class="form-label"><b>Select Your Course</b></label>
