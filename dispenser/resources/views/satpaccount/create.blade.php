@@ -29,12 +29,12 @@
 
         <div class="form-group">
             <label for="student_id">Student ID</label>
-            <input type="text" name="student_id" class="form-control" value="{{ old('student_id') }}" required>
+            <input type="text" name="student_id" class="form-control" style="width: 30%;" value="{{ old('student_id') }}" required>
         </div>
 
         <div class="form-group">
             <label for="satp_password">Password</label>
-            <input type="text" name="satp_password" class="form-control" value="{{ old('satp_password') }}" required>
+            <input type="text" name="satp_password" class="form-control" style="width: 30%;" value="{{ old('satp_password') }}" required>
         </div>
 
         <button type="submit" class="btn btn-primary">Add SATP Account</button>
