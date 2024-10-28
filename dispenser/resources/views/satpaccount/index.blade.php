@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Student Import')
+@section('title', 'SATP Import')
 
 @section('content_header')
     <!-- Additional header content can be added here -->

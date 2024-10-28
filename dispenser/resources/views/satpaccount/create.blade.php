@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Student Import')
+@section('title', 'SATP Add User')
 
 @section('content_header')
 <div class="container mt-5" style="max-width: 50%;">

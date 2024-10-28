@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'Voucher Admin Login',
+    'title' => 'Voucher Admin DashBoard',
     'title_prefix' => '',
     'title_postfix' => '',
 
