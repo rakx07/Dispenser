@@ -167,7 +167,7 @@ class StudentController extends Controller
 
             return redirect()->route('students.search')->with('success', 'Student added successfully!');
         } catch (\Exception $e) {
-            return redirect()->route('students.create')->with('error', 'Failed to add student. Please try again.');
+            return redirect()->route('student.create')->with('error', 'Failed to add student. Please try again.');
         }
     }
 
