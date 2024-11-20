@@ -58,34 +58,41 @@
 
     <!-- Main Content -->
     <main class="container mt-5">
-        <h1 class="mb-4"><b>Student Information</b></h1>
-    
-        <!-- Student Information -->
-        <div class="student-info">
-            @if (isset($student))
-                <h3>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
-                <p><strong>ID Number: </strong>{{ $student->school_id }}</p>
-                <p><strong>Course:</strong> {{ $student->course->name }}</p>
-                <p><strong>Email:</strong> {{ ucfirst(Str::camel($student->email_id)) }}TBA</p>
-                
-                <!-- New Satp Password Display -->
-                <p><strong>SATP Username : </strong>{{ $student->school_id }}</p>
-                <p><strong>SATP Password:</strong> {{ $satp_password }}</p>
-                
-                <p><strong>Voucher Code:</strong> {{ $voucher->voucher_code ?? 'Not available' }}</p>
-            @else
-                <div class="alert alert-danger">
-                    Student information not found.
-                </div>
-            @endif
-        </div>
+    <h1 class="mb-4"><b>Student Information</b></h1>
 
-        <!-- Done Button -->
-        <div class="text-center done-button">
-            <button id="doneButton" class="btn btn-primary btn-lg">Done</button>
-        </div>
+    <!-- Student Information -->
+    <div class="student-info">
         
-    </main>
+        @if (isset($student))
+            <h3>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
+            <div class="satp-box border p-3 my-4 rounded">
+            <p><strong>ID Number: </strong>{{ $student->school_id }}</p>
+            <p><strong>Course:</strong> {{ $student->course->name }}</p>
+            <p><strong>Email:</strong> {{ ucfirst(Str::camel($student->email_id)) }}TBA</p>
+            </div>
+            <!-- New SATP Information Box -->
+            <div class="satp-box border p-3 my-4 rounded">
+                <h3>SATP Credentials</h3><br>
+                <p><strong>SATP Username:</strong> {{ $student->school_id }}</p>
+                <p><strong>SATP Password:</strong> {{ $satp_password }}</p>
+                <p><strong>SATP Link:</strong> <u>http://satp.ndmu.edu.ph</u></p>
+            </div>
+            <div class="satp-box border p-3 my-4 rounded">
+            <p><strong>Voucher Code:</strong> {{ $voucher->voucher_code ?? 'Not available' }}</p>
+            </div>
+        @else
+            <div class="alert alert-danger">
+                Student information not found.
+            </div>
+        @endif
+    </div>
+
+    <!-- Done Button -->
+    <div class="text-center done-button">
+        <button id="doneButton" class="btn btn-primary btn-lg">Done</button>
+    </div>
+</main>
+
     
     <!-- Footer -->
     <footer>
