@@ -75,7 +75,9 @@
                 <h3>SATP Credentials</h3><br>
                 <p><strong>SATP Username:</strong> {{ $student->school_id }}</p>
                 <p><strong>SATP Password:</strong> {{ $satp_password }}</p>
-                <p><strong>SATP Link:</strong> <u>http://satp.ndmu.edu.ph</u></p>
+                <p><strong>SATP Link:</strong> <span>http://satp.ndmu.edu.ph</span></p>
+
+
             </div>
             <div class="satp-box border p-3 my-4 rounded">
             <p><strong>Voucher Code:</strong> {{ $voucher->voucher_code ?? 'Not available' }}</p>
