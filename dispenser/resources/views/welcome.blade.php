@@ -43,6 +43,21 @@
         .bootstrap-select .dropdown-menu li {
             white-space: normal !important;
         }
+        .beating-text {
+            color: red;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            animation: beat 1s infinite;
+        }
+        @keyframes beat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
     </style>
 </head>
 <body>
@@ -61,6 +76,11 @@
 
     <!-- Main Content -->
     <main class="container mt-5">
+        <!-- Beating Text -->
+        <div class="mb-5">
+            <p class="beating-text">GET YOUR SATP ACCOUNT HERE!</p>
+        </div>
+
         <div class="row">
             <div class="col-md-6">
                 <h1 class="mb-4"><b>Student Information</b></h1>
@@ -92,8 +112,7 @@
                     </div>
                 @endif
 
-                {{-- <form method="POST" action="{{ route('voucher.show') }}"> --}}
-                    <form method="POST" action="{{ route('students.voucherAndSatp') }}">
+                <form method="POST" action="{{ route('students.voucherAndSatp') }}">
                     @csrf
                     <div class="mb-3">
                         <label for="courseSelect" class="form-label"><b>Select Your Course</b></label>
@@ -126,16 +145,12 @@
             <div class="col-md-6">
                 <h1 class="mb-4"><b>Voucher Usage Guidelines</b></h1>
                 <ul class="list-group">
-    <li class="list-group-item"><strong>• This voucher code is exclusively for enrolled students of Notre Dame of Marbel University.</strong></li>
-    <li class="list-group-item"><strong>• Each student is entitled to use one voucher code.</strong></li>
-    <li class="list-group-item"><strong>• The voucher code is valid for use with NDMUWLAN1, NDMUWDS, and similar WiFi access points.</strong></li>
-    <li class="list-group-item"><strong>• The voucher code provides 2 hours of access; the connection will be automatically disconnected after this time, requiring you to reconnect using the same voucher code.</strong></li>
-    <li class="list-group-item"><strong>• If there are concerns kindly proceed to MIS Office.</strong></li>
-    <li class="list-group-item text-center text-danger" style="font-size: 1.5rem; font-weight: bold;">
-        GET YOUR SATP ACCOUNT HERE!
-    </li>
-</ul>
-
+                    <li class="list-group-item"><strong>• This voucher code is exclusively for enrolled students of Notre Dame of Marbel University.</strong></li>
+                    <li class="list-group-item"><strong>• Each student is entitled to use one voucher code.</strong></li>
+                    <li class="list-group-item"><strong>• The voucher code is valid for use with NDMUWLAN1, NDMUWDS, and similar WiFi access points.</strong></li>
+                    <li class="list-group-item"><strong>• The voucher code provides 2 hours of access; the connection will be automatically disconnected after this time, requiring you to reconnect using the same voucher code.</strong></li>
+                    <li class="list-group-item"><strong>• If there are concerns kindly proceed to MIS Office.</strong></li>
+                </ul>
             </div>
         </div>
     </main>
@@ -184,44 +199,6 @@
                 $('#courseSelect').selectpicker('val', '');
             });
         });
-    </script>
-
-    <script type="text/javascript">
-        (function (global) {
-            if(typeof (global) === "undefined") {
-                throw new Error("window is undefined");
-            }
-
-            var _hash = "!";
-            var noBackPlease = function () {
-                global.location.href += "#";
-
-                // Making sure we have the fruit available for juice (^__^)
-                global.setTimeout(function () {
-                    global.location.href += "!";
-                }, 50);
-            };
-
-            global.onhashchange = function () {
-                if (global.location.hash !== _hash) {
-                    global.location.hash = _hash;
-                }
-            };
-
-            global.onload = function () {
-                noBackPlease();
-
-                // Disables backspace on page except on input fields and textarea..
-                document.body.onkeydown = function (e) {
-                    var elm = e.target.nodeName.toLowerCase();
-                    if (e.which === 8 && (elm !== 'input' && elm  !== 'textarea')) {
-                        e.preventDefault();
-                    }
-                    // Stopping the event bubbling up the DOM tree...
-                    e.stopPropagation();
-                };
-            };
-        })(window);
     </script>
 </body>
 </html>
