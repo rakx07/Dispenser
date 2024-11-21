@@ -60,7 +60,7 @@ Route::middleware(['auth'])->prefix('satpaccount')->group(function () {
 });
 
 // Authentication routes
-Auth::routes(['register' => true, 'reset' => false]);
+Auth::routes(['register' => false, 'reset' => false]);
 
 // Home route for authenticated users
 Route::get('/home', [HomeController::class, 'index'])->name('home');
