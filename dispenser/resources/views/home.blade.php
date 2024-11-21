@@ -51,7 +51,6 @@
                     <!-- This will display the calculated differences -->
                     <h5>Differences:</h5>
                     <p id="difference1">Calculating...</p>
-                    <p id="difference2">Calculating...</p>
                 </div>
             </div>
         </div>
@@ -79,16 +78,14 @@
         const studentVoucherLabels = @json($studentVoucherData['labels']);
         const studentVoucherValues = @json($studentVoucherData['values']);
 
-        // Difference Calculations
+        // Difference Calculation
         const studentsWithoutVoucher = studentVoucherValues[1]; // Second value in Student Distribution
         const notGivenVouchers = voucherValues[1]; // Second value in Voucher Status
         const difference1 = studentsWithoutVoucher - notGivenVouchers; // Students Without Voucher - Not Given Vouchers
-        const difference2 = notGivenVouchers - studentsWithoutVoucher; // Available Vouchers - Students Without Vouchers
 
         // Display the differences
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('difference1').textContent = `Difference 1: ${difference1} (Students Without Voucher - Not Given Vouchers)`;
-            document.getElementById('difference2').textContent = `Difference 2: ${difference2} (Not Given Vouchers - Students Without Voucher)`;
         });
 
         // Chart Options
