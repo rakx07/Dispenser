@@ -76,7 +76,7 @@
                 <p><strong>SATP Username:</strong> {{ $student->school_id }}</p>
                 <p><strong>SATP Password:</strong> {{ $satp_password }}</p>
                 <p><strong>SATP Link:</strong> <span>http://satp.ndmu.edu.ph</span></p>
-                <p><strong>NOTE: <span>Use Google Chrome Web Browser.</span></strong></p>
+                <p style="color: red; font-weight: bold;"><strong>NOTE: <span>Use Google Chrome Web Browser.</span></strong></p>
 
 
             </div>
