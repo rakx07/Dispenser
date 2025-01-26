@@ -20,19 +20,24 @@ class EmailController extends Controller
      * Handle the Excel file upload and import process.
      */
     public function importExcelData(Request $request)
-    {
-        // Validate the uploaded file
-        $request->validate([
-            'import_file' => 'required|file|mimes:xlsx,csv',
-        ]);
+{
+    $request->validate([
+        'import_file' => 'required|file|mimes:xlsx,csv',
+    ]);
 
-        try {
-            // Import the Excel file
-            Excel::import(new EmailImport, $request->file('import_file'));
+    try {
+        $import = new EmailImport();
+        Excel::import($import, $request->file('import_file'));
 
-            return redirect()->back()->with('status', 'Excel import successful!');
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['import_error' => 'There was an error importing the file. Please ensure the format is correct.']);
+        $message = 'Excel import successful!';
+        if ($import->skipped > 0) {
+            $message .= " {$import->skipped} records were skipped due to duplicates or missing data.";
         }
+
+        return redirect()->back()->with('status', $message);
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors(['import_error' => 'Error importing the file: ' . $e->getMessage()]);
     }
+}
+
 }

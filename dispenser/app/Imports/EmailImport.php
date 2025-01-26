@@ -8,33 +8,34 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class EmailImport implements ToModel, WithHeadingRow
 {
-    public $skipped = 0; // Track the number of skipped records
+    public $skipped = 0; // Track skipped records
 
-    /**
-     * Map each row of the Excel file to the Email model.
-     *
-     * @param array $row
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
     public function model(array $row)
     {
-        // Check if the record already exists in the database
-        $existingEmail = Email::where('email_address', $row['email_address'])
-            ->where('sch_id_number', $row['sch_id_number'])
-            ->first();
+        // Trim and clean up the data
+        $row = array_map('trim', $row);
 
-        if ($existingEmail) {
-            $this->skipped++; // Increment the skipped counter if the email exists
+        // Validate required fields
+        if (empty($row['first_name']) || empty($row['last_name']) || empty($row['email_address'])) {
+            $this->skipped++; // Increment skipped counter
             return null;
         }
 
-        // Return a new Email model instance for insertion
+        // Check for existing record
+        $existingEmail = Email::where('email_address', $row['email_address'])->first();
+
+        if ($existingEmail) {
+            $this->skipped++; // Skip duplicate email addresses
+            return null;
+        }
+
         return new Email([
-            'first_name'    => $row['first_name'],
-            'last_name'     => $row['last_name'],
-            'email_address' => $row['email_address'],
-            'password'      => $row['password'], // Store plain text password
-            'sch_id_number' => $row['sch_id_number'],
+            'first_name'     => $row['first_name'],
+            'last_name'      => $row['last_name'],
+            'email_address'  => $row['email_address'],
+            'password'       => $row['password'], // Assuming password is plaintext
+            'sch_id_number'  => $row['sch_id_number'],
         ]);
     }
 }
+
