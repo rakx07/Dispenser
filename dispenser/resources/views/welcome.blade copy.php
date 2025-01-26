@@ -155,21 +155,21 @@
             // Initialize Bootstrap-Select
             $('.selectpicker').selectpicker();
             
-            @if(session('showModal'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Student Found!',
-                    html: '<p>Student found with ID: <b>{{ session('school_id') }}</b></p>',
-                    confirmButtonText: 'Great!',
-                    confirmButtonColor: '#3085d6',
-                    timer: 3000,
-                    showConfirmButton: true
-                }).then((result) => {
-                    if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
-                        window.location.href = "{{ route('voucher') }}"; // Adjust this route as needed
-                    }
-                });
-            @endif
+            // @if(session('showModal'))
+            //     Swal.fire({
+            //         icon: 'success',
+            //         title: 'Student Found!',
+            //         html: '<p>Student found with ID: <b>{{ session('school_id') }}</b></p>',
+            //         confirmButtonText: 'Great!',
+            //         confirmButtonColor: '#3085d6',
+            //         timer: 3000,
+            //         showConfirmButton: true
+            //     }).then((result) => {
+            //         if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+            //             window.location.href = "{{ route('voucher') }}"; // Adjust this route as needed
+            //         }
+            //     });
+            // @endif Error
 
             // Clear button functionality
             document.getElementById('clearButton').addEventListener('click', function() {
