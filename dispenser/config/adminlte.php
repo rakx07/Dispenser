@@ -387,6 +387,11 @@ return [
                     'url' => 'satpaccount/import',
                     'icon' => 'fas fa-fw fa-paperclip',
                 ],
+                [
+                    'text' => 'Email Upload',
+                    'url' => 'emails/import',
+                    'icon' => 'fas fa-fw fa-paperclip',
+                ],
             ],
         ],
 

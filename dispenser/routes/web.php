@@ -6,6 +6,7 @@ use App\Http\Controllers\{
     StudentController, CollegeController, DepartmentController,
     CourseController, VoucherController, SatpController, HomeController
 };
+use App\Http\Controllers\EmailController;
 
 // Home and welcome route
 Route::get('/', [StudentController::class, 'welcomeview'])->name('welcome');
@@ -85,4 +86,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('satpaccount/store', [App\Http\Controllers\SatpController::class, 'store'])->name('satpaccount.store'); 
     Route::get('satpaccount/import',[App\Http\Controllers\SatpController::class, 'index']);
     Route::post('satpaccount/import',[App\Http\Controllers\SatpController::class, 'importExcelData']);
+
+    // Route::post('/emails/import-emails', [App\Http\Controllers\EmailController::class, 'importExcelData'])->name('emails.import');
+
+    Route::get('/emails/import', [EmailController::class, 'index'])->name('emails.index');
+    Route::post('/emails/import-emails', [EmailController::class, 'importExcelData'])->name('emails.import');
 });
