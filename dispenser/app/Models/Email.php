@@ -9,16 +9,11 @@ class Email extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    protected $table = 'emails';
+
     protected $fillable = [
-        'first_name',
-        'last_name',
-        'email_address',
-        'password', // Plain text password
         'sch_id_number',
+        'email_address',
+        'password',
     ];
 }

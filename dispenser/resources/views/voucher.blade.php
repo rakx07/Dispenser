@@ -62,33 +62,39 @@
 
     <!-- Student Information -->
     <div class="student-info">
-        
-        @if (isset($student))
-            <h3>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
-            <div class="satp-box border p-3 my-4 rounded">
+    @if (isset($student))
+        <h3>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
+        <div class="satp-box border p-3 my-4 rounded">
             <p><strong>ID Number: </strong>{{ $student->school_id }}</p>
             <p><strong>Course:</strong> {{ $student->course->name }}</p>
-            <p><strong>Email:</strong> {{ ucfirst(Str::camel($student->email_id)) }}TBA</p>
-            </div>
-            <!-- New SATP Information Box -->
-            <div class="satp-box border p-3 my-4 rounded">
-                <h3>SATP Credentials</h3><br>
-                <p><strong>SATP Username:</strong> {{ $student->school_id }}</p>
-                <p><strong>SATP Password:</strong> {{ $satp_password }}</p>
-                <p><strong>SATP Link:</strong> <span>http://satp.ndmu.edu.ph</span></p>
-                <p style="color: red; font-weight: bold;"><strong>NOTE: <span>Use Google Chrome Web Browser.</span></strong></p>
+            <p><strong>Email: </strong> {{ isset($email) ? $email : 'Not Available' }}</p>
+            <p><strong>Password: </strong> 
+            <span id="password-field" style="font-weight: bold;"> 
+               {{ isset($password) ? str_repeat('*', strlen($password)) : 'Not Available' }}
+             </span> 
+    <button type="button" id="toggle-password" class="btn btn-sm btn-outline-primary">Show</button>
+</p>
+        </div>
 
+        <!-- New SATP Information Box -->
+        <div class="satp-box border p-3 my-4 rounded">
+            <h3>SATP Credentials</h3><br>
+            <p><strong>SATP Username:</strong> {{ $student->school_id }}</p>
+            <p><strong>SATP Password:</strong> {{ $satp_password }}</p>
+            <p><strong>SATP Link:</strong> <span>http://satp.ndmu.edu.ph</span></p>
+            <p style="color: red; font-weight: bold;"><strong>NOTE: <span>Use Google Chrome Web Browser.</span></strong></p>
+        </div>
 
-            </div>
-            <div class="satp-box border p-3 my-4 rounded">
+        <div class="satp-box border p-3 my-4 rounded">
             <p><strong>Voucher Code:</strong> {{ $voucher->voucher_code ?? 'Not available' }}</p>
-            </div>
-        @else
-            <div class="alert alert-danger">
-                Student information not found.
-            </div>
-        @endif
-    </div>
+        </div>
+    @else
+        <div class="alert alert-danger">
+            Student information not found.
+        </div>
+    @endif
+</div>
+
 
     <!-- Done Button -->
     <div class="text-center done-button">
@@ -132,5 +138,24 @@
     <script>
         console.log(Swal); // Should log the Swal object if correctly loaded
     </script>
+    <!-- JavaScript to Toggle Password Visibility -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const passwordField = document.getElementById('password-field');
+        const toggleButton = document.getElementById('toggle-password');
+        let isHidden = true;
+
+        toggleButton.addEventListener('click', function () {
+            if (isHidden) {
+                passwordField.textContent = "{{ isset($password) ? $password : 'Not Available' }}";
+                toggleButton.textContent = "Hide";
+            } else {
+                passwordField.textContent = "{{ isset($password) ? str_repeat('*', strlen($password)) : 'Not Available' }}";
+                toggleButton.textContent = "Show";
+            }
+            isHidden = !isHidden;
+        });
+    });
+</script>
 </body>
 </html>

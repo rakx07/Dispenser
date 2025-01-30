@@ -26,4 +26,10 @@ class Student extends Model
     {
         return $this->belongsTo(Course::class, 'course_id');
     }
+
+    public function email()
+    {
+        return $this->belongsTo(Email::class, 'email_id');
+    }
 }
+

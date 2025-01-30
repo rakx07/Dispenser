@@ -49,9 +49,7 @@ Route::prefix('voucher')->group(function () {
     Route::get('/import', [VoucherController::class, 'index']);
     Route::post('/import', [VoucherController::class, 'importExcelData']);
     Route::post('/show', [VoucherController::class, 'show'])->name('voucher.show');
-    Route::get('/', function () {
-        return view('voucher');
-    })->name('voucher');
+    Route::get('/', [StudentController::class, 'showVoucher'])->name('voucher'); // Updated route to fetch email and password
     Route::get('/{id}/generate', [VoucherController::class, 'generateVoucherCode'])->name('voucher.generate');
 });
 

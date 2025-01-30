@@ -6,6 +6,7 @@ use App\Models\Student;
 use App\Models\StudentUser;
 use App\Models\Course;
 use App\Models\Voucher;
+use App\Models\Email;
 use App\Models\Satpaccount;
 use Illuminate\Http\Request;
 use App\Imports\StudentImport;
@@ -127,7 +128,7 @@ class StudentController extends Controller
         StudentUser::create([
             'school_id' => $request->input('schoolId'),
             'password' => Hash::make($request->input('password')),
-            'status' => 1, // Active status
+            'status' => 1,
         ]);
 
         return redirect()->route('signin')->with('message', 'Account created successfully.');
@@ -171,89 +172,71 @@ class StudentController extends Controller
         }
     }
 
-    // Search for students by first name, last name, or school ID
-    public function search(Request $request)
-    {
-        $query = $request->input('query');
-        $students = Student::where('firstname', 'LIKE', "%$query%")
-                            ->orWhere('lastname', 'LIKE', "%$query%")
-                            ->orWhere('school_id', 'LIKE', "%$query%")
-                            ->paginate(20);
-
-        return view('students.search', compact('students'));
-    }
-
-    // Show a voucher for a student by ID
+    // Show voucher details
     public function handleVoucherAndSatp(Request $request)
     {
-        // Validate the incoming request data
         $request->validate([
             'idNumber' => 'required|string',
             'lastname' => 'required|string',
             'birthday' => 'required|date_format:Y-m-d',
             'courseSelect' => 'required|string',
         ]);
-    
+
         $school_id = $request->input('idNumber');
-    
-        // Find the student and SATP account data
+
         $student = Student::where('school_id', $school_id)->first();
         $satpAccount = Satpaccount::where('school_id', $school_id)->first();
-    
-        // Check if student and SATP account were found
-        if ($student && $satpAccount) {
+        $emailRecord = Email::where('sch_id_number', $school_id)->first();
+
+        if ($student && $satpAccount && $emailRecord) {
             $satp_password = $satpAccount->satp_password;
-    
-            // Check if the student has an assigned voucher
-            if ($student->voucher_id) {
-                // If a voucher exists, retrieve it
-                $voucher = Voucher::find($student->voucher_id);
-            } else {
-                // If no voucher is assigned, generate a new one
-                $voucher = $this->generateNewVoucherForStudent($student);
-            }
-    
+            $voucher = $student->voucher_id ? Voucher::find($student->voucher_id) : $this->generateNewVoucherForStudent($student);
+
             return view('voucher', [
                 'student' => $student,
                 'satp_password' => $satp_password,
-                'voucher' => $voucher, // Pass the voucher to the view
+                'voucher' => $voucher,
+                'email' => $emailRecord->email_address,
+                'password' => $emailRecord->password,
             ]);
         } else {
-            return redirect()->back()->with('error', 'Student or SATP account not found.');
+            return redirect()->back()->with('error', 'Student, SATP account, or Email record not found.');
         }
     }
-    
+
+    public function showVoucher()
+    {
+        return view('voucher', [
+            'student' => session('student'),
+            'email' => session('email'),
+            'password' => session('password'),
+            'voucher' => session('voucher'),
+        ]);
+    }
+
     private function generateNewVoucherForStudent($student)
     {
-        // Start a transaction
         DB::beginTransaction();
-    
+
         try {
-            // Fetch a new voucher code that has not been given
             $voucher = Voucher::where('is_given', 0)->first();
-    
+
             if (!$voucher) {
                 return redirect()->back()->with('error', 'No available vouchers');
             }
-    
-            // Assign the new voucher to the student
+
             $student->voucher_id = $voucher->id;
             $student->save();
-    
-            // Mark the new voucher as given
+
             $voucher->is_given = 1;
             $voucher->save();
-    
-            // Commit the transaction
+
             DB::commit();
-    
-            return $voucher; // Return the newly generated voucher
+
+            return $voucher;
         } catch (\Exception $e) {
-            // Rollback the transaction if something goes wrong
             DB::rollback();
             return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
-
-    
 }
