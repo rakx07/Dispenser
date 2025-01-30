@@ -9,11 +9,13 @@ class Email extends Model
 {
     use HasFactory;
 
-    protected $table = 'emails';
+    protected $table = 'emails'; // Ensure table name matches
 
     protected $fillable = [
-        'sch_id_number',
+        'first_name',
+        'last_name',
         'email_address',
         'password',
+        'sch_id_number',
     ];
 }

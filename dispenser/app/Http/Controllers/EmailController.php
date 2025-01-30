@@ -36,26 +36,20 @@ class EmailController extends Controller
 
         return redirect()->back()->with('status', $message);
     } catch (\Illuminate\Database\QueryException $e) {
-        // Check if the error is a duplicate entry error
-        if ($e->getCode() === '23000' && str_contains($e->getMessage(), 'Duplicate entry')) {
-            preg_match("/Duplicate entry '(.*?)' for key/", $e->getMessage(), $matches);
-            $duplicateValue = $matches[1] ?? 'unknown';
+        \Log::error('Database Import Error: ' . $e->getMessage()); // Log error for debugging
 
-            return redirect()->back()->withErrors([
-                'import_error' => "Error: Duplicate entry found for `sch_id_number`: {$duplicateValue}.",
-            ]);
-        }
-
-        // Handle other query exceptions
         return redirect()->back()->withErrors([
             'import_error' => 'Error importing the file: ' . $e->getMessage(),
         ]);
     } catch (\Exception $e) {
+        \Log::error('General Import Error: ' . $e->getMessage()); // Log general errors
+
         return redirect()->back()->withErrors([
             'import_error' => 'Error importing the file: ' . $e->getMessage(),
         ]);
     }
 }
+
 
 
 }
