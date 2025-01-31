@@ -346,6 +346,11 @@ return [
             'icon' => 'fas fa-fw fa-plus',
         ],
         [
+            'text' => 'Add Student Email',
+            'url' => 'emails/create',
+            'icon' => 'fas fa-fw fa-plus',
+        ],
+        [
             'text' => 'Edit Student',
             'url' => 'student/edit',
             'icon' => 'fas fa-fw fa-edit',

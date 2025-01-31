@@ -89,4 +89,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/emails/import', [EmailController::class, 'index'])->name('emails.index');
     Route::post('/emails/import-emails', [EmailController::class, 'importExcelData'])->name('emails.import');
+
+    //Add Email Function
+    Route::get('/emails/create', [EmailController::class, 'create'])->name('emails.create');
+    Route::post('/emails/store', [EmailController::class, 'store'])->name('emails.store');
 });
