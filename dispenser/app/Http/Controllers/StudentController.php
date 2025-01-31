@@ -150,27 +150,48 @@ class StudentController extends Controller
 
     // Store a new student
     public function store(Request $request)
-    {
-        $request->validate([
-            'school_id' => 'required|unique:students,school_id',
-            'lastname' => 'required|string|max:255',
-            'firstname' => 'required|string|max:255',
-            'middlename' => 'nullable|string|max:255',
-            'course_id' => 'required|exists:course,id',
-            'birthday' => 'required|string',
-            'status' => 'required|boolean',
+{
+    $request->validate([
+        'school_id' => 'required|unique:students,school_id',
+        'lastname' => 'required|string|max:255',
+        'firstname' => 'required|string|max:255',
+        'middlename' => 'nullable|string|max:255',
+        'course_id' => 'required|exists:course,id',
+        'birthday' => 'required|string', // Treated as plain text
+        'status' => 'required|boolean',
+    ]);
+
+    try {
+        DB::beginTransaction(); // Start database transaction
+
+        $student = Student::create([
+            'school_id' => $request->school_id,
+            'lastname' => $request->lastname,
+            'firstname' => $request->firstname,
+            'middlename' => $request->middlename,
+            'course_id' => $request->course_id,
+            'birthday' => $request->birthday,
+            'status' => $request->status,
         ]);
 
-        try {
-            Student::create($request->only([
-                'school_id', 'lastname', 'firstname', 'middlename', 'course_id', 'birthday', 'status'
-            ]));
-
-            return redirect()->route('students.search')->with('success', 'Student added successfully!');
-        } catch (\Exception $e) {
-            return redirect()->route('student.create')->with('error', 'Failed to add student. Please try again.');
+        if (!$student) {
+            throw new \Exception("Student record was not created.");
         }
+
+        DB::commit(); // Commit transaction if successful
+
+        return response()->json(['success' => 'Student added successfully!'], 200);
+    
+    } catch (\Exception $e) {
+        DB::rollBack(); // Rollback transaction in case of error
+
+        \Log::error('Failed to add student: ' . $e->getMessage()); // Log the actual error
+
+        return response()->json(['error' => 'Failed to add student. Please try again.'], 500);
     }
+}
+
+
 
     // Show voucher details
     public function handleVoucherAndSatp(Request $request)
