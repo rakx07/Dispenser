@@ -78,7 +78,7 @@
     <main class="container mt-5">
         <!-- Beating Text -->
         <div class="mb-5">
-            <p class="beating-text">GET YOUR INTSITUTIONAL EMAIL AND VOUCHER CODE HERE!</p>
+            <p class="beating-text">GET YOUR INSTITUTIONAL EMAIL AND VOUCHER CODE HERE!</p>
         </div>
 
         <div class="row">
