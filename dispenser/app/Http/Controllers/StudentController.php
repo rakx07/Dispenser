@@ -195,35 +195,36 @@ class StudentController extends Controller
 
     // Show voucher details
     public function handleVoucherAndSatp(Request $request)
-    {
-        $request->validate([
-            'idNumber' => 'required|string',
-            'lastname' => 'required|string',
-            'birthday' => 'required|date_format:Y-m-d',
-            'courseSelect' => 'required|string',
+{
+    $request->validate([
+        'idNumber' => 'required|string',
+        'lastname' => 'required|string',
+        'birthday' => 'required|date_format:Y-m-d',
+        'courseSelect' => 'required|string',
+    ]);
+
+    $school_id = $request->input('idNumber');
+
+    $student = Student::where('school_id', $school_id)->first();
+    $satpAccount = Satpaccount::where('school_id', $school_id)->first();
+    $emailRecord = Email::where('sch_id_number', $school_id)->first();
+
+    if ($student && $emailRecord) {
+        $satp_password = $satpAccount ? $satpAccount->satp_password : null;
+        $voucher = $student->voucher_id ? Voucher::find($student->voucher_id) : $this->generateNewVoucherForStudent($student);
+
+        return view('voucher', [
+            'student' => $student,
+            'satp_password' => $satp_password, // Will be null if no SATP account exists
+            'voucher' => $voucher,
+            'email' => $emailRecord->email_address,
+            'password' => $emailRecord->password,
         ]);
-
-        $school_id = $request->input('idNumber');
-
-        $student = Student::where('school_id', $school_id)->first();
-        $satpAccount = Satpaccount::where('school_id', $school_id)->first();
-        $emailRecord = Email::where('sch_id_number', $school_id)->first();
-
-        if ($student && $satpAccount && $emailRecord) {
-            $satp_password = $satpAccount->satp_password;
-            $voucher = $student->voucher_id ? Voucher::find($student->voucher_id) : $this->generateNewVoucherForStudent($student);
-
-            return view('voucher', [
-                'student' => $student,
-                'satp_password' => $satp_password,
-                'voucher' => $voucher,
-                'email' => $emailRecord->email_address,
-                'password' => $emailRecord->password,
-            ]);
-        } else {
-            return redirect()->back()->with('error', 'Student, SATP account, or Email record not found.');
-        }
+    } else {
+        return redirect()->back()->with('error', 'Student or Email record not found.');
     }
+}
+
 
     public function showVoucher()
     {
