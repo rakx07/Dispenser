@@ -25,6 +25,12 @@
             text-align: center;
             padding: 1rem;
         }
+        .content-container {
+            border: 2px solid #ccc;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
         .student-info, .satp-box {
             border: 1px solid #ccc;
             padding: 15px;
@@ -32,57 +38,16 @@
             background-color: #f9f9f9;
             margin-top: 15px;
         }
-        .student-info h3, .satp-box h3 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #333;
-        }
         .done-button {
             margin-top: 20px;
         }
-        .content-container {
-            border: 2px solid #ccc; /* Add border around the entire content */
-            border-radius: 8px;
-            padding: 15px;
-            background-color: #f4f4f4;
+        .red-note {
+            color: red;
+            font-weight: bold;
         }
-        .row {
-            margin-top: 30px;
-        }
-        .col-md-7, .col-md-5 {
-            padding-left: 15px;
-            padding-right: 15px;
-            display: flex;
-            flex-direction: column;
-        }
-        .col-md-7 {
-            flex-grow: 1;
-        }
-        .col-md-5 {
-            flex-grow: 1;
-            display: flex;
-            justify-content: flex-start;
-        }
-        .satp-box, .student-info {
-            flex-grow: 1;
-        }
-        .col-md-5 .satp-box {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .alert {
-            margin-top: 20px;
-        }
-        /* Tighten up the spacing between elements inside satp-box */
-        .satp-box p {
-            margin-bottom: 5px;
-            line-height: 1.4; /* Reduce line height */
-        }
-        .satp-box button {
-            padding: 2px 6px;
-            font-size: 0.85rem;
-            margin-left: 10px;
+        .btn-show-all {
+            display: block;
+            margin: 10px auto;
         }
     </style>
 </head>
@@ -102,69 +67,61 @@
 
     <!-- Main Content -->
     <main class="container mt-5">
-    <h1 class="mb-4"><b>Student Information</b></h1>
+        <h1 class="mb-4"><b>Student Information</b></h1>
 
-    <div class="content-container">
-        <div class="row">
-            <!-- Student Information Column -->
-            <div class="col-md-7">
-                <div class="student-info">
-                @if (isset($student))
-                    <h3>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
-                    <div class="satp-box">
-                        <p><strong>ID Number: </strong>{{ $student->school_id }}</p>
-                        <p><strong>Course:</strong> {{ $student->course->name }}</p>
-                        <p><strong>Email: </strong> {{ isset($email) ? $email : 'Not Available' }}</p>
-                        <p><strong>Password: </strong> 
-                        <span id="password-field"> 
-                           {{ isset($password) ? str_repeat('*', strlen($password)) : 'Not Available' }}
-                         </span> 
-                        <button type="button" id="toggle-password" class="btn btn-sm btn-outline-primary">Show</button>
-                    </p>
+        <div class="content-container">
+            <div class="row">
+                <!-- Left Side - Student Information -->
+                <div class="col-md-7">
+                    <div class="student-info">
+                        @if (isset($student))
+                            <h3>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
+                            <p><strong>ID Number:</strong> {{ $student->school_id }}</p>
+                            <p><strong>Course:</strong> {{ $student->course->name }}</p>
+                            <p><strong>Email:</strong> {{ $email ?? 'Not Available' }}</p>
+                            <p><strong>Password:</strong>
+                                <span id="password-field">********</span>
+                            </p>
+                        @else
+                            <div class="alert alert-danger">
+                                Student information not found.
+                            </div>
+                        @endif
                     </div>
 
-                    <!-- Voucher Code Box -->
-                    <div class="satp-box">
-                        <p><strong>Voucher Code:</strong> 
-                            <span id="voucher-code-field">
-                                {{ str_repeat('*', strlen($voucher->voucher_code ?? '')) }}
-                            </span> 
-                            <button type="button" id="toggle-voucher-code" class="btn btn-sm btn-outline-primary">Show</button>
+                    <!-- Voucher Code in Separate Div -->
+                    <div class="student-info mt-3">
+                        <p><strong>Voucher Code:</strong>
+                            <span id="voucher-code-field">********</span>
                         </p>
                     </div>
-                @else
-                    <div class="alert alert-danger">
-                        Student information not found.
-                    </div>
-                @endif
+                </div>
+
+                <!-- Right Side - SATP Credentials -->
+                <div class="col-md-5">
+                    @if (isset($student))
+                        <div class="satp-box">
+                            <h3>SATP Credentials</h3>
+                            <p><strong>SATP Username:</strong> {{ $student->school_id }}</p>
+                            <p><strong>SATP Password:</strong>
+                                <span id="satp-password-field">********</span>
+                            </p>
+                            <p><strong>SATP Link:</strong> <span>http://satp.ndmu.edu.ph</span></p>
+                            <p class="red-note"><strong>NOTE: Use Google Chrome Web Browser.</strong></p>
+                        </div>
+                    @endif
                 </div>
             </div>
 
-            <!-- SATP Credentials Column -->
-            <div class="col-md-5">
-                @if (isset($student))
-                    <div class="satp-box">
-                        <h3>SATP Credentials</h3>
-                        <p><strong>SATP Username:</strong> {{ $student->school_id }}</p>
-                        <p><strong>SATP Password:</strong> 
-                            <span id="satp-password-field">
-                                {{ str_repeat('*', strlen($satp_password)) }}
-                            </span> 
-                            <button type="button" id="toggle-satp-password" class="btn btn-sm btn-outline-primary">Show</button>
-                        </p>
-                        <p><strong>SATP Link:</strong> <span>http://satp.ndmu.edu.ph</span></p>
-                        <p style="color: red; font-weight: bold;"><strong>NOTE: <span>Use Google Chrome Web Browser.</span></strong></p>
-                    </div>
-                @endif
-            </div>
+            <!-- Single Show All Button (Inside the Content Box) -->
+            <button id="toggle-all" class="btn btn-primary btn-show-all">Show All</button>
         </div>
-    </div>
 
-    <!-- Done Button -->
-    <div class="text-center done-button">
-        <button id="doneButton" class="btn btn-primary btn-lg">Done</button>
-    </div>
-</main>
+        <!-- Done Button -->
+        <div class="text-center done-button">
+            <button id="doneButton" class="btn btn-primary btn-lg">Done</button>
+        </div>
+    </main>
 
     <!-- Footer -->
     <footer>
@@ -176,77 +133,73 @@
     
     <!-- Local SweetAlert2 JS -->
     <script src="{{ asset('assets/sweetalert2/sweetalert2.min.js') }}"></script>
+    
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            setTimeout(function () {
-                window.location.href = "{{ route('welcome') }}";
-            }, 60000); // 60 seconds timeout
+    document.addEventListener('DOMContentLoaded', function () {
+        let transactionRecorded = false; // Ensures it is recorded only once
 
-            document.getElementById('doneButton').addEventListener('click', function () {
+        document.getElementById('toggle-all').addEventListener('click', function () {
+            if (!transactionRecorded) {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Thank you!',
-                    text: 'Have a nice day!',
-                    showConfirmButton: false,
-                    timer: 2000 // 2 seconds
-                }).then(() => {
-                    window.location.href = "{{ route('welcome') }}"; // Redirect to welcome page
+                    title: "Confirmation Required",
+                    text: "By clicking 'Show All', you confirm that you have received your credentials. This action will be recorded.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Confirm",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        revealCredentials();
+                        recordTransaction(); // Record only the first time
+                        transactionRecorded = true; // Prevent re-recording
+                    }
                 });
+            } else {
+                revealCredentials(); // Just reveal credentials without re-recording
+            }
+        });
+
+        function revealCredentials() {
+            document.getElementById('password-field').textContent = "{{ $password ?? 'Not Available' }}";
+            document.getElementById('voucher-code-field').textContent = "{{ $voucher->voucher_code ?? 'Not Available' }}";
+            document.getElementById('satp-password-field').textContent = "{{ $satp_password ?? 'Not Available' }}";
+        }
+
+        function recordTransaction() {
+            fetch("{{ route('transactions.recordShowPassword') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    student_id: "{{ $student->id }}"
+                })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      console.log("Transaction Recorded:", data);
+                  } else {
+                      console.log("Transaction already exists, no new record.");
+                  }
+              })
+              .catch(error => console.error("Error:", error));
+        }
+
+        document.getElementById('doneButton').addEventListener('click', function () {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thank you!',
+                text: 'Have a nice day!',
+                showConfirmButton: false,
+                timer: 2000
+            }).then(() => {
+                window.location.href = "{{ route('welcome') }}";
             });
         });
-    </script>
+    });
+</script>
 
-    <!-- JavaScript to Toggle Password and Voucher Code Visibility -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Toggle password visibility
-            const passwordField = document.getElementById('password-field');
-            const togglePasswordButton = document.getElementById('toggle-password');
-            let isPasswordHidden = true;
 
-            togglePasswordButton.addEventListener('click', function () {
-                if (isPasswordHidden) {
-                    passwordField.textContent = "{{ isset($password) ? $password : 'Not Available' }}";
-                    togglePasswordButton.textContent = "Hide";
-                } else {
-                    passwordField.textContent = "{{ isset($password) ? str_repeat('*', strlen($password)) : 'Not Available' }}";
-                    togglePasswordButton.textContent = "Show";
-                }
-                isPasswordHidden = !isPasswordHidden;
-            });
-
-            // Toggle SATP password visibility
-            const satpPasswordField = document.getElementById('satp-password-field');
-            const toggleSatpPasswordButton = document.getElementById('toggle-satp-password');
-            let isSatpPasswordHidden = true;
-
-            toggleSatpPasswordButton.addEventListener('click', function () {
-                if (isSatpPasswordHidden) {
-                    satpPasswordField.textContent = "{{ $satp_password }}";
-                    toggleSatpPasswordButton.textContent = "Hide";
-                } else {
-                    satpPasswordField.textContent = "{{ isset($satp_password) ? str_repeat('*', strlen($satp_password)) : 'Not Available' }}";
-                    toggleSatpPasswordButton.textContent = "Show";
-                }
-                isSatpPasswordHidden = !isSatpPasswordHidden;
-            });
-
-            // Toggle voucher code visibility
-            const voucherCodeField = document.getElementById('voucher-code-field');
-            const toggleVoucherCodeButton = document.getElementById('toggle-voucher-code');
-            let isVoucherCodeHidden = true;
-
-            toggleVoucherCodeButton.addEventListener('click', function () {
-                if (isVoucherCodeHidden) {
-                    voucherCodeField.textContent = "{{ $voucher->voucher_code ?? 'Not available' }}";
-                    toggleVoucherCodeButton.textContent = "Hide";
-                } else {
-                    voucherCodeField.textContent = "{{ isset($voucher->voucher_code) ? str_repeat('*', strlen($voucher->voucher_code)) : 'Not available' }}";
-                    toggleVoucherCodeButton.textContent = "Show";
-                }
-                isVoucherCodeHidden = !isVoucherCodeHidden;
-            });
-        });
-    </script>
 </body>
 </html>

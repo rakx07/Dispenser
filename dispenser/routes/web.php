@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     StudentController, CollegeController, DepartmentController,
-    CourseController, VoucherController, SatpController, HomeController
+    CourseController, VoucherController, SatpController, HomeController, TransactionController
 };
 use App\Http\Controllers\EmailController;
 
@@ -40,6 +40,8 @@ Route::prefix('course')->group(function () {
 
 // Student routes
 Route::prefix('students')->group(function () {
+    Route::post('/transactions/record-show-password', [TransactionController::class, 'recordShowPassword'])->name('transactions.recordShowPassword');
+    Route::post('/transactions/record-show', [TransactionController::class, 'recordShow'])->name('transactions.recordShow');
     Route::post('/check-student', [StudentController::class, 'checkStudent'])->name('check.student');
     Route::post('/voucher-and-satp', [StudentController::class, 'handleVoucherAndSatp'])->name('students.voucherAndSatp'); // Updated route for combined functionality
 });
