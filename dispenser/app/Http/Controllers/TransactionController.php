@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Transaction;
+use App\Exports\TransactionsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TransactionController extends Controller
 {
@@ -41,5 +43,10 @@ class TransactionController extends Controller
     
         return view('audit.transaction', compact('transactions'));
     }
+    public function export()
+    {
+        return Excel::download(new TransactionsExport, 'student_transactions.xlsx');
+    }
+    
     
 }

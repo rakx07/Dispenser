@@ -1,11 +1,14 @@
 @extends('adminlte::page')
 
-
-
 @section('content')
 <div class="container">
     <h2 class="mb-4">Student Transactions</h2>
-    
+
+    <!-- Export Button -->
+    <a href="{{ route('audit.transactions.export') }}" class="btn btn-success mb-3">
+        Download Excel
+    </a>
+
     <table class="table table-bordered">
         <thead>
             <tr>
