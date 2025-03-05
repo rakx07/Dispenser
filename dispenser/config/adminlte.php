@@ -355,6 +355,11 @@ return [
             'url' => 'student/edit',
             'icon' => 'fas fa-fw fa-edit',
         ],
+        [
+            'text' => 'Student Transactions',
+            'url' => 'audit/transactions',
+            'icon' => 'fas fa-fw fa-table',
+        ],
         
         
         ///added multi level
