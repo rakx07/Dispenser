@@ -86,7 +86,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('satpaccount/store', [App\Http\Controllers\SatpController::class, 'store'])->name('satpaccount.store'); 
     Route::get('satpaccount/import',[App\Http\Controllers\SatpController::class, 'index']);
     Route::post('satpaccount/import',[App\Http\Controllers\SatpController::class, 'importExcelData']);
-
+    Route::get('/audit/transactions', [TransactionController::class, 'index'])->name('audit.transactions');
+    Route::get('/audit/transactions/export', [TransactionController::class, 'export'])->name('audit.transactions.export');
     // Route::post('/emails/import-emails', [App\Http\Controllers\EmailController::class, 'importExcelData'])->name('emails.import');
 
     Route::get('/emails/import', [EmailController::class, 'index'])->name('emails.index');

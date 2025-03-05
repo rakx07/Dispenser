@@ -35,4 +35,11 @@ class TransactionController extends Controller
         // If a transaction already exists, do nothing (return success but no new record)
         return response()->json(['success' => false, 'message' => 'Transaction already exists']);
     }
+    public function index()
+    {
+        $transactions = Transaction::with(['student.course'])->get();
+    
+        return view('audit.transaction', compact('transactions'));
+    }
+    
 }
