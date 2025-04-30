@@ -74,51 +74,51 @@ class VoucherController extends Controller
     }
 
     // Generate a new voucher code for a student
-    public function generateVoucherCode(Request $request, $id)
+ // In StudentController or VoucherController
+ public function removeVoucherCode($id)
 {
-    // Start a transaction
     DB::beginTransaction();
 
     try {
-        // Find the student by ID
         $student = Student::find($id);
-
         if (!$student) {
             return response()->json(['success' => false, 'message' => 'Student not found']);
         }
 
-        // Fetch a new voucher code that has not been given
-        $voucher = Voucher::where('is_given', 0)->first();
+        $hadOldVoucher = !is_null($student->voucher_id); // Check if student had an old voucher
 
-        if (!$voucher) {
-            return response()->json(['success' => false, 'message' => 'No available vouchers']);
+        $newVoucher = Voucher::where('is_given', 0)->first();
+        if (!$newVoucher) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No available vouchers to assign.'
+            ]);
         }
 
-        // Assign the new voucher to the student
-        $student->voucher_id = $voucher->id;
+        // Assign new voucher
+        $student->voucher_id = $newVoucher->id;
         $student->save();
 
-        // Mark the new voucher as given
-        $voucher->is_given = 1;
-        $voucher->save();
+        // Mark the new voucher as used
+        $newVoucher->is_given = 1;
+        $newVoucher->save();
 
-        // If the student had an old voucher, mark it as not given
-        if ($student->voucher_id != $voucher->id) {
-            $oldVoucher = Voucher::find($student->voucher_id);
-            if ($oldVoucher) {
-                $oldVoucher->is_given = 0;
-                $oldVoucher->save();
-            }
-        }
-
-        // Commit the transaction
         DB::commit();
 
-        return response()->json(['success' => true, 'voucher_code' => $voucher->voucher_code]);
+        return response()->json([
+            'success' => true,
+            'voucher_code' => $newVoucher->voucher_code,
+            'message' => $hadOldVoucher
+                ? 'Voucher replaced successfully.'
+                : 'Voucher assigned successfully.'
+        ]);
     } catch (\Exception $e) {
-        // Rollback the transaction if something goes wrong
         DB::rollback();
-        return response()->json(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Error: ' . $e->getMessage()
+        ]);
     }
 }
+
 }

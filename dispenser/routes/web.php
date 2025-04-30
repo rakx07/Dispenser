@@ -52,7 +52,8 @@ Route::prefix('voucher')->group(function () {
     Route::post('/import', [VoucherController::class, 'importExcelData']);
     Route::post('/show', [VoucherController::class, 'show'])->name('voucher.show');
     Route::get('/', [StudentController::class, 'showVoucher'])->name('voucher'); // Updated route to fetch email and password
-    Route::get('/{id}/generate', [VoucherController::class, 'generateVoucherCode'])->name('voucher.generate');
+    Route::get('/voucher/remove/{id}', [VoucherController::class, 'removeVoucherCode'])->name('voucher.remove');
+
 });
 
 // SATP account routes (only accessible to authenticated users)

@@ -31,5 +31,11 @@ class Student extends Model
     {
         return $this->belongsTo(Email::class, 'email_id');
     }
+    // Student.php
+public function voucher()
+{
+    return $this->belongsTo(Voucher::class);
+}
+
 }
 
