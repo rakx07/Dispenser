@@ -197,9 +197,24 @@
                 window.location.href = "{{ route('welcome') }}";
             });
         });
+
+        // 40-second inactivity timer
+        let inactivityTimer;
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                window.location.href = "{{ route('welcome') }}";
+            }, 40000); // 40 seconds
+        }
+
+        // Events that reset the inactivity timer
+        ['mousemove', 'keydown', 'click', 'touchstart'].forEach(event => {
+            document.addEventListener(event, resetInactivityTimer);
+        });
+
+        // Start the timer when page loads
+        resetInactivityTimer();
     });
 </script>
-
-
 </body>
 </html>
