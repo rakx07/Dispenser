@@ -7,9 +7,10 @@
 
     <!-- Local Bootstrap CSS -->
     <link href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    
+
     <!-- Local SweetAlert2 CSS -->
     <link href="{{ asset('assets/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
+
     <style>
         body {
             display: flex;
@@ -24,19 +25,23 @@
             color: white;
             text-align: center;
             padding: 1rem;
+            font-weight: bold;
         }
-        .content-container {
-            border: 2px solid #ccc;
-            padding: 15px;
-            border-radius: 8px;
+        .content-container,
+        .student-info,
+        .satp-box {
+            border: 3px solid #444;
+            padding: 20px;
+            border-radius: 10px;
             background-color: #f9f9f9;
+            font-size: 1.15rem;
+            font-weight: bold;
         }
-        .student-info, .satp-box {
-            border: 1px solid #ccc;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            margin-top: 15px;
+        h4, h3, h1, p, a {
+            font-weight: bold !important;
+        }
+        h1, h3, h4 {
+            font-size: 1.6rem;
         }
         .done-button {
             margin-top: 20px;
@@ -47,7 +52,7 @@
         }
         .btn-show-all {
             display: block;
-            margin: 10px auto;
+            margin: 20px auto 0 auto;
         }
     </style>
 </head>
@@ -60,62 +65,68 @@
                 <b>Notre Dame of Marbel University</b>
             </a>
             <span class="navbar-text text-white">
-            WiFi Access Code Manager
+                WiFi Access Code Manager
             </span>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="container mt-5">
-        <h1 class="mb-4"><b>Student Information</b></h1>
+        <h1 class="mb-4 text-center"><b>Student WiFi & System Credentials</b></h1>
 
-        <div class="content-container">
-            <div class="row">
-                <!-- Left Side - Student Information -->
-                <div class="col-md-7">
-                    <div class="student-info">
-                        @if (isset($student))
-                            <h3>Name: {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
-                            <p><strong>ID Number:</strong> {{ $student->school_id }}</p>
-                            <p><strong>Course:</strong> {{ $student->course->name }}</p>
-                            <p><strong>Email:</strong> {{ $email ?? 'Not Available' }}</p>
-                            <p><strong>Password:</strong>
-                                <span id="password-field">********</span>
-                            </p>
-                        @else
-                            <div class="alert alert-danger">
-                                Student information not found.
-                            </div>
-                        @endif
-                    </div>
+        <!-- Center Top Box - Name and Course -->
+        <div class="content-container text-center mb-4">
+            @if (isset($student))
+                <h3><strong>Name:</strong> {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
+                <p><strong>Course:</strong> {{ $student->course->name }}</p>
+            @else
+                <div class="alert alert-danger">Student information not found.</div>
+            @endif
+        </div>
 
-                    <!-- Voucher Code in Separate Div -->
-                    <div class="student-info mt-3">
-                        <p><strong>Voucher Code:</strong>
-                            <span id="voucher-code-field">********</span>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Right Side - SATP Credentials -->
-                <div class="col-md-5">
-                    @if (isset($student))
-                        <div class="satp-box">
-                            <h3>SATP Credentials</h3>
-                            <p><strong>SATP Username:</strong> {{ $student->school_id }}</p>
-                            <p><strong>SATP Password:</strong>
-                                <span id="satp-password-field">********</span>
-                            </p>
-                            <p><strong>SATP Link:</strong> <span>http://satp.ndmu.edu.ph</span></p>
-                            <p class="red-note"><strong>NOTE: Use Google Chrome Web Browser.</strong></p>
-                        </div>
-                    @endif
+        <!-- Grid of 4 Credential Boxes -->
+        <div class="row g-4">
+            <!-- Left Top - Email Credentials -->
+            <div class="col-md-6">
+                <div class="student-info h-100">
+                    <h4>Email Credentials</h4>
+                    <p><strong>Email:</strong> {{ $email ?? 'Not Available' }}</p>
+                    <p><strong>Password:</strong> <span id="password-field">********</span></p>
                 </div>
             </div>
 
-            <!-- Single Show All Button (Inside the Content Box) -->
-            <button id="toggle-all" class="btn btn-primary btn-show-all">Show All</button>
+            <!-- Right Top - Voucher Code -->
+            <div class="col-md-6">
+                <div class="student-info h-100">
+                    <h4>Voucher Code</h4>
+                    <p><strong>Voucher:</strong> <span id="voucher-code-field">********</span></p>
+                </div>
+            </div>
+
+            <!-- Left Bottom - Schoology -->
+            <div class="col-md-6">
+                <div class="student-info h-100">
+                    <h4>Schoology Access</h4>
+                    <p><strong>Username:</strong> {{ $student->school_id }}</p>
+                    <p><strong>Password:</strong> <span id="password-field-schoology">********</span></p>
+                    <p><strong>Login:</strong> <a href="https://ndmu.schoology.com/" target="_blank">https://ndmu.schoology.com/</a></p>
+                </div>
+            </div>
+
+            <!-- Right Bottom - SATP -->
+            <div class="col-md-6">
+                <div class="satp-box h-100">
+                    <h4>SATP Credentials</h4>
+                    <p><strong>SATP Username:</strong> {{ $student->school_id }}</p>
+                    <p><strong>SATP Password:</strong> <span id="satp-password-field">********</span></p>
+                    <p><strong>SATP Link:</strong> <a href="http://satp.ndmu.edu.ph" target="_blank">http://satp.ndmu.edu.ph</a></p>
+                    <p class="red-note">NOTE: Use Google Chrome Web Browser.</p>
+                </div>
+            </div>
         </div>
+
+        <!-- Show All Button -->
+        <button id="toggle-all" class="btn btn-primary btn-show-all">Show All</button>
 
         <!-- Done Button -->
         <div class="text-center done-button">
@@ -130,13 +141,13 @@
 
     <!-- Local Bootstrap JS -->
     <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    
+
     <!-- Local SweetAlert2 JS -->
     <script src="{{ asset('assets/sweetalert2/sweetalert2.min.js') }}"></script>
-    
+
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        let transactionRecorded = false; // Ensures it is recorded only once
+        let transactionRecorded = false;
 
         document.getElementById('toggle-all').addEventListener('click', function () {
             if (!transactionRecorded) {
@@ -150,12 +161,12 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         revealCredentials();
-                        recordTransaction(); // Record only the first time
-                        transactionRecorded = true; // Prevent re-recording
+                        recordTransaction();
+                        transactionRecorded = true;
                     }
                 });
             } else {
-                revealCredentials(); // Just reveal credentials without re-recording
+                revealCredentials();
             }
         });
 
@@ -163,6 +174,7 @@
             document.getElementById('password-field').textContent = "{{ $password ?? 'Not Available' }}";
             document.getElementById('voucher-code-field').textContent = "{{ $voucher->voucher_code ?? 'Not Available' }}";
             document.getElementById('satp-password-field').textContent = "{{ $satp_password ?? 'Not Available' }}";
+            document.getElementById('password-field-schoology').textContent = "{{ $password ?? 'Not Available' }}";
         }
 
         function recordTransaction() {
@@ -204,17 +216,15 @@
             clearTimeout(inactivityTimer);
             inactivityTimer = setTimeout(() => {
                 window.location.href = "{{ route('welcome') }}";
-            }, 40000); // 40 seconds
+            }, 40000);
         }
 
-        // Events that reset the inactivity timer
         ['mousemove', 'keydown', 'click', 'touchstart'].forEach(event => {
             document.addEventListener(event, resetInactivityTimer);
         });
 
-        // Start the timer when page loads
         resetInactivityTimer();
     });
-</script>
+    </script>
 </body>
 </html>
