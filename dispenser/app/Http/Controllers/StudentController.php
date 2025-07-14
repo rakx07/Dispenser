@@ -265,18 +265,19 @@ class StudentController extends Controller
             return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
-    public function search(Request $request)
+public function search(Request $request)
 {
     $query = $request->input('query');
 
-    // Fetch students based on search query
-    $students = Student::when($query, function ($q) use ($query) {
-        $q->where('firstname', 'LIKE', "%{$query}%")
-            ->orWhere('lastname', 'LIKE', "%{$query}%")
-            ->orWhere('school_id', 'LIKE', "%{$query}%");
-    })->paginate(10);
+    $students = Student::with(['course', 'satp', 'schoology', 'email']) // ✅ Add 'email'
+        ->when($query, function ($q) use ($query) {
+            $q->where('firstname', 'LIKE', "%{$query}%")
+              ->orWhere('lastname', 'LIKE', "%{$query}%")
+              ->orWhere('school_id', 'LIKE', "%{$query}%");
+        })->paginate(10);
 
     return view('students.search', compact('students'));
 }
+
 
 }
