@@ -3,7 +3,6 @@
 @section('title', 'Edit Student')
 
 @section('content_header')
-    <!-- <h1>Edit Student</h1> -->
 @endsection
 
 @section('content')
@@ -63,9 +62,12 @@
                         <div class="form-group">
                             <label for="course_id">Course:</label>
                             <select id="course_id" name="course_id" class="form-control selectpicker" data-live-search="true" data-size="8" required>
-                                <option value="" disabled selected>Select a course</option>
+                                <option value="" disabled>Select a course</option>
                                 @foreach($courses as $course)
-                                    <option value="{{ $course->id }}" data-subtext="{{ $course->code }}">{{ $course->name }}</option>
+                                    <option value="{{ $course->id }}" data-subtext="{{ $course->code }}"
+                                        {{ $student->course_id == $course->id ? 'selected' : '' }}>
+                                        {{ $course->name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -126,10 +128,8 @@
                 const alertContainer = document.getElementById('voucher-alert');
 
                 if (data.success) {
-                    // Update input field
                     document.getElementById('voucher').value = data.voucher_code ?? '';
 
-                    // Update display
                     const display = document.getElementById('currentVoucherDisplay');
                     if (data.voucher_code) {
                         display.classList.remove('text-muted');
@@ -141,7 +141,6 @@
                         display.innerHTML = `No voucher assigned to this student.`;
                     }
 
-                    // Show success alert
                     alertContainer.innerHTML = `<div class="alert alert-success alert-dismissible fade show" role="alert">
                         ${data.message}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -167,24 +166,23 @@
 @endsection
 
 @push('styles')
-    <style>
-        .form-group label {
-            font-weight: bold;
-        }
-        .card-header {
-            background-color: #343a40;
-            color: white;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-    </style>
+<style>
+    .form-group label {
+        font-weight: bold;
+    }
+    .card-header {
+        background-color: #343a40;
+        color: white;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+</style>
 @endpush
 
 @push('js')
-    <!-- Include Bootstrap, jQuery, and Bootstrap Select JS -->
-    <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('assets/bootstrap-select/js/bootstrap-select.min.js') }}"></script>
+<script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('assets/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/bootstrap-select/js/bootstrap-select.min.js') }}"></script>
 @endpush
