@@ -398,6 +398,11 @@ return [
                     'icon' => 'fas fa-fw fa-paperclip',
                 ],
                 [
+                    'text' => 'Schoology Account Upload',
+                    'url' => 'schoology-credentials/import',
+                    'icon' => 'fas fa-fw fa-paperclip',
+                ],
+                [
                     'text' => 'Email Upload',
                     'url' => 'emails/import',
                     'icon' => 'fas fa-fw fa-paperclip',

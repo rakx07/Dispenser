@@ -7,8 +7,6 @@
 
     <!-- Local Bootstrap CSS -->
     <link href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-
-    <!-- Local SweetAlert2 CSS -->
     <link href="{{ asset('assets/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
 
     <style>
@@ -139,10 +137,8 @@
         NDMU © 2024 | Developed by MIS Department
     </footer>
 
-    <!-- Local Bootstrap JS -->
+    <!-- Local JS -->
     <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-    <!-- Local SweetAlert2 JS -->
     <script src="{{ asset('assets/sweetalert2/sweetalert2.min.js') }}"></script>
 
     <script>
@@ -174,7 +170,7 @@
             document.getElementById('password-field').textContent = "{{ $password ?? 'Not Available' }}";
             document.getElementById('voucher-code-field').textContent = "{{ $voucher->voucher_code ?? 'Not Available' }}";
             document.getElementById('satp-password-field').textContent = "{{ $satp_password ?? 'Not Available' }}";
-            document.getElementById('password-field-schoology').textContent = "{{ $password ?? 'Not Available' }}";
+            document.getElementById('password-field-schoology').textContent = "{{ $schoology_credentials ?? 'Not Available' }}";
         }
 
         function recordTransaction() {

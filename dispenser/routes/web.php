@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     StudentController, CollegeController, DepartmentController,
-    CourseController, VoucherController, SatpController, HomeController, TransactionController
+    CourseController, VoucherController, SatpController, HomeController, TransactionController, SchoologyCredentialController
 };
 use App\Http\Controllers\EmailController;
 
@@ -55,6 +55,21 @@ Route::prefix('voucher')->group(function () {
     Route::get('/voucher/remove/{id}', [VoucherController::class, 'removeVoucherCode'])->name('voucher.remove');
 
 });
+
+//SCHOOLOGY credentials route
+// Schoology upload form (index)
+Route::get('/schoology-credentials', [SchoologyCredentialController::class, 'index'])->name('schoology-credentials.index');
+// Manual add form
+Route::get('/schoology-credentials/create', [SchoologyCredentialController::class, 'create'])->name('schoology-credentials.create');
+// Store manual input
+Route::post('/schoology-credentials', [SchoologyCredentialController::class, 'store'])->name('schoology-credentials.store');
+// Handle Excel upload
+// Show the form when visiting /schoology-credentials/import (GET)
+Route::get('/schoology-credentials/import', [SchoologyCredentialController::class, 'index'])->name('schoology-credentials.import');
+
+// Handle Excel import submission (POST)
+Route::post('/schoology-credentials/import', [SchoologyCredentialController::class, 'importExcelData']);
+
 
 // SATP account routes (only accessible to authenticated users)
 Route::middleware(['auth'])->prefix('satpaccount')->group(function () {

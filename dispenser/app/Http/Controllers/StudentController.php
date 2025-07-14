@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\Voucher;
 use App\Models\Email;
 use App\Models\Satpaccount;
+use App\Models\SchoologyCredential;
 use Illuminate\Http\Request;
 use App\Imports\StudentImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -194,7 +195,7 @@ class StudentController extends Controller
 
 
     // Show voucher details
-    public function handleVoucherAndSatp(Request $request)
+   public function handleVoucherAndSatp(Request $request)
 {
     $request->validate([
         'idNumber' => 'required|string',
@@ -208,6 +209,7 @@ class StudentController extends Controller
     $student = Student::where('school_id', $school_id)->first();
     $satpAccount = Satpaccount::where('school_id', $school_id)->first();
     $emailRecord = Email::where('sch_id_number', $school_id)->first();
+    $schoology = SchoologyCredential::where('school_id', $school_id)->first(); // ✅ Add this line
 
     if ($student && $emailRecord) {
         $satp_password = $satpAccount ? $satpAccount->satp_password : null;
@@ -215,15 +217,17 @@ class StudentController extends Controller
 
         return view('voucher', [
             'student' => $student,
-            'satp_password' => $satp_password, // Will be null if no SATP account exists
+            'satp_password' => $satp_password,
             'voucher' => $voucher,
             'email' => $emailRecord->email_address,
             'password' => $emailRecord->password,
+            'schoology_credentials' => $schoology->schoology_credentials ?? null, // ✅ Pass to view
         ]);
     } else {
         return redirect()->back()->with('error', 'Student or Email record not found.');
     }
 }
+
 
 
     public function showVoucher()
