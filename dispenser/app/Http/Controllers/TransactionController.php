@@ -38,11 +38,13 @@ class TransactionController extends Controller
         return response()->json(['success' => false, 'message' => 'Transaction already exists']);
     }
     public function index()
-    {
-        $transactions = Transaction::with(['student.course'])->get();
-    
-        return view('audit.transaction', compact('transactions'));
-    }
+{
+    $transactions = Transaction::with(['student.course'])
+                        ->latest()
+                        ->paginate(10); // Use 15, 10, or any per-page count
+
+    return view('audit.transaction', compact('transactions'));
+}
     public function export()
     {
         return Excel::download(new TransactionsExport, 'student_transactions.xlsx');

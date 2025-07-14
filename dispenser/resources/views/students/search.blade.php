@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid">
         <form action="{{ route('student.search') }}" method="GET">
             <div class="input-group mb-3">
                 <input type="text" name="query" class="form-control" placeholder="Search by ID/Name.." aria-label="Search">
@@ -43,13 +43,17 @@
                                 <td>{{ $student->lastname }}</td>
                                 <td>{{ $student->course->name ?? '-' }}</td>
                                 <td>{{ $student->birthday }}</td>
-                                <td>{{ $student->status ? 'Active' : 'Inactive' }}</td>
+                                <td>
+                                    <span class="badge {{ $student->status ? 'bg-success' : 'bg-secondary' }}">
+                                        {{ $student->status ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </td>
                                 <td>{{ $student->satp->satp_password ?? '-' }}</td>
                                 <td>{{ $student->schoology->schoology_credentials ?? '-' }}</td>
                                 <td>{{ $student->email->email_address ?? '-' }}</td>
                                 <td>{{ $student->email->password ?? '-' }}</td>
                                 <td>
-                                    <a href="{{ route('student.edit', $student->id) }}" class="btn btn-primary btn-sm">Edit</a>
+                                    <a href="{{ route('student.edit', $student->id) }}" class="btn btn-sm btn-primary">Edit</a>
                                 </td>
                             </tr>
                         @endforeach
@@ -57,9 +61,37 @@
                 </table>
             </div>
 
-            {{ $students->links() }}
+            <div class="d-flex justify-content-center mt-3">
+                {{ $students->links() }} <!-- Bootstrap pagination -->
+            </div>
         @else
             <p>No students found matching your search.</p>
         @endif
     </div>
 @endsection
+
+@push('styles')
+    <style>
+        .table th,
+        .table td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 0.75rem;
+            height: 60px;
+            white-space: nowrap;
+        }
+
+        /* Optional fixed column widths for consistency */
+        .table th:nth-child(1), .table td:nth-child(1) { width: 110px; }
+        .table th:nth-child(2), .table td:nth-child(2) { width: 120px; }
+        .table th:nth-child(3), .table td:nth-child(3) { width: 120px; }
+        .table th:nth-child(4), .table td:nth-child(4) { width: 180px; }
+        .table th:nth-child(5), .table td:nth-child(5) { width: 110px; }
+        .table th:nth-child(6), .table td:nth-child(6) { width: 90px; }
+        .table th:nth-child(7), .table td:nth-child(7) { width: 150px; }
+        .table th:nth-child(8), .table td:nth-child(8) { width: 200px; }
+        .table th:nth-child(9), .table td:nth-child(9) { width: 200px; }
+        .table th:nth-child(10), .table td:nth-child(10) { width: 150px; }
+        .table th:nth-child(11), .table td:nth-child(11) { width: 90px; }
+    </style>
+@endpush
