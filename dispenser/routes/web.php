@@ -56,17 +56,6 @@ Route::prefix('voucher')->group(function () {
 
 });
 
-// Schoology upload form (index)
-Route::get('/schoology-credentials', [SchoologyCredentialController::class, 'index'])->name('schoology-credentials.index');
-// Manual add form
-Route::get('/schoology-credentials/create', [SchoologyCredentialController::class, 'create'])->name('schoology-credentials.create');
-// Store manual input
-Route::post('/schoology-credentials', [SchoologyCredentialController::class, 'store'])->name('schoology-credentials.store');
-// Handle Excel upload
-// Show the form when visiting /schoology-credentials/import (GET)
-Route::get('/schoology-credentials/import', [SchoologyCredentialController::class, 'index'])->name('schoology-credentials.import');
-// Handle Excel import submission (POST)
-Route::post('/schoology-credentials/import', [SchoologyCredentialController::class, 'importExcelData']);
 
 
 // SATP account routes (only accessible to authenticated users)
@@ -110,4 +99,16 @@ Route::middleware(['auth'])->group(function () {
     //Add Email Function
     Route::get('/emails/create', [EmailController::class, 'create'])->name('emails.create');
     Route::post('/emails/store', [EmailController::class, 'store'])->name('emails.store');
+    // Schoology upload form (index)
+    Route::get('/schoology-credentials', [SchoologyCredentialController::class, 'index'])->name('schoology-credentials.index');
+    // Manual add form
+    Route::get('/schoology-credentials/create', [SchoologyCredentialController::class, 'create'])->name('schoology-credentials.create');
+    // Store manual input
+    Route::post('/schoology-credentials', [SchoologyCredentialController::class, 'store'])->name('schoology-credentials.store');
+    // Handle Excel upload
+    // Show the form when visiting /schoology-credentials/import (GET)
+    Route::get('/schoology-credentials/import', [SchoologyCredentialController::class, 'index'])->name('schoology-credentials.import');
+    // Handle Excel import submission (POST)
+    Route::post('/schoology-credentials/import', [SchoologyCredentialController::class, 'importExcelData']);
+
 });
