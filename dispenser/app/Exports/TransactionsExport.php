@@ -11,7 +11,9 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping
 {
     public function collection()
     {
-        return Transaction::with('student.course')->get();
+         return Transaction::with('student.course')
+            ->orderBy('accessed_at', 'desc') // ✅ Sort by newest first
+            ->get();
     }
 
     public function headings(): array
