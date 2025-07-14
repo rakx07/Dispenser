@@ -78,7 +78,7 @@
     <main class="container mt-5">
         <!-- Beating Text -->
         <div class="mb-5">
-            <p class="beating-text">GET YOUR INSTITUTIONAL EMAIL AND VOUCHER CODE HERE!</p>
+            <p class="beating-text">GET YOUR INSTITUTIONAL EMAIL, SCHOOLOGY, SATP, AND WIFI VOUCHER CODE HERE!</p>
         </div>
 
         <div class="row">
@@ -150,7 +150,7 @@
                     <li class="list-group-item"><strong>• The voucher code is valid for use with NDMUWLAN1, NDMUWDS, and similar WiFi access points.</strong></li>
                     <li class="list-group-item"><strong>• The voucher code provides 2 hours of access; the connection will be automatically disconnected after this time, requiring you to reconnect using the same voucher code.</strong></li>
                     <li class="list-group-item" style="color: red; font-weight: bold;">
-                    <strong>• If there are concerns kindly proceed to MIS Office.</strong>
+                    <strong>• If there are concerns, kindly proceed to MIS Office.</strong>
                 </ul>
             </div>
         </div>

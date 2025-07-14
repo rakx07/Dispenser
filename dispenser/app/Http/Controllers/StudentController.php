@@ -209,24 +209,27 @@ class StudentController extends Controller
     $student = Student::where('school_id', $school_id)->first();
     $satpAccount = Satpaccount::where('school_id', $school_id)->first();
     $emailRecord = Email::where('sch_id_number', $school_id)->first();
-    $schoology = SchoologyCredential::where('school_id', $school_id)->first(); // ✅ Add this line
+    $schoology = SchoologyCredential::where('school_id', $school_id)->first();
 
-    if ($student && $emailRecord) {
+    if ($student) {
         $satp_password = $satpAccount ? $satpAccount->satp_password : null;
-        $voucher = $student->voucher_id ? Voucher::find($student->voucher_id) : $this->generateNewVoucherForStudent($student);
+        $voucher = $student->voucher_id
+            ? Voucher::find($student->voucher_id)
+            : $this->generateNewVoucherForStudent($student);
 
         return view('voucher', [
             'student' => $student,
             'satp_password' => $satp_password,
             'voucher' => $voucher,
-            'email' => $emailRecord->email_address,
-            'password' => $emailRecord->password,
-            'schoology_credentials' => $schoology->schoology_credentials ?? null, // ✅ Pass to view
+            'email' => $emailRecord->email_address ?? null,
+            'password' => $emailRecord->password ?? null,
+            'schoology_credentials' => $schoology->schoology_credentials ?? null,
         ]);
     } else {
-        return redirect()->back()->with('error', 'Student or Email record not found.');
+        return redirect()->back()->with('error', 'Student record not found.');
     }
 }
+
 
 
 
