@@ -15,27 +15,38 @@ class EmailImport implements ToModel, WithHeadingRow
         // Trim and clean up the data
         $row = array_map('trim', $row);
 
-        // Validate required fields (Ensure they exist and are not empty)
-        if (empty($row['first_name']) || empty($row['last_name']) || empty($row['email_address']) || empty($row['sch_id_number'])) {
-            $this->skipped++; // Increment skipped counter
-            return null; // Skip this row
-        }
-
-        // Convert email to lowercase for consistency
-        $row['email_address'] = strtolower($row['email_address']);
-
-        // Prevent duplicate email entries
-        if (Email::where('email_address', $row['email_address'])->exists()) {
-            $this->skipped++; // Count skipped duplicates
+        // Validate required fields
+        if (
+            empty($row['first_name']) ||
+            empty($row['last_name']) ||
+            empty($row['email_address']) ||
+            empty($row['sch_id_number'])
+        ) {
+            $this->skipped++; // Missing required field
             return null;
         }
 
-        // Ensure password is not empty (fallback to a default if missing)
+        // Convert email to lowercase
+        $row['email_address'] = strtolower($row['email_address']);
+
+        // Skip if sch_id_number already exists
+        if (Email::where('sch_id_number', $row['sch_id_number'])->exists()) {
+            $this->skipped++; // Duplicate sch_id_number
+            return null;
+        }
+
+        // Skip if email_address already exists
+        if (Email::where('email_address', $row['email_address'])->exists()) {
+            $this->skipped++; // Duplicate email_address
+            return null;
+        }
+
+        // Default fallback password
         $password = !empty($row['password']) ? $row['password'] : 'defaultpassword';
 
-        // Insert the new record
+        // Return the model to insert
         return new Email([
-            'first_name'     => $row['first_name'],  // **Ensure first_name is inserted**
+            'first_name'     => $row['first_name'],
             'last_name'      => $row['last_name'],
             'email_address'  => $row['email_address'],
             'password'       => $password, // Stored as plain text

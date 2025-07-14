@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\EmailImport;
-use App\Models\Email; // ✅ Add this line to import the Email model
+use App\Models\Email;
 
 class EmailController extends Controller
 {
@@ -32,18 +32,18 @@ class EmailController extends Controller
 
             $message = 'Excel import successful!';
             if ($import->skipped > 0) {
-                $message .= " {$import->skipped} records were skipped due to duplicates or missing data.";
+                $message .= " {$import->skipped} records were skipped due to duplicate sch_id_number.";
             }
 
             return redirect()->back()->with('status', $message);
         } catch (\Illuminate\Database\QueryException $e) {
-            \Log::error('Database Import Error: ' . $e->getMessage()); // Log error for debugging
+            \Log::error('Database Import Error: ' . $e->getMessage());
 
             return redirect()->back()->withErrors([
                 'import_error' => 'Error importing the file: ' . $e->getMessage(),
             ]);
         } catch (\Exception $e) {
-            \Log::error('General Import Error: ' . $e->getMessage()); // Log general errors
+            \Log::error('General Import Error: ' . $e->getMessage());
 
             return redirect()->back()->withErrors([
                 'import_error' => 'Error importing the file: ' . $e->getMessage(),
@@ -64,7 +64,6 @@ class EmailController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the input
         $request->validate([
             'first_name'     => 'required|string|max:255',
             'last_name'      => 'required|string|max:255',
@@ -73,16 +72,14 @@ class EmailController extends Controller
             'sch_id_number'  => 'required|string|unique:emails,sch_id_number',
         ]);
 
-        // Create a new Email entry
         Email::create([
             'first_name'     => $request->first_name,
             'last_name'      => $request->last_name,
             'email_address'  => strtolower($request->email_address),
-            'password'       => $request->password, // Stored as plain text
+            'password'       => $request->password,
             'sch_id_number'  => $request->sch_id_number,
         ]);
 
-        // Redirect with a success message
         return redirect()->route('emails.create')->with('success', 'Email entry added successfully!');
     }
 }
