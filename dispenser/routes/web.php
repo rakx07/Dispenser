@@ -56,7 +56,6 @@ Route::prefix('voucher')->group(function () {
 
 });
 
-//SCHOOLOGY credentials route
 // Schoology upload form (index)
 Route::get('/schoology-credentials', [SchoologyCredentialController::class, 'index'])->name('schoology-credentials.index');
 // Manual add form
@@ -66,7 +65,6 @@ Route::post('/schoology-credentials', [SchoologyCredentialController::class, 'st
 // Handle Excel upload
 // Show the form when visiting /schoology-credentials/import (GET)
 Route::get('/schoology-credentials/import', [SchoologyCredentialController::class, 'index'])->name('schoology-credentials.import');
-
 // Handle Excel import submission (POST)
 Route::post('/schoology-credentials/import', [SchoologyCredentialController::class, 'importExcelData']);
 

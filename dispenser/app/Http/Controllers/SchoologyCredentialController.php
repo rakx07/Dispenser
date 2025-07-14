@@ -50,4 +50,8 @@ class SchoologyCredentialController extends Controller
             ->with('status', 'Excel import successful!')
             ->with('skipped', $import->skippedCount);
     }
+    public function create()
+{
+    return view('schoology_credentials.create');
+}
 }
