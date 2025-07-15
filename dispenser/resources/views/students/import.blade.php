@@ -60,6 +60,11 @@
                     <div class="alert alert-success">{{ session('status') }}</div>
                 @endif
 
+                @if (session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
+
+                
                 <div class="card mt-4">
                     <div class="card-header">
                         <h4>Import to Database</h4>

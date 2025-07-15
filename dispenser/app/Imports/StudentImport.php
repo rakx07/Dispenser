@@ -11,9 +11,18 @@ class StudentImport implements ToModel, WithHeadingRow
 {
     public $skipped = 0; // Track the number of skipped records
 
-    public function model(array $row)
-    {
+   public function model(array $row)
+{
+    try {
+        \Log::info('Importing row: ', $row); // Log every row
+
         $course = Course::where('code', $row['course_code'])->first();
+
+        if (!$course) {
+            \Log::warning("Course not found: " . $row['course_code']);
+            $this->skipped++;
+            return null;
+        }
 
         $existingStudent = Student::where('school_id', $row['school_id'])
             ->where('lastname', $row['lastname'])
@@ -22,7 +31,8 @@ class StudentImport implements ToModel, WithHeadingRow
             ->first();
 
         if ($existingStudent) {
-            $this->skipped++; // Increment the skipped counter if the student exists
+            \Log::info("Duplicate student skipped: " . $row['school_id']);
+            $this->skipped++;
             return null;
         }
 
@@ -33,9 +43,15 @@ class StudentImport implements ToModel, WithHeadingRow
             'middlename' => $row['middlename'],
             'course_id'  => $course->id,
             'birthday'   => $row['birthday'],
-            'status'     => $row['status'],
-            'voucher_id' => $row['voucher_id'],
-            'email_id'   => $row['email_id'],
+            'status'     => $row['status'] ?? 1,
+            'voucher_id' => $row['voucher_id'] ?? null,
+            'email_id'   => $row['email_id'] ?? null,
         ]);
+    } catch (\Exception $e) {
+        \Log::error("Import error: " . $e->getMessage());
+        $this->skipped++;
+        return null;
     }
+}
+
 }

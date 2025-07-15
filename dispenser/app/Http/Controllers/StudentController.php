@@ -27,6 +27,7 @@ class StudentController extends Controller
     // Import students from an Excel file
     public function import(Request $request)
     {
+        //   dd($request->file('import_file')); // ← Check if file is received
         $request->validate([
             'import_file' => 'required|mimes:xlsx,xls,csv',
         ]);
