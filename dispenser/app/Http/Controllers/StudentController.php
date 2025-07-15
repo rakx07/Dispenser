@@ -26,28 +26,38 @@ class StudentController extends Controller
 
     // Import students from an Excel file
     public function import(Request $request)
-    {
-        //   dd($request->file('import_file')); // ← Check if file is received
-        $request->validate([
-            'import_file' => 'required|mimes:xlsx,xls,csv',
-        ]);
+{
+    $request->validate([
+        'import_file' => 'required|mimes:xlsx,xls,csv',
+    ]);
 
-        try {
-            $import = new StudentImport();
-            Excel::import($import, $request->file('import_file'));
+    try {
+        $import = new StudentImport();
+        Excel::import($import, $request->file('import_file'));
 
-            $skippedCount = $import->skipped;
-            $message = 'File imported successfully!';
+        // Save skipped rows to CSV
+        if (!empty($import->skippedRows)) {
+            $filename = 'skipped_students_' . now()->format('Ymd_His') . '.csv';
+            $csvPath = storage_path("app/public/{$filename}");
 
-            if ($skippedCount > 0) {
-                $message .= " $skippedCount duplicate student/s were skipped.";
+            $file = fopen($csvPath, 'w');
+            fputcsv($file, ['school_id', 'lastname', 'firstname', 'reason']);
+            foreach ($import->skippedRows as $row) {
+                fputcsv($file, $row);
             }
+            fclose($file);
 
-            return redirect()->back()->with('status', $message);
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'An error occurred while importing the file: ' . $e->getMessage());
+            $downloadUrl = asset("storage/{$filename}");
+
+            return redirect()->back()->with('status', "Import complete. {$import->skipped} student(s) skipped. ")
+                                   ->with('download_skipped', $downloadUrl);
         }
+
+        return redirect()->back()->with('status', 'File imported successfully!');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Import error: ' . $e->getMessage());
     }
+}
 
     // Edit a specific student by ID
     public function edit($id)

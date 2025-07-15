@@ -64,7 +64,6 @@
                     <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
 
-                
                 <div class="card mt-4">
                     <div class="card-header">
                         <h4>Import to Database</h4>
@@ -77,39 +76,36 @@
                                 <button type="submit" class="btn btn-primary">Import</button>
                             </div>
                         </form>
+
+                        @if (session('download_skipped'))
+                            <div class="mt-3">
+                                <a href="{{ session('download_skipped') }}" class="btn btn-outline-secondary btn-sm" download>
+                                    ⬇️ Download Skipped Students CSV
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
                 <!-- Bootstrap Pagination Links -->
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-center mt-5">
-                        {{-- Previous Page Link --}}
                         @if ($students->onFirstPage())
-                            <li class="page-item disabled">
-                                <span class="page-link" aria-disabled="true">&laquo;</span>
-                            </li>
+                            <li class="page-item disabled"><span class="page-link" aria-disabled="true">&laquo;</span></li>
                         @else
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $students->previousPageUrl() }}" rel="prev" aria-label="Previous">&laquo;</a>
-                            </li>
+                            <li class="page-item"><a class="page-link" href="{{ $students->previousPageUrl() }}" rel="prev" aria-label="Previous">&laquo;</a></li>
                         @endif
 
-                        {{-- Pagination Elements --}}
                         @foreach ($students->links()->elements[0] as $page => $url)
                             <li class="page-item {{ $students->currentPage() == $page ? 'active' : '' }}">
                                 <a class="page-link" href="{{ $url }}">{{ $page }}</a>
                             </li>
                         @endforeach
 
-                        {{-- Next Page Link --}}
                         @if ($students->hasMorePages())
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $students->nextPageUrl() }}" rel="next" aria-label="Next">&raquo;</a>
-                            </li>
+                            <li class="page-item"><a class="page-link" href="{{ $students->nextPageUrl() }}" rel="next" aria-label="Next">&raquo;</a></li>
                         @else
-                            <li class="page-item disabled">
-                                <span class="page-link" aria-disabled="true">&raquo;</span>
-                            </li>
+                            <li class="page-item disabled"><span class="page-link" aria-disabled="true">&raquo;</span></li>
                         @endif
                     </ul>
                 </nav>
@@ -119,72 +115,39 @@
 @endsection
 
 @push('styles')
-    <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    
     <style>
-        /* Custom styles for pagination */
-        .pagination {
-            margin-top: 20px; /* Adjust margin as needed */
-        }
-        .pagination > .page-item > .page-link {
-            padding: 8px 16px; /* Adjust padding as needed */
-            font-size: 14px; /* Adjust font size as needed */
-        }
-        /* Adjust SVG icon size */
-        .pagination > .page-item > .page-link svg {
-            width: 1em; /* Set desired width */
-            height: 1em; /* Set desired height */
-            vertical-align: middle; /* Align vertically */
-        }
-        /* Adjust icon size for Previous and Next arrows */
-        .pagination > .page-item > .page-link span {
-            font-size: 1em; /* Adjust font size as needed */
-        }
-        /* Custom styles for table cell height */
-        .table td,
-        .table th {
-            padding: 0.4rem; /* Adjust padding to make cells smaller */
-            vertical-align: middle; /* Align content vertically */
-        }
-        /* Add border and hover effects */
-        .table-bordered {
-            border: 1px solid #dee2e6;
-        }
-        .table-hover tbody tr:hover {
-            background-color: #f5f5f5;
-        }
-        .thead-dark th {
-            background-color: #343a40;
-            color: white;
-        }
+        .pagination { margin-top: 20px; }
+        .pagination > .page-item > .page-link { padding: 8px 16px; font-size: 14px; }
+        .pagination > .page-item > .page-link svg { width: 1em; height: 1em; vertical-align: middle; }
+        .pagination > .page-item > .page-link span { font-size: 1em; }
+        .table td, .table th { padding: 0.4rem; vertical-align: middle; }
+        .table-bordered { border: 1px solid #dee2e6; }
+        .table-hover tbody tr:hover { background-color: #f5f5f5; }
+        .thead-dark th { background-color: #343a40; color: white; }
     </style>
 @endpush
 
 @push('scripts')
-    <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
-    <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#student-table').DataTable({
-                paging: false, // Disable front-end pagination (handled by Laravel)
-                lengthChange: false, // Disable length change
-                searching: false, // Disable search feature
-                ordering: true, // Enable ordering (sorting)
-                info: false, // Disable info display (handled by Laravel pagination)
-                autoWidth: false, // Disable auto width calculation
-                responsive: true // Enable responsiveness
+                paging: false,
+                lengthChange: false,
+                searching: false,
+                ordering: true,
+                info: false,
+                autoWidth: false,
+                responsive: true
             });
 
-            // Populate modal with student data
             $('#editStudentModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget); // Button that triggered the modal
+                var button = $(event.relatedTarget);
                 var modal = $(this);
                 modal.find('#editStudentId').val(button.data('id'));
                 modal.find('#editSchoolId').val(button.data('school_id'));
@@ -196,10 +159,9 @@
                 modal.find('#editStatus').val(button.data('status'));
             });
 
-            // Confirm delete action
-            function confirmDelete() {
+            window.confirmDelete = function () {
                 return confirm('Are you sure you want to delete this student? This action cannot be undone.');
-            }
+            };
         });
     </script>
 @endpush
