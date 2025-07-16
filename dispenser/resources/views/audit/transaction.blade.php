@@ -11,6 +11,10 @@
         </a>
     </div>
 
+    <div class="mb-3">
+        <p>Total Transactions: <strong>{{ $totalTransactions }}</strong></p>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover align-middle">
             <thead class="thead-dark">

@@ -39,11 +39,16 @@ class TransactionController extends Controller
     }
     public function index()
 {
+    // Fetch transactions with their associated student and course
     $transactions = Transaction::with(['student.course'])
                         ->latest()
-                        ->paginate(10); // Use 15, 10, or any per-page count
+                        ->paginate(10); // Change this as needed for pagination
 
-    return view('audit.transaction', compact('transactions'));
+    // Get the total number of transactions
+    $totalTransactions = Transaction::count(); // Count all transactions
+
+    // Pass both transactions and totalTransactions to the view
+    return view('audit.transaction', compact('transactions', 'totalTransactions'));
 }
     public function export()
     {
