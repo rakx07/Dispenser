@@ -107,7 +107,7 @@
                     <h4>Schoology Access</h4>
                     <p><strong>Username:</strong> {{ $student->school_id }}</p>
                     <p><strong>Password:</strong> <span id="password-field-schoology">********</span></p>
-                    <p><strong>Login:</strong> <a href="https://ndmu.schoology.com/" target="_blank">https://ndmu.schoology.com/</a></p>
+                    <p><strong>Schoology Link:</strong> https://ndmu.schoology.com/</p>
                 </div>
             </div>
 
@@ -117,7 +117,7 @@
                     <h4>SATP Credentials</h4>
                     <p><strong>SATP Username:</strong> {{ $student->school_id }}</p>
                     <p><strong>SATP Password:</strong> <span id="satp-password-field">********</span></p>
-                    <p><strong>SATP Link:</strong> <a href="http://satp.ndmu.edu.ph" target="_blank">http://satp.ndmu.edu.ph</a></p>
+                    <p><strong>SATP Link:</strong> http://satp.ndmu.edu.ph</p>
                     <p class="red-note">NOTE: Use Google Chrome Web Browser.</p>
                 </div>
             </div>
