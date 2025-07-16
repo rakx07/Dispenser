@@ -10,9 +10,6 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TransactionController extends Controller
 {
-    /**
-     * Handle recording the action of showing the password.
-     */
     public function recordShowPassword(Request $request)
     {
         $request->validate([
@@ -21,11 +18,9 @@ class TransactionController extends Controller
 
         $student = Student::findOrFail($request->student_id);
 
-        // Check if a transaction already exists for this student
         $existingTransaction = Transaction::where('student_id', $student->id)->first();
 
         if (!$existingTransaction) {
-            // Record the first time only, never update again
             Transaction::create([
                 'student_id'  => $student->id,
                 'accessed_at' => now(),
@@ -34,26 +29,42 @@ class TransactionController extends Controller
             return response()->json(['success' => true, 'message' => 'Transaction recorded successfully']);
         }
 
-        // If a transaction already exists, do nothing (return success but no new record)
         return response()->json(['success' => false, 'message' => 'Transaction already exists']);
     }
+
     public function index()
-{
-    // Fetch transactions with their associated student and course
-    $transactions = Transaction::with(['student.course'])
-                        ->latest()
-                        ->paginate(10); // Change this as needed for pagination
+    {
+        $transactions = Transaction::with(['student.course'])
+                            ->latest()
+                            ->paginate(10);
 
-    // Get the total number of transactions
-    $totalTransactions = Transaction::count(); // Count all transactions
+        $totalTransactions = Transaction::count();
 
-    // Pass both transactions and totalTransactions to the view
-    return view('audit.transaction', compact('transactions', 'totalTransactions'));
-}
+        return view('audit.transaction', compact('transactions', 'totalTransactions'));
+    }
+
     public function export()
     {
         return Excel::download(new TransactionsExport, 'student_transactions.xlsx');
     }
-    
-    
+
+    public function search(Request $request)
+    {
+        $query = $request->get('query');
+
+        $transactions = Transaction::with(['student.course'])
+            ->whereHas('student', function ($q) use ($query) {
+                $q->where('school_id', 'like', "%$query%")
+                  ->orWhere('firstname', 'like', "%$query%")
+                  ->orWhere('lastname', 'like', "%$query%")
+                  ->orWhere('middlename', 'like', "%$query%");
+            })
+            ->orWhereHas('student.course', function ($q) use ($query) {
+                $q->where('name', 'like', "%$query%");
+            })
+            ->latest()
+            ->paginate(10);
+
+        return view('audit.partials.transaction_table', compact('transactions'))->render();
+    }
 }

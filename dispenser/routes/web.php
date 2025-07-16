@@ -110,5 +110,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/schoology-credentials/import', [SchoologyCredentialController::class, 'index'])->name('schoology-credentials.import');
     // Handle Excel import submission (POST)
     Route::post('/schoology-credentials/import', [SchoologyCredentialController::class, 'importExcelData']);
+    //Search Route
+    Route::get('/transactions/search', [TransactionController::class, 'search'])->name('transactions.search');
+
 
 });

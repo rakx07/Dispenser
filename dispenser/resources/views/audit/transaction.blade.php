@@ -13,41 +13,33 @@
 
     <div class="mb-3">
         <p>Total Transactions: <strong>{{ $totalTransactions }}</strong></p>
+        <input type="text" id="search" class="form-control" placeholder="Search by ID, name or course...">
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped table-hover align-middle">
-            <thead class="thead-dark">
-                <tr>
-                    <th>School ID</th>
-                    <th>First Name</th>
-                    <th>Middle Name</th>
-                    <th>Last Name</th>
-                    <th>Course</th>
-                    <th>Accessed At</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($transactions as $transaction)
-                    <tr>
-                        <td>{{ $transaction->student->school_id }}</td>
-                        <td>{{ $transaction->student->firstname }}</td>
-                        <td>{{ $transaction->student->middlename }}</td>
-                        <td>{{ $transaction->student->lastname }}</td>
-                        <td>{{ $transaction->student->course->name ?? 'N/A' }}</td>
-                        <td>{{ \Carbon\Carbon::parse($transaction->accessed_at)->format('Y-m-d H:i:s') }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-center">No transactions found.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="d-flex justify-content-center">
-        {{ $transactions->links('pagination::bootstrap-4') }}
+    {{-- AJAX Search Results --}}
+    <div id="search-results">
+        @include('audit.partials.transaction_table', ['transactions' => $transactions])
     </div>
 </div>
+@endsection
+
+@section('js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('#search').on('keyup', function () {
+        let query = $(this).val();
+
+        $.ajax({
+            url: "{{ route('transactions.search') }}",
+            type: "GET",
+            data: { query: query },
+            success: function (data) {
+                $('#search-results').html(data);
+            },
+            error: function () {
+                $('#search-results').html('<p class="text-danger">Error loading results.</p>');
+            }
+        });
+    });
+</script>
 @endsection
