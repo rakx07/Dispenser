@@ -293,5 +293,20 @@ public function search(Request $request)
     return view('students.search', compact('students'));
 }
 
+public function searchAjax(Request $request)
+{
+    $query = $request->input('query');
+
+    $students = Student::with(['course', 'satp', 'schoology', 'email'])
+        ->when($query, function ($q) use ($query) {
+            $q->where('school_id', 'LIKE', "%{$query}%")
+              ->orWhere('firstname', 'LIKE', "%{$query}%")
+              ->orWhere('lastname', 'LIKE', "%{$query}%");
+        })
+        ->paginate(10);
+
+    return view('students.partials.student_table', compact('students'))->render();
+}
+
 
 }

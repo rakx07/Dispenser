@@ -112,6 +112,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/schoology-credentials/import', [SchoologyCredentialController::class, 'importExcelData']);
     //Search Route
     Route::get('/transactions/search', [TransactionController::class, 'search'])->name('transactions.search');
+    
+    Route::get('/students/search-ajax', [StudentController::class, 'searchAjax'])->name('students.search.ajax');
 
 
 });
