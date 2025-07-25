@@ -28,15 +28,16 @@
     <form action="{{ route('schoology-credentials.store') }}" method="POST" class="p-4 border rounded shadow-sm">
         @csrf
 
-        <div class="form-group mb-3">
+                <div class="form-group mb-3">
             <label for="school_id" class="form-label">Student ID</label>
             <input type="text" name="school_id" id="school_id" class="form-control form-control-lg" value="{{ old('school_id') }}" required>
         </div>
 
         <div class="form-group mb-4">
             <label for="schoology_credentials" class="form-label">Schoology Credentials</label>
-            <textarea name="schoology_credentials" id="schoology_credentials" class="form-control form-control-lg" rows="1" required>{{ old('schoology_credentials') }}</textarea>
+            <input type="text" name="schoology_credentials" id="schoology_credentials" class="form-control form-control-lg" value="{{ old('schoology_credentials') }}" required>
         </div>
+
 
         <button type="submit" class="btn btn-primary w-100">Add Credentials</button>
     </form>
