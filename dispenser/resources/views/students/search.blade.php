@@ -3,7 +3,14 @@
 @section('title', 'Search Student')
 
 @section('content_header')
+<div class="d-flex justify-content-between align-items-center">
     <h1>Search Student</h1>
+
+    {{-- Download Excel Button --}}
+    <a href="{{ route('students.export') }}" class="btn btn-success">
+        <i class="fas fa-file-excel"></i> Download Excel
+    </a>
+</div>
 @endsection
 
 @section('content')

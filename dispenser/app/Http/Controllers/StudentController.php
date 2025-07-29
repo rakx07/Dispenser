@@ -15,6 +15,8 @@ use App\Imports\StudentImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use App\Exports\StudentsExport;
+
 
 use Carbon\Carbon;
 
@@ -322,4 +324,9 @@ public function handleVoucherAndSatp(Request $request)
 
         return view('students.partials.student_table', compact('students'))->render();
     }
+
+    public function exportExcel()
+{
+    return Excel::download(new StudentsExport, 'students_with_kumosoft.xlsx');
+}
 }

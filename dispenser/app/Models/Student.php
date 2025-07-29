@@ -45,6 +45,10 @@ public function schoology()
 {
     return $this->hasOne(SchoologyCredential::class, 'school_id', 'school_id');
 }
+public function kumosoft()
+{
+    return $this->hasOne(\App\Models\Kumosoft::class, 'school_id', 'school_id');
+}
 
 }
 

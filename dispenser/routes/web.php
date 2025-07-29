@@ -124,5 +124,7 @@ Route::middleware(['auth'])->group(function () {
     // Manual entry
     Route::get('/kumosoft/create', [KumosoftController::class, 'create'])->name('kumosoft.create');
     Route::post('/kumosoft/store', [KumosoftController::class, 'store'])->name('kumosoft.store');
+    //Excel Export
+    Route::get('/students/export', [StudentController::class, 'exportExcel'])->name('students.export');
 
 });
