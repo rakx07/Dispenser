@@ -412,6 +412,11 @@ return [
                     'url' => 'emails/import',
                     'icon' => 'fas fa-fw fa-paperclip',
                 ],
+                [
+                    'text' => 'Kumosoft Upload',
+                    'url' => 'kumosoft/import',
+                    'icon' => 'fas fa-fw fa-paperclip',
+                ],
             ],
         ],
 

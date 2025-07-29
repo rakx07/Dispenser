@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     StudentController, CollegeController, DepartmentController,
-    CourseController, VoucherController, SatpController, HomeController, TransactionController, SchoologyCredentialController
+    CourseController, VoucherController, SatpController, HomeController, TransactionController, SchoologyCredentialController, KumosoftController
 };
 use App\Http\Controllers\EmailController;
 
@@ -115,5 +115,14 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/students/search-ajax', [StudentController::class, 'searchAjax'])->name('students.search.ajax');
 
+    // Show Excel form for upload
+    Route::get('/kumosoft/import', [KumosoftController::class, 'index'])->name('kumosoft.import');
+
+    // Process Excel
+    Route::post('/kumosoft/import', [KumosoftController::class, 'importExcelData']);
+
+    // Manual entry
+    Route::get('/kumosoft/create', [KumosoftController::class, 'create'])->name('kumosoft.create');
+    Route::post('/kumosoft/store', [KumosoftController::class, 'store'])->name('kumosoft.store');
 
 });
