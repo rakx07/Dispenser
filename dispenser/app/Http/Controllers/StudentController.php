@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\Voucher;
 use App\Models\Email;
 use App\Models\Satpaccount;
+use App\Models\Kumosoft; // ✅ should be here
 use App\Models\SchoologyCredential;
 use Illuminate\Http\Request;
 use App\Imports\StudentImport;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
 use Carbon\Carbon;
+
 
 class StudentController extends Controller
 {
@@ -206,52 +208,55 @@ class StudentController extends Controller
         }
     }
 
-    public function handleVoucherAndSatp(Request $request)
-    {
-        $request->validate([
-            'idNumber' => 'required|string',
-            'lastname' => 'required|string',
-            'birthday' => 'required|date_format:Y-m-d',
-            'courseSelect' => 'required|string',
-        ]);
+public function handleVoucherAndSatp(Request $request)
+{
+    $request->validate([
+        'idNumber' => 'required|string',
+        'lastname' => 'required|string',
+        'birthday' => 'required|date_format:Y-m-d',
+        'courseSelect' => 'required|string',
+    ]);
 
-        $idNumber = trim($request->input('idNumber'));
-        $lastname = strtolower(trim($request->input('lastname')));
-        $birthday = Carbon::parse($request->input('birthday'))->format('Y-m-d');
-        $course = Course::where('code', $request->input('courseSelect'))->first();
+    $idNumber = trim($request->input('idNumber'));
+    $lastname = strtolower(trim($request->input('lastname')));
+    $birthday = Carbon::parse($request->input('birthday'))->format('Y-m-d');
+    $course = Course::where('code', $request->input('courseSelect'))->first();
 
-        if (!$course) {
-            return redirect()->back()->with('error', 'Invalid course selected.');
-        }
-
-        $student = Student::where('school_id', $idNumber)
-            ->whereRaw('LOWER(lastname) = ?', [$lastname])
-            ->where('birthday', $birthday)
-            ->where('course_id', $course->id)
-            ->first();
-
-        if (!$student) {
-            return redirect()->back()->with('error', 'Student record not found or information does not match.');
-        }
-
-        $satpAccount = Satpaccount::where('school_id', $idNumber)->first();
-        $emailRecord = Email::where('sch_id_number', $idNumber)->first();
-        $schoology = SchoologyCredential::where('school_id', $idNumber)->first();
-
-        $satp_password = $satpAccount ? $satpAccount->satp_password : null;
-        $voucher = $student->voucher_id
-            ? Voucher::find($student->voucher_id)
-            : $this->generateNewVoucherForStudent($student);
-
-        return view('voucher', [
-            'student' => $student,
-            'satp_password' => $satp_password,
-            'voucher' => $voucher,
-            'email' => $emailRecord->email_address ?? null,
-            'password' => $emailRecord->password ?? null,
-            'schoology_credentials' => $schoology->schoology_credentials ?? null,
-        ]);
+    if (!$course) {
+        return redirect()->back()->with('error', 'Invalid course selected.');
     }
+
+    $student = Student::where('school_id', $idNumber)
+        ->whereRaw('LOWER(lastname) = ?', [$lastname])
+        ->where('birthday', $birthday)
+        ->where('course_id', $course->id)
+        ->first();
+
+    if (!$student) {
+        return redirect()->back()->with('error', 'Student record not found or information does not match.');
+    }
+
+    $satpAccount = Satpaccount::where('school_id', $idNumber)->first();
+    $emailRecord = Email::where('sch_id_number', $idNumber)->first();
+    $schoology = SchoologyCredential::where('school_id', $idNumber)->first();
+    $kumosoft = Kumosoft::where('school_id', $idNumber)->first(); // ✅ add this
+
+    $satp_password = $satpAccount ? $satpAccount->satp_password : null;
+    $voucher = $student->voucher_id
+        ? Voucher::find($student->voucher_id)
+        : $this->generateNewVoucherForStudent($student);
+
+    return view('voucher', [
+        'student' => $student,
+        'satp_password' => $satp_password,
+        'voucher' => $voucher,
+        'email' => $emailRecord->email_address ?? null,
+        'password' => $emailRecord->password ?? null,
+        'schoology_credentials' => $schoology->schoology_credentials ?? null,
+        'kumosoft_credentials' => $kumosoft->kumosoft_credentials ?? null, // ✅ pass to blade
+    ]);
+}
+
 
     public function showVoucher()
     {

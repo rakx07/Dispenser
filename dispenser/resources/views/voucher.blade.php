@@ -77,6 +77,7 @@
             @if (isset($student))
                 <h3><strong>Name:</strong> {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
                 <p><strong>Course:</strong> {{ $student->course->name }}</p>
+                <p><strong>WiFi Voucher:</strong> <span id="voucher-code-field">********</span></p>
             @else
                 <div class="alert alert-danger">Student information not found.</div>
             @endif
@@ -93,11 +94,12 @@
                 </div>
             </div>
 
-            <!-- Right Top - Voucher Code -->
+            <!-- Right Top - Kumosoft Credentials -->
             <div class="col-md-6">
                 <div class="student-info h-100">
-                    <h4>Voucher Code</h4>
-                    <p><strong>Voucher:</strong> <span id="voucher-code-field">********</span></p>
+                    <h4>Kumosoft Credentials</h4>
+                    <p><strong>Kumosoft Username:</strong> {{ $student->school_id ?? 'Not Available' }}</p>
+                    <p><strong>Kumosoft Password:</strong> <span id="kumosoft-password">********</span></p>
                 </div>
             </div>
 
@@ -171,6 +173,7 @@
             document.getElementById('voucher-code-field').textContent = "{{ $voucher->voucher_code ?? 'Not Available' }}";
             document.getElementById('satp-password-field').textContent = "{{ $satp_password ?? 'Not Available' }}";
             document.getElementById('password-field-schoology').textContent = "{{ $schoology_credentials ?? 'Not Available' }}";
+            document.getElementById('kumosoft-password').textContent = "{{ $kumosoft_credentials ?? 'Not Available' }}";
         }
 
         function recordTransaction() {
