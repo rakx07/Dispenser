@@ -365,6 +365,11 @@ return [
             'url' => 'audit/transactions',
             'icon' => 'fas fa-fw fa-table',
         ],
+        [
+            'text' => 'Credentials Display Controls',
+            'url' => 'controls',
+            'icon' => 'fas fa-fw fa-table',
+        ],
         
         
         ///added multi level

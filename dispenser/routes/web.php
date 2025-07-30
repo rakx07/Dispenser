@@ -6,6 +6,9 @@ use App\Http\Controllers\{
     StudentController, CollegeController, DepartmentController,
     CourseController, VoucherController, SatpController, HomeController, TransactionController, SchoologyCredentialController, KumosoftController
 };
+
+use App\Http\Controllers\CredentialDisplayController;
+
 use App\Http\Controllers\EmailController;
 
 // Home and welcome route
@@ -127,4 +130,6 @@ Route::middleware(['auth'])->group(function () {
     //Excel Export
     Route::get('/students/export', [StudentController::class, 'exportExcel'])->name('students.export');
 
+    Route::get('/controls', [CredentialDisplayController::class, 'index'])->name('controls.index');
+    Route::post('/controls/toggle', [CredentialDisplayController::class, 'toggle'])->name('controls.toggle');
 });

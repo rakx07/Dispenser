@@ -77,7 +77,9 @@
             @if (isset($student))
                 <h3><strong>Name:</strong> {{ ucfirst($student->firstname) }} {{ ucfirst($student->lastname) }}</h3>
                 <p><strong>Course:</strong> {{ $student->course->name }}</p>
-                <p><strong>WiFi Voucher:</strong> <span id="voucher-code-field">********</span></p>
+                @if($displaySettings['voucher']->is_enabled)
+                    <p><strong>WiFi Voucher:</strong> <span id="voucher-code-field">********</span></p>
+                @endif
             @else
                 <div class="alert alert-danger">Student information not found.</div>
             @endif
@@ -85,7 +87,8 @@
 
         <!-- Grid of 4 Credential Boxes -->
         <div class="row g-4">
-            <!-- Left Top - Email Credentials -->
+            @if($displaySettings['email']->is_enabled)
+            <!-- Email Credentials -->
             <div class="col-md-6">
                 <div class="student-info h-100">
                     <h4>Email Credentials</h4>
@@ -93,8 +96,10 @@
                     <p><strong>Password:</strong> <span id="password-field">********</span></p>
                 </div>
             </div>
+            @endif
 
-            <!-- Right Top - Kumosoft Credentials -->
+            @if($displaySettings['kumosoft']->is_enabled)
+            <!-- Kumosoft Credentials -->
             <div class="col-md-6">
                 <div class="student-info h-100">
                     <h4>Kumosoft Credentials</h4>
@@ -102,8 +107,10 @@
                     <p><strong>Kumosoft Password:</strong> <span id="kumosoft-password">********</span></p>
                 </div>
             </div>
+            @endif
 
-            <!-- Left Bottom - Schoology -->
+            @if($displaySettings['schoology']->is_enabled)
+            <!-- Schoology Credentials -->
             <div class="col-md-6">
                 <div class="student-info h-100">
                     <h4>Schoology Access</h4>
@@ -112,8 +119,10 @@
                     <p><strong>Schoology Link:</strong> https://ndmu.schoology.com/</p>
                 </div>
             </div>
+            @endif
 
-            <!-- Right Bottom - SATP -->
+            @if($displaySettings['satp']->is_enabled)
+            <!-- SATP Credentials -->
             <div class="col-md-6">
                 <div class="satp-box h-100">
                     <h4>SATP Credentials</h4>
@@ -123,6 +132,7 @@
                     <p class="red-note">NOTE: Use Google Chrome Web Browser.</p>
                 </div>
             </div>
+            @endif
         </div>
 
         <!-- Show All Button -->
@@ -168,13 +178,24 @@
             }
         });
 
-        function revealCredentials() {
-            document.getElementById('password-field').textContent = "{{ $password ?? 'Not Available' }}";
-            document.getElementById('voucher-code-field').textContent = "{{ $voucher->voucher_code ?? 'Not Available' }}";
-            document.getElementById('satp-password-field').textContent = "{{ $satp_password ?? 'Not Available' }}";
-            document.getElementById('password-field-schoology').textContent = "{{ $schoology_credentials ?? 'Not Available' }}";
-            document.getElementById('kumosoft-password').textContent = "{{ $kumosoft_credentials ?? 'Not Available' }}";
-        }
+       function revealCredentials() {
+    const passwordField = document.getElementById('password-field');
+    if (passwordField) passwordField.textContent = @json($password ?? 'Not Available');
+
+    const voucherField = document.getElementById('voucher-code-field');
+    if (voucherField) voucherField.textContent = @json(optional($voucher)->voucher_code ?? 'Not Available');
+
+    const satpField = document.getElementById('satp-password-field');
+    if (satpField) satpField.textContent = @json($satp_password ?? 'Not Available');
+
+    const schoologyField = document.getElementById('password-field-schoology');
+    if (schoologyField) schoologyField.textContent = @json($schoology_credentials ?? 'Not Available');
+
+    const kumosoftField = document.getElementById('kumosoft-password');
+    if (kumosoftField) kumosoftField.textContent = @json($kumosoft_credentials ?? 'Not Available');
+}
+
+
 
         function recordTransaction() {
             fetch("{{ route('transactions.recordShowPassword') }}", {
@@ -209,7 +230,6 @@
             });
         });
 
-        // 40-second inactivity timer
         let inactivityTimer;
         function resetInactivityTimer() {
             clearTimeout(inactivityTimer);

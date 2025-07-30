@@ -16,6 +16,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Exports\StudentsExport;
+use App\Models\CredentialDisplaySetting; // ← Add at the top
 
 
 use Carbon\Carbon;
@@ -241,22 +242,27 @@ public function handleVoucherAndSatp(Request $request)
     $satpAccount = Satpaccount::where('school_id', $idNumber)->first();
     $emailRecord = Email::where('sch_id_number', $idNumber)->first();
     $schoology = SchoologyCredential::where('school_id', $idNumber)->first();
-    $kumosoft = Kumosoft::where('school_id', $idNumber)->first(); // ✅ add this
+    $kumosoft = Kumosoft::where('school_id', $idNumber)->first();
 
     $satp_password = $satpAccount ? $satpAccount->satp_password : null;
     $voucher = $student->voucher_id
         ? Voucher::find($student->voucher_id)
         : $this->generateNewVoucherForStudent($student);
 
+    // 🔐 Get display settings
+    $displaySettings = CredentialDisplaySetting::all()->keyBy('section');
+
     return view('voucher', [
-        'student' => $student,
-        'satp_password' => $satp_password,
-        'voucher' => $voucher,
-        'email' => $emailRecord->email_address ?? null,
-        'password' => $emailRecord->password ?? null,
-        'schoology_credentials' => $schoology->schoology_credentials ?? null,
-        'kumosoft_credentials' => $kumosoft->kumosoft_credentials ?? null, // ✅ pass to blade
-    ]);
+    'student' => $student,
+    'satp_password' => $satp_password,
+    'voucher' => $voucher,
+    'email' => $emailRecord->email_address ?? null,
+    'password' => $emailRecord->password ?? null,
+    'schoology_credentials' => optional($schoology)->schoology_credentials,
+    'kumosoft_credentials' => optional($kumosoft)->kumosoft_credentials, // ✅ fix here
+    'displaySettings' => $displaySettings,
+]);
+
 }
 
 
