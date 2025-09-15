@@ -346,6 +346,11 @@ return [
             'icon' => 'fas fa-fw fa-plus',
         ],
         [
+            'text' => 'Add Kumosoft User',
+            'url' => 'kumosoft/create',
+            'icon' => 'fas fa-fw fa-plus',
+        ],
+        [
             'text' => 'Add Schoology User',
             'url' => 'schoology-credentials/create',
             'icon' => 'fas fa-fw fa-plus',
