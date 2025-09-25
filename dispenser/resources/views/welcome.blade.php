@@ -127,7 +127,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="idNumber" class="form-label"><b>ID Number1</b></label>
+                        <label for="idNumber" class="form-label"><b>ID Number</b></label>
                         <input type="text" name="idNumber" placeholder="Enter your ID number" class="form-control" id="idNumber">
                     </div>
                     <div class="mb-3">
