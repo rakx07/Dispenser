@@ -59,7 +59,7 @@
         </div>
     </form>
 
-    {{-- Results --}}
+    {{-- Results (replaced by AJAX) --}}
     <div id="results">
         <div class="card">
             <div class="card-body p-0">
@@ -196,7 +196,7 @@
                                                                value="{{ $voucher->voucher_code ?? '' }}"
                                                                placeholder="Click Generate"
                                                                readonly>
-                                                        {{-- Hidden (real field) --}}
+                                                        {{-- Hidden (real field only set on Generate) --}}
                                                         <input type="hidden"
                                                                id="voucher-{{ $s->school_id }}"
                                                                name="voucher_code"
@@ -232,6 +232,17 @@
                         @endforelse
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            {{-- Pagination (keeps current filters) --}}
+            <div class="card-footer">
+                <div class="d-flex justify-content-center">
+                    {{ $students->onEachSide(1)->appends(request()->query())->links() }}
+
+                </div>
+                <div class="text-center small text-muted">
+                    Showing {{ $students->firstItem() ?? 0 }}–{{ $students->lastItem() ?? 0 }} of {{ $students->total() }} results
                 </div>
             </div>
         </div>
@@ -270,21 +281,33 @@ $(function () {
     @endif
 
     // Debounce helper
-    function debounce(fn, delay) {
-        var t; return function(){ clearTimeout(t); t = setTimeout(fn.bind(this, ...arguments), delay); };
-    }
+    function debounce(fn, delay) { var t; return function(){ clearTimeout(t); t = setTimeout(fn.bind(this, ...arguments), delay); }; }
 
     var $form   = $('#filter-form');
     var $q      = $('#q');
     var $course = $('#course');
     var $only   = $('#only_with_creds');
 
+    function replaceResultsFromHtml(html) {
+        var $html = $('<div>').html(html);
+        var $newResults = $html.find('#results');
+        if ($newResults.length) {
+            $('#results').replaceWith($newResults);
+        } else {
+            // fallback: try to grab the table/card
+            var $card = $html.find('.card').first();
+            if ($card.length) $('#results').html($card);
+        }
+    }
+
     function runSearch(pushState) {
-        var url = $form.attr('action') + '?' + $.param({
+        var base = $form.attr('action');
+        var qs = {
             q: $q.val(),
             course: $course.val(),
             only_with_creds: $only.is(':checked') ? 1 : ''
-        }) + '&ajax=1';
+        };
+        var url = base + '?' + $.param(qs) + '&ajax=1';
 
         if (!$('#ajax-spinner').length) {
             $('body').append('<div id="ajax-spinner" class="btn btn-light"><i class="fas fa-spinner fa-spin"></i> Loading…</div>');
@@ -292,23 +315,13 @@ $(function () {
         $('#ajax-spinner').fadeIn(100);
 
         $.get(url, function (data) {
-            var $html = $('<div>').html(data);
-            var $newResults = $html.find('#results');
-            if ($newResults.length) {
-                $('#results').replaceWith($newResults);
-            } else {
-                $('#results').html($(data).find('table').closest('.card'));
-            }
+            replaceResultsFromHtml(data);
         }).always(function(){
             $('#ajax-spinner').fadeOut(100);
         });
 
         if (pushState && window.history && window.history.pushState) {
-            window.history.pushState({}, '', $form.attr('action') + '?' + $.param({
-                q: $q.val(),
-                course: $course.val(),
-                only_with_creds: $only.is(':checked') ? 1 : ''
-            }));
+            window.history.pushState({}, '', base + '?' + $.param(qs));
         }
     }
 
@@ -317,6 +330,27 @@ $(function () {
     $course.on('keyup', debounce(function(){ runSearch(true); }, 250));
     $only.on('change', function(){ runSearch(true); });
     $form.on('submit', function(e){ e.preventDefault(); runSearch(true); });
+
+    // Intercept pagination clicks and load via AJAX (keeps smooth UX)
+    $(document).on('click', '#results .pagination a', function (e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        if (!url) return;
+        if (!$('#ajax-spinner').length) {
+            $('body').append('<div id="ajax-spinner" class="btn btn-light"><i class="fas fa-spinner fa-spin"></i> Loading…</div>');
+        }
+        $('#ajax-spinner').fadeIn(100);
+        $.get(url + (url.indexOf('?') >= 0 ? '&' : '?') + 'ajax=1', function (data) {
+            replaceResultsFromHtml(data);
+            if (window.history && window.history.pushState) {
+                // reflect new page in URL, preserving filters
+                var cleanUrl = url.replace(/[?&]ajax=1\b/, '');
+                window.history.pushState({}, '', cleanUrl);
+            }
+        }).always(function(){
+            $('#ajax-spinner').fadeOut(100);
+        });
+    });
 
     // CSRF
     var csrf = '{{ csrf_token() }}';

@@ -17,12 +17,12 @@ use App\Models\SchoologyCredential;
 class FilterController extends Controller
 {
     /**
-     * GET /filters — search + list
+     * GET /filters — search + list (paginated: 15/page)
      */
     public function index(Request $request)
     {
-        $q = trim((string) $request->query('q', ''));
-        $course = trim((string) $request->query('course', ''));
+        $q             = trim((string) $request->query('q', ''));
+        $course        = trim((string) $request->query('course', ''));
         $onlyWithCreds = (bool) $request->query('only_with_creds', false);
 
         $studentsQuery = Student::query()
@@ -30,9 +30,9 @@ class FilterController extends Controller
             ->when($q !== '', function ($qq) use ($q) {
                 $qq->where(function ($w) use ($q) {
                     $w->where('school_id', 'like', "%{$q}%")
-                        ->orWhere('firstname', 'like', "%{$q}%")
-                        ->orWhere('lastname', 'like', "%{$q}%")
-                        ->orWhere('middlename', 'like', "%{$q}%");
+                      ->orWhere('firstname', 'like', "%{$q}%")
+                      ->orWhere('lastname', 'like', "%{$q}%")
+                      ->orWhere('middlename', 'like', "%{$q}%");
                 });
             })
             // Course filter by code only (e.g., "BSIT")
@@ -41,11 +41,23 @@ class FilterController extends Controller
                     $c->where('code', $course);
                 });
             })
-            ->orderBy('lastname')->orderBy('firstname')
-            ->limit(100);
+            // Only students with any credentials (done at DB level so pagination stays correct)
+            ->when($onlyWithCreds, function ($qq) {
+                $qq->where(function ($w) {
+                    $w->whereIn('school_id', Email::select('sch_id_number'))
+                      ->orWhereIn('school_id', Satpaccount::select('school_id'))
+                      ->orWhereIn('school_id', Kumosoft::select('school_id'))
+                      ->orWhereIn('school_id', SchoologyCredential::select('school_id'))
+                      ->orWhereNotNull('voucher_id');
+                });
+            })
+            ->orderBy('lastname')
+            ->orderBy('firstname');
 
-        $students = $studentsQuery->get();
+        // Paginate 15 per page and keep query string
+        $students = $studentsQuery->paginate(15)->appends($request->query());
 
+        // Pull credential records for the CURRENT PAGE ONLY
         $schoolIds  = $students->pluck('school_id')->filter()->values();
         $voucherIds = $students->pluck('voucher_id')->filter()->values();
 
@@ -57,28 +69,20 @@ class FilterController extends Controller
             ? Voucher::whereIn('id', $voucherIds)->get()->keyBy('id')
             : collect();
 
-        if ($onlyWithCreds) {
-            $students = $students->filter(function ($s) use ($emails, $satps, $kumos, $schoologys, $vouchers) {
-                return $emails->has($s->school_id)
-                    || $satps->has($s->school_id)
-                    || $kumos->has($s->school_id)
-                    || $schoologys->has($s->school_id)
-                    || ($s->voucher_id && $vouchers->has($s->voucher_id));
-            })->values();
-        }
-
+        // Auto-open modal when there is exactly one overall match and it is on this page
         $autoOpenId = null;
-        if ($q !== '' && $students->count() === 1) {
+        if ($q !== '' && $students->total() === 1 && $students->count() === 1) {
             $autoOpenId = $students->first()->school_id;
         }
 
+        // Course options (codes only used in UI datalist)
         $courses = Course::orderBy('name')->get(['id', 'code', 'name']);
 
         return view('filters.filter', [
             'q'           => $q,
             'course'      => $course,
             'onlyWith'    => $onlyWithCreds,
-            'students'    => $students,
+            'students'    => $students, // paginator
             'courses'     => $courses,
             'emails'      => $emails,
             'satps'       => $satps,
@@ -119,7 +123,6 @@ class FilterController extends Controller
             if ($request->filled('email_address') || $request->filled('email_password')) {
                 $email = Email::firstOrNew(['sch_id_number' => $school_id]);
                 $email->exists ? null : $email->fill(['email_address' => null, 'password' => null]);
-                $before = $email->getAttributes();
                 if ($request->filled('email_address'))  $email->email_address = $request->input('email_address');
                 if ($request->filled('email_password')) $email->password      = $request->input('email_password');
                 $email->save();
@@ -181,7 +184,7 @@ class FilterController extends Controller
 
                 // same as current: no change
                 if ($currentVoucher && (int)$currentVoucher->id === (int)$newVoucher->id) {
-                    // do nothing
+                    // no-op
                 } else {
                     if ((int)$newVoucher->is_given === 1) {
                         DB::rollBack();
