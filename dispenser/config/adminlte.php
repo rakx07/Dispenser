@@ -331,6 +331,11 @@ return [
             'icon' => 'fas fa-fw fa-globe',
         ],
         [
+            'text' => 'Filter Student',
+            'url'  => 'filters',              // ✅ use GET /filters
+            'icon' => 'fas fa-fw fa-filter',
+        ],
+        [
             'text' => 'Search Student',
             'url' => 'student/search',
             'icon' => 'fas fa-fw fa-search',
@@ -365,11 +370,6 @@ return [
         //     'url' => 'student/edit',
         //     'icon' => 'fas fa-fw fa-edit',
         // ],
-        [
-            'text' => 'Filter Student',
-            'url'  => 'filters',              // ✅ use GET /filters
-            'icon' => 'fas fa-fw fa-filter',
-        ],
 
         [
             'text' => 'Student Transactions',
