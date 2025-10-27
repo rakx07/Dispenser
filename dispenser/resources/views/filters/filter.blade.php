@@ -111,15 +111,13 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-primary"
-                                            data-toggle="modal"
-                                            data-target="#editModal-{{ $s->school_id }}">
+                                    <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal-{{ $s->school_id }}">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
                                 </td>
                             </tr>
 
-                            {{-- Edit Modal (Bootstrap 4) --}}
+                            {{-- Edit Modal --}}
                             <div class="modal fade" id="editModal-{{ $s->school_id }}" tabindex="-1" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
                                     <div class="modal-content">
@@ -134,11 +132,11 @@
                                                 </button>
                                             </div>
                                             <div class="modal-body">
-                                                {{-- Success notice INSIDE this modal when coming back from a save --}}
                                                 @if ($justSavedForThis)
                                                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                                                         <strong>Changes saved.</strong>
-                                                        <span class="ml-1">Successfully changed:
+                                                        <span class="ml-1">
+                                                            Successfully changed:
                                                             <strong>{{ session('changed_text') ?? (session('changed') ? implode(', ', session('changed')) : '—') }}</strong>
                                                         </span>
                                                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -176,7 +174,6 @@
                                                                value="{{ $satp->satp_password ?? '' }}" placeholder="">
                                                     </div>
 
-                                                    {{-- Birthday (editable) --}}
                                                     <div class="col-md-6">
                                                         <label class="form-label">Birthday</label>
                                                         <input type="date" name="birthday" class="form-control"
@@ -192,13 +189,18 @@
                                                                 <i class="fas fa-magic"></i> Generate
                                                             </button>
                                                         </label>
+                                                        {{-- Visible (no name) --}}
                                                         <input type="text"
-                                                               id="voucher-{{ $s->school_id }}"
-                                                               name="voucher_code"
+                                                               id="voucher-display-{{ $s->school_id }}"
                                                                class="form-control"
                                                                value="{{ $voucher->voucher_code ?? '' }}"
                                                                placeholder="Click Generate"
                                                                readonly>
+                                                        {{-- Hidden (real field) --}}
+                                                        <input type="hidden"
+                                                               id="voucher-{{ $s->school_id }}"
+                                                               name="voucher_code"
+                                                               value="">
                                                         <small class="form-text text-muted">
                                                             Clicking <strong>Generate</strong> assigns the next available voucher and frees any old one automatically.
                                                         </small>
@@ -252,10 +254,8 @@
     }
     #ajax-spinner {
         position: fixed;
-        right: 1rem;
-        bottom: 1rem;
-        z-index: 1051;
-        display: none;
+        right: 1rem; bottom: 1rem;
+        z-index: 1051; display: none;
     }
 </style>
 @endpush
@@ -263,7 +263,7 @@
 @push('js')
 <script>
 $(function () {
-    // On successful save, re-open the SAME student's modal (to show inline success)
+    // Re-open the same student's modal after save to show inline success
     @php $autoId = session('auto_open') ?? ($autoOpenId ?? null); @endphp
     @if (!empty($autoId))
         $('#editModal-{{ $autoId }}').modal('show');
@@ -271,14 +271,9 @@ $(function () {
 
     // Debounce helper
     function debounce(fn, delay) {
-        var t; return function() {
-            var ctx = this, args = arguments;
-            clearTimeout(t);
-            t = setTimeout(function(){ fn.apply(ctx, args); }, delay);
-        };
+        var t; return function(){ clearTimeout(t); t = setTimeout(fn.bind(this, ...arguments), delay); };
     }
 
-    // Live search elements
     var $form   = $('#filter-form');
     var $q      = $('#q');
     var $course = $('#course');
@@ -317,25 +312,21 @@ $(function () {
         }
     }
 
-    // Bind live search
+    // Live search (every letter)
     $q.on('keyup', debounce(function(){ runSearch(true); }, 250));
     $course.on('keyup', debounce(function(){ runSearch(true); }, 250));
     $only.on('change', function(){ runSearch(true); });
+    $form.on('submit', function(e){ e.preventDefault(); runSearch(true); });
 
-    // Fallback submit (uses same AJAX path)
-    $form.on('submit', function(e){
-        e.preventDefault();
-        runSearch(true);
-    });
-
-    // CSRF for AJAX
+    // CSRF
     var csrf = '{{ csrf_token() }}';
 
-    // Generate voucher (delegated so it works after AJAX refresh)
+    // Generate voucher (delegated; works after AJAX refresh)
     $(document).on('click', '.generate-voucher', function () {
         var $btn = $(this);
         var schoolId = $btn.data('school-id');
-        var $input = $('#voucher-' + schoolId);
+        var $display = $('#voucher-display-' + schoolId);
+        var $hidden  = $('#voucher-' + schoolId);
 
         $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generating…');
 
@@ -345,9 +336,10 @@ $(function () {
             data: { _token: csrf },
             success: function (res) {
                 if (res && res.success) {
-                    $input.val(res.voucher_code);
+                    $display.val(res.voucher_code);
+                    $hidden.val(res.voucher_code); // only set hidden when generated
                     $('<div class="alert alert-success mt-2" role="alert">New voucher: <strong>' + res.voucher_code + '</strong></div>')
-                        .insertAfter($input).delay(1500).fadeOut(400, function(){ $(this).remove(); });
+                        .insertAfter($display).delay(1500).fadeOut(400, function(){ $(this).remove(); });
                 } else {
                     alert(res && res.message ? res.message : 'Failed to generate voucher.');
                 }
@@ -361,7 +353,6 @@ $(function () {
             }
         });
     });
-
 });
 </script>
 @endpush
