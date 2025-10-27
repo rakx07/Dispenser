@@ -360,11 +360,17 @@ return [
             'url' => 'emails/create',
             'icon' => 'fas fa-fw fa-plus',
         ],
+        // [
+        //     'text' => 'Edit Student',
+        //     'url' => 'student/edit',
+        //     'icon' => 'fas fa-fw fa-edit',
+        // ],
         [
-            'text' => 'Edit Student',
-            'url' => 'student/edit',
-            'icon' => 'fas fa-fw fa-edit',
+            'text' => 'Filter Student',
+            'url'  => 'filters',              // ✅ use GET /filters
+            'icon' => 'fas fa-fw fa-filter',
         ],
+
         [
             'text' => 'Student Transactions',
             'url' => 'audit/transactions',

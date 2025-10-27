@@ -6,6 +6,7 @@ use App\Http\Controllers\{
     StudentController, CollegeController, DepartmentController,
     CourseController, VoucherController, SatpController, HomeController, TransactionController, SchoologyCredentialController, KumosoftController
 };
+use App\Http\Controllers\FilterController;
 
 use App\Http\Controllers\CredentialDisplayController;
 
@@ -132,4 +133,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/controls', [CredentialDisplayController::class, 'index'])->name('controls.index');
     Route::post('/controls/toggle', [CredentialDisplayController::class, 'toggle'])->name('controls.toggle');
+
+    Route::get('/filters', [FilterController::class, 'index'])->name('filters.index');
+    Route::post('/filters/{school_id}', [FilterController::class, 'update'])->name('filters.update');
+    Route::post('/filters/{school_id}/voucher/generate', [FilterController::class, 'generateVoucher'])
+    ->name('filters.voucher.generate');
 });
