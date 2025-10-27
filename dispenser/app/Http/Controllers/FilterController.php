@@ -88,172 +88,142 @@ class FilterController extends Controller
     }
 
     public function update(Request $request, string $school_id)
-    {
-        $request->validate([
-            'email_address'          => ['nullable', 'email'],
-            'email_password'         => ['nullable', 'string'],
-            'satp_password'          => ['nullable', 'string'],
-            'schoology_credentials'  => ['nullable', 'string'],
-            'kumosoft_credentials'   => ['nullable', 'string'],
-            'voucher_code'           => ['nullable', 'string'],
-            'free_old_voucher'       => ['nullable', 'boolean'],
-            'birthday'               => ['nullable', 'date'], // NEW
-        ]);
+{
+    $request->validate([
+        'email_address'          => ['nullable', 'email'],
+        'email_password'         => ['nullable', 'string'],
+        'satp_password'          => ['nullable', 'string'],
+        'schoology_credentials'  => ['nullable', 'string'],
+        'kumosoft_credentials'   => ['nullable', 'string'],
+        'voucher_code'           => ['nullable', 'string'],
+        'free_old_voucher'       => ['nullable', 'boolean'],
+        'birthday'               => ['nullable', 'date'],
+    ]);
 
-        $student = Student::where('school_id', $school_id)->first();
-        if (!$student) {
-            return back()->withErrors(['student' => 'Student not found for School ID: '.$school_id])->withInput();
-        }
-
-        $changed = [];
-
-        DB::beginTransaction();
-        try {
-            // ===== EMAIL =====
-            if ($request->hasAny(['email_address', 'email_password'])) {
-                $email = Email::firstOrNew(['sch_id_number' => $school_id]);
-
-                $addr = $request->input('email_address');
-                $pass = $request->input('email_password');
-
-                if (!$email->exists && ($addr === null && $pass === null)) {
-                    // skip
-                } else {
-                    if ($addr === null && $email->exists) $addr = '';
-                    if ($pass === null && $email->exists) $pass = '';
-
-                    if ($addr === null) $addr = $email->email_address;
-                    if ($pass === null) $pass = $email->password;
-
-                    $email->email_address = $addr;
-                    $email->password      = $pass;
-                    $email->save();
-
-                    if ($email->wasRecentlyCreated || $email->wasChanged(['email_address','password'])) {
-                        $changed[] = 'Email';
-                    }
-                }
-            }
-
-            // ===== SATP =====
-            if ($request->has('satp_password')) {
-                $satp = Satpaccount::firstOrNew(['school_id' => $school_id]);
-                $val  = $request->input('satp_password');
-
-                if (!$satp->exists && $val === null) {
-                    // skip
-                } else {
-                    if ($val === null && $satp->exists) $val = '';
-                    if ($val === null) $val = $satp->satp_password;
-                    $satp->satp_password = $val;
-                    $satp->save();
-
-                    if ($satp->wasRecentlyCreated || $satp->wasChanged('satp_password')) {
-                        $changed[] = 'SATP';
-                    }
-                }
-            }
-
-            // ===== SCHOOLOGY =====
-            if ($request->has('schoology_credentials')) {
-                $sch = SchoologyCredential::firstOrNew(['school_id' => $school_id]);
-                $val = $request->input('schoology_credentials');
-
-                if (!$sch->exists && $val === null) {
-                    // skip
-                } else {
-                    if ($val === null && $sch->exists) $val = '';
-                    if ($val === null) $val = $sch->schoology_credentials;
-                    $sch->schoology_credentials = $val;
-                    $sch->save();
-
-                    if ($sch->wasRecentlyCreated || $sch->wasChanged('schoology_credentials')) {
-                        $changed[] = 'Schoology';
-                    }
-                }
-            }
-
-            // ===== KUMOSOFT =====
-            if ($request->has('kumosoft_credentials')) {
-                $ks  = Kumosoft::firstOrNew(['school_id' => $school_id]);
-                $val = $request->input('kumosoft_credentials');
-
-                if (!$ks->exists && $val === null) {
-                    // skip
-                } else {
-                    if ($val === null && $ks->exists) $val = '';
-                    if ($val === null) $val = $ks->kumosoft_credentials;
-                    $ks->kumosoft_credentials = $val;
-                    $ks->save();
-
-                    if ($ks->wasRecentlyCreated || $ks->wasChanged('kumosoft_credentials')) {
-                        $changed[] = 'Kumosoft';
-                    }
-                }
-            }
-
-            // ===== BIRTHDAY (Student) =====
-            if ($request->has('birthday')) {
-                $newBday = $request->input('birthday'); // nullable (empty -> null)
-                if ($newBday !== null && $newBday !== '') {
-                    $student->birthday = $newBday;
-                    $student->save();
-                    if ($student->wasChanged('birthday')) {
-                        $changed[] = 'Birthday';
-                    }
-                }
-            }
-
-            // ===== VOUCHER (manual entry path) =====
-            $voucherCode = trim((string) $request->input('voucher_code', ''));
-            $freeOld     = (bool) $request->boolean('free_old_voucher');
-
-            if ($voucherCode !== '') {
-                $newVoucher = Voucher::where('voucher_code', $voucherCode)->first();
-                if (!$newVoucher) {
-                    DB::rollBack();
-                    return back()->withErrors(['voucher_code' => 'Voucher code not found.'])->withInput();
-                }
-                if ((int) $newVoucher->is_given === 1 && (int) $student->voucher_id !== (int) $newVoucher->id) {
-                    DB::rollBack();
-                    return back()->withErrors(['voucher_code' => 'Voucher code is already assigned to someone else.'])->withInput();
-                }
-
-                if (!is_null($student->voucher_id) && (int)$student->voucher_id !== (int)$newVoucher->id) {
-                    Voucher::where('id', $student->voucher_id)->update(['is_given' => 0]);
-                }
-
-                $student->voucher_id = $newVoucher->id;
-                $student->save();
-
-                $newVoucher->is_given = 1;
-                $newVoucher->save();
-
-                $changed[] = 'Voucher (assigned)';
-            } elseif ($freeOld) {
-                if (!is_null($student->voucher_id)) {
-                    Voucher::where('id', $student->voucher_id)->update(['is_given' => 0]);
-                    $student->voucher_id = null;
-                    $student->save();
-                    $changed[] = 'Voucher (unassigned)';
-                }
-            }
-
-            DB::commit();
-
-            $changedText = empty($changed) ? 'No fields changed' : implode(', ', $changed);
-
-            return redirect()
-                ->route('filters.index', ['q' => $school_id])
-                ->with('status', 'Credentials updated successfully.')
-                ->with('changed', $changed)
-                ->with('changed_text', $changedText)
-                ->with('auto_open', $school_id);
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return back()->withErrors(['server' => 'Error: '.$e->getMessage()])->withInput();
-        }
+    $student = \App\Models\Student::where('school_id', $school_id)->first();
+    if (!$student) {
+        return back()->withErrors(['student' => 'Student not found for School ID: '.$school_id])->withInput();
     }
+
+    $changed = [];
+
+    DB::beginTransaction();
+    try {
+        /** -------------------------
+         *  EMAIL (create if missing)
+         *  -------------------------
+         *  Only touch if user provided ANY email field.
+         */
+        if ($request->filled('email_address') || $request->filled('email_password')) {
+            $updates = [];
+            if ($request->filled('email_address'))  $updates['email_address'] = $request->input('email_address');
+            if ($request->filled('email_password')) $updates['password']      = $request->input('email_password');
+
+            if (!empty($updates)) {
+                \App\Models\Email::updateOrCreate(
+                    ['sch_id_number' => $school_id],
+                    $updates
+                );
+                $changed[] = 'Email';
+            }
+        }
+
+        /** -------------------------
+         *  SATP (create if missing)
+         *  ------------------------- */
+        if ($request->filled('satp_password')) {
+            \App\Models\Satpaccount::updateOrCreate(
+                ['school_id' => $school_id],
+                ['satp_password' => $request->input('satp_password')]
+            );
+            $changed[] = 'SATP';
+        }
+
+        /** --------------------------------
+         *  SCHOOLOGY (create if missing)
+         *  -------------------------------- */
+        if ($request->filled('schoology_credentials')) {
+            \App\Models\SchoologyCredential::updateOrCreate(
+                ['school_id' => $school_id],
+                ['schoology_credentials' => $request->input('schoology_credentials')]
+            );
+            $changed[] = 'Schoology';
+        }
+
+        /** ------------------------------
+         *  KUMOSOFT (create if missing)
+         *  ------------------------------ */
+        if ($request->filled('kumosoft_credentials')) {
+            \App\Models\Kumosoft::updateOrCreate(
+                ['school_id' => $school_id],
+                ['kumosoft_credentials' => $request->input('kumosoft_credentials')]
+            );
+            $changed[] = 'Kumosoft';
+        }
+
+        /** ---------------
+         *  BIRTHDAY
+         *  --------------- */
+        if ($request->filled('birthday')) {
+            $student->birthday = $request->input('birthday');
+            $student->save();
+            $changed[] = 'Birthday';
+        }
+
+        /** ----------------
+         *  VOUCHER (manual)
+         *  ---------------- */
+        $voucherCode = trim((string) $request->input('voucher_code', ''));
+        $freeOld     = (bool) $request->boolean('free_old_voucher');
+
+        if ($voucherCode !== '') {
+            $newVoucher = \App\Models\Voucher::where('voucher_code', $voucherCode)->first();
+            if (!$newVoucher) {
+                DB::rollBack();
+                return back()->withErrors(['voucher_code' => 'Voucher code not found.'])->withInput();
+            }
+            if ((int) $newVoucher->is_given === 1 && (int) $student->voucher_id !== (int) $newVoucher->id) {
+                DB::rollBack();
+                return back()->withErrors(['voucher_code' => 'Voucher code is already assigned to someone else.'])->withInput();
+            }
+
+            if (!is_null($student->voucher_id) && (int)$student->voucher_id !== (int)$newVoucher->id) {
+                \App\Models\Voucher::where('id', $student->voucher_id)->update(['is_given' => 0]);
+            }
+
+            $student->voucher_id = $newVoucher->id;
+            $student->save();
+
+            $newVoucher->is_given = 1;
+            $newVoucher->save();
+
+            $changed[] = 'Voucher (assigned)';
+        } elseif ($freeOld) {
+            if (!is_null($student->voucher_id)) {
+                \App\Models\Voucher::where('id', $student->voucher_id)->update(['is_given' => 0]);
+                $student->voucher_id = null;
+                $student->save();
+                $changed[] = 'Voucher (unassigned)';
+            }
+        }
+
+        DB::commit();
+
+        $changedText = empty($changed) ? 'No fields changed' : implode(', ', $changed);
+
+        // Reopen the same modal and show the inline success alert in it
+        return redirect()
+            ->route('filters.index', ['q' => $school_id])
+            ->with('status', 'Credentials updated successfully.')
+            ->with('changed', $changed)
+            ->with('changed_text', $changedText)
+            ->with('auto_open', $school_id);
+
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        return back()->withErrors(['server' => 'Error: '.$e->getMessage()])->withInput();
+    }
+}
 
     public function generateVoucher(Request $request, string $school_id): JsonResponse
     {
