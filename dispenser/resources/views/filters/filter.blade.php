@@ -59,7 +59,7 @@
         </div>
     </form>
 
-    {{-- Results container (only this is swapped by AJAX) --}}
+    {{-- Results container (only this gets swapped by AJAX) --}}
     <div id="results">
         <div class="card">
             <div class="card-body p-0">
@@ -86,7 +86,6 @@
                                 $kumo      = $kumos[$s->school_id] ?? null;
                                 $schoology = $schoologys[$s->school_id] ?? null;
                                 $voucher   = $s->voucher_id ? ($vouchers[$s->voucher_id] ?? null) : null;
-                                $justSavedForThis = (session('status') && (session('auto_open') ?? ($autoOpenId ?? null)) === $s->school_id);
                             @endphp
                             <tr>
                                 <td class="font-weight-bold">{{ $s->school_id }}</td>
@@ -121,7 +120,7 @@
                             <div class="modal fade" id="editModal-{{ $s->school_id }}" tabindex="-1" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
                                     <div class="modal-content">
-                                        <form method="POST" action="{{ route('filters.update', $s->school_id) }}">
+                                        <form method="POST" action="{{ route('filters.update', $s->school_id) }}" class="cred-form">
                                             @csrf
                                             <div class="modal-header">
                                                 <h5 class="modal-title">
@@ -133,51 +132,56 @@
                                             </div>
 
                                             <div class="modal-body">
-                                                @if ($justSavedForThis)
-                                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                                        <strong>Changes saved.</strong>
-                                                        <span class="ml-1">
-                                                            Successfully changed:
-                                                            <strong>{{ session('changed_text') ?? (session('changed') ? implode(', ', session('changed')) : '—') }}</strong>
-                                                        </span>
-                                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                @endif
+                                                {{-- Inline success / error feedback --}}
+                                                <div class="save-feedback"></div>
 
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <label class="form-label">Email Address</label>
-                                                        <input type="email" name="email_address" class="form-control"
-                                                               value="{{ $email->email_address ?? '' }}" placeholder="student@domain.edu">
+                                                        <input type="email" name="email_address"
+                                                               class="form-control track-change"
+                                                               data-label="Email"
+                                                               value="{{ $email->email_address ?? '' }}"
+                                                               placeholder="student@domain.edu">
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Email Password</label>
-                                                        <input type="text" name="email_password" class="form-control"
-                                                               value="{{ $email->password ?? '' }}" placeholder="">
+                                                        <input type="text" name="email_password"
+                                                               class="form-control track-change"
+                                                               data-label="Email Password"
+                                                               value="{{ $email->password ?? '' }}">
                                                     </div>
 
                                                     <div class="col-md-6">
                                                         <label class="form-label">Schoology Credentials</label>
-                                                        <input type="text" name="schoology_credentials" class="form-control"
-                                                               value="{{ $schoology->schoology_credentials ?? '' }}" placeholder="username / password or token">
+                                                        <input type="text" name="schoology_credentials"
+                                                               class="form-control track-change"
+                                                               data-label="Schoology"
+                                                               value="{{ $schoology->schoology_credentials ?? '' }}"
+                                                               placeholder="username / password or token">
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Kumosoft Credentials</label>
-                                                        <input type="text" name="kumosoft_credentials" class="form-control"
-                                                               value="{{ $kumo->kumosoft_credentials ?? '' }}" placeholder="username / password">
+                                                        <input type="text" name="kumosoft_credentials"
+                                                               class="form-control track-change"
+                                                               data-label="Kumosoft"
+                                                               value="{{ $kumo->kumosoft_credentials ?? '' }}"
+                                                               placeholder="username / password">
                                                     </div>
 
                                                     <div class="col-md-6">
                                                         <label class="form-label">SATP Password</label>
-                                                        <input type="text" name="satp_password" class="form-control"
-                                                               value="{{ $satp->satp_password ?? '' }}" placeholder="">
+                                                        <input type="text" name="satp_password"
+                                                               class="form-control track-change"
+                                                               data-label="SATP"
+                                                               value="{{ $satp->satp_password ?? '' }}">
                                                     </div>
 
                                                     <div class="col-md-6">
                                                         <label class="form-label">Birthday</label>
-                                                        <input type="date" name="birthday" class="form-control"
+                                                        <input type="date" name="birthday"
+                                                               class="form-control track-change"
+                                                               data-label="Birthday"
                                                                value="{{ optional(\Carbon\Carbon::parse($s->birthday))->format('Y-m-d') }}">
                                                     </div>
 
@@ -190,20 +194,22 @@
                                                                 <i class="fas fa-magic"></i> Generate
                                                             </button>
                                                         </label>
-                                                        {{-- Visible (readonly) --}}
+                                                        {{-- visible readonly --}}
                                                         <input type="text"
                                                                id="voucher-display-{{ $s->school_id }}"
                                                                class="form-control"
                                                                value="{{ $voucher->voucher_code ?? '' }}"
                                                                placeholder="Click Generate"
                                                                readonly>
-                                                        {{-- Hidden (set only on Generate) --}}
+                                                        {{-- hidden real field (set only when generated) --}}
                                                         <input type="hidden"
                                                                id="voucher-{{ $s->school_id }}"
                                                                name="voucher_code"
+                                                               class="track-change"
+                                                               data-label="Voucher"
                                                                value="">
                                                         <small class="form-text text-muted">
-                                                            Clicking <strong>Generate</strong> assigns the next available voucher and frees any old one automatically.
+                                                            Clicking <strong>Generate</strong> assigns the next available voucher and frees the old one.
                                                         </small>
                                                     </div>
 
@@ -278,8 +284,7 @@ $(function () {
   // ===== helpers =====
   function debounce(fn, delay){ let t; return function(){ clearTimeout(t); t = setTimeout(fn.bind(this, ...arguments), delay); }; }
   function buildUrl(base, params){
-    const usp = new URLSearchParams(params);
-    const qs = usp.toString();
+    const usp = new URLSearchParams(params); const qs = usp.toString();
     return qs ? base + '?' + qs : base;
   }
   function replaceResultsFromHtml(html){
@@ -290,17 +295,17 @@ $(function () {
       $('#results').replaceWith($newResults);
     }
   }
+  function mask(val){ return val ? '••••••' : '—'; }
 
+  // ===== search/pagination (AJAX replace #results only) =====
   const $form   = $('#filter-form');
   const $q      = $('#q');
   const $course = $('#course');
   const $only   = $('#only_with_creds');
 
-  // Show tiny spinner (optional)
   function showSpin(){
     if (!$('#ajax-spinner').length) {
-      $('body').append('<div id="ajax-spinner" class="btn btn-light"><i class="fas fa-spinner fa-spin"></i> Loading…</div>');
-      $('#ajax-spinner').css({position:'fixed',right:'1rem',bottom:'1rem',zIndex:1051,display:'none'});
+      $('body').append('<div id="ajax-spinner" class="btn btn-light" style="position:fixed;right:1rem;bottom:1rem;z-index:1051;display:none"><i class="fas fa-spinner fa-spin"></i> Loading…</div>');
     }
     $('#ajax-spinner').fadeIn(100);
   }
@@ -313,19 +318,15 @@ $(function () {
       course: $course.val().trim(),
       only_with_creds: $only.is(':checked') ? 1 : ''
     };
-
-    // Ask server for ajax=1 so we can grab just #results
-    const url = buildUrl(base, params) + (base.indexOf('?') >= 0 ? '&' : '?') + 'ajax=1';
+    const url = buildUrl(base, params) + (base.includes('?') ? '&' : '?') + 'ajax=1';
 
     showSpin();
-    $.get(url)
-      .done(function(html){
-        replaceResultsFromHtml(html);
-        if (pushState && window.history && window.history.pushState) {
-          window.history.pushState({}, '', buildUrl(base, params));
-        }
-      })
-      .always(hideSpin);
+    $.get(url).done(function(html){
+      replaceResultsFromHtml(html);
+      if (pushState && window.history && window.history.pushState) {
+        window.history.pushState({}, '', buildUrl(base, params));
+      }
+    }).always(hideSpin);
   }
 
   // Live search (every letter)
@@ -339,22 +340,18 @@ $(function () {
   // Intercept pagination and fetch next page into #results
   $(document).on('click', '#results .pagination a', function(e){
     e.preventDefault();
-    const href = $(this).attr('href');
-    if (!href) return;
+    const href = $(this).attr('href'); if (!href) return;
     showSpin();
-    const url = href + (href.indexOf('?') >= 0 ? '&' : '?') + 'ajax=1';
-    $.get(url)
-      .done(function(html){
-        replaceResultsFromHtml(html);
-        if (window.history && window.history.pushState) {
-          const clean = href.replace(/[?&]ajax=1\b/, '');
-          window.history.pushState({}, '', clean);
-        }
-      })
-      .always(hideSpin);
+    const url = href + (href.includes('?') ? '&' : '?') + 'ajax=1';
+    $.get(url).done(function(html){
+      replaceResultsFromHtml(html);
+      if (window.history && window.history.pushState) {
+        window.history.pushState({}, '', href.replace(/[?&]ajax=1\b/, ''));
+      }
+    }).always(hideSpin);
   });
 
-  // Delegated handler: Generate voucher (works after table refresh)
+  // ===== voucher: delegated (works after table refresh) =====
   var csrf = '{{ csrf_token() }}';
   $(document).on('click', '.generate-voucher', function () {
     const $btn = $(this);
@@ -371,7 +368,7 @@ $(function () {
     }).done(function(res){
       if (res && res.success) {
         $display.val(res.voucher_code);
-        $hidden.val(res.voucher_code); // only set hidden when generated
+        $hidden.val(res.voucher_code); // set hidden so Save will persist
         $('<div class="alert alert-success mt-2" role="alert">New voucher: <strong>'+res.voucher_code+'</strong></div>')
           .insertAfter($display).delay(1200).fadeOut(300, function(){ $(this).remove(); });
       } else {
@@ -385,7 +382,117 @@ $(function () {
     });
   });
 
-  // Re-open success modal for the same student after POST->redirect
+  // ===== capture original values when a modal opens (for exact "changed" list) =====
+  $(document).on('shown.bs.modal', '.modal', function () {
+    // store original values for change detection
+    $(this).find('.track-change').each(function(){
+      const $i = $(this);
+      $i.data('orig', ($i.val() || '')); // save original
+    });
+    // clear old feedback
+    $(this).find('.save-feedback').empty();
+  });
+
+  // ===== AJAX submit: update creds without reload; show success in modal; update row =====
+  $(document).on('submit', '.cred-form', function(e){
+    e.preventDefault();
+    const $form = $(this);
+    const $modal = $form.closest('.modal');
+    const $footerBtn = $form.find('button[type="submit"]');
+    const action = $form.attr('action');
+
+    // compute WHICH labels changed by comparing to originals
+    const changedLabels = [];
+    $form.find('.track-change').each(function(){
+      const $i = $(this);
+      const before = ($i.data('orig') ?? '');
+      const after  = ($i.val() || '');
+      if (before !== after && (after !== '' || before !== '')) {
+        const label = $i.data('label') || $i.attr('name');
+        changedLabels.push(label);
+      }
+    });
+
+    $footerBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving…');
+    $form.find('.is-invalid').removeClass('is-invalid');
+    $form.find('.invalid-feedback').remove();
+
+    $.ajax({
+      url: action,
+      method: 'POST',
+      data: $form.serialize(),
+      headers: { 'X-Requested-With': 'XMLHttpRequest' } // optional hint
+    }).done(function(_res){
+      // success UI inside modal
+      const list = changedLabels.length ? changedLabels.join(', ') : 'No fields changed';
+      const $fb = $form.find('.save-feedback');
+      $fb.html(
+        '<div class="alert alert-success alert-dismissible fade show" role="alert">'+
+          '<strong>Changes saved.</strong> Successfully changed: <strong>'+ $('<div>').text(list).html() +'</strong>'+
+          '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'+
+            '<span aria-hidden="true">&times;</span>'+
+          '</button>'+
+        '</div>'
+      );
+
+      // update the table row cells to reflect new values (no reload)
+      const sid = action.split('/').pop(); // school_id from route .../filters/{school_id}
+      const $row = $('button[data-target="#editModal-'+sid+'"]').closest('tr');
+      if ($row.length) {
+        // email column (d-lg)
+        const emailAddr = $form.find('input[name="email_address"]').val();
+        const emailPwd  = $form.find('input[name="email_password"]').val();
+        const emailHtml = emailAddr
+          ? '<div>'+ $('<div>').text(emailAddr).html() +'</div><div class="text-muted small">'+mask(emailPwd)+'</div>'
+          : '<span class="text-muted">—</span>';
+        $row.find('td').eq(3).html(emailHtml); // indexes match thead order
+
+        // schoology (d-xl)
+        const sch = $form.find('input[name="schoology_credentials"]').val();
+        $row.find('td').eq(4).text(sch || '—');
+
+        // kumosoft (d-xl)
+        const kumo = $form.find('input[name="kumosoft_credentials"]').val();
+        $row.find('td').eq(5).text(kumo || '—');
+
+        // satp (d-lg)
+        const satp = $form.find('input[name="satp_password"]').val();
+        $row.find('td').eq(6).text(satp || '—');
+
+        // voucher (d-lg)
+        const voucherCode = $form.find('input[name="voucher_code"]').val() || $('#voucher-display-'+sid).val();
+        const vHtml = voucherCode
+          ? '<span class="badge badge-success">'+$('<div>').text(voucherCode).html()+'</span>'
+          : '<span class="text-muted">—</span>';
+        $row.find('td').eq(7).html(vHtml);
+      }
+
+      // reset originals to new values so subsequent edits compute correctly
+      $form.find('.track-change').each(function(){
+        $(this).data('orig', ($(this).val() || ''));
+      });
+    }).fail(function(xhr){
+      if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+        // validation errors: mark fields
+        const errs = xhr.responseJSON.errors;
+        Object.keys(errs).forEach(function(name){
+          const $i = $form.find('[name="'+name+'"]');
+          if ($i.length) {
+            $i.addClass('is-invalid');
+            $('<div class="invalid-feedback">'+errs[name][0]+'</div>').insertAfter($i);
+          }
+        });
+        $form.find('.save-feedback').html('<div class="alert alert-danger">Please correct the highlighted fields.</div>');
+      } else {
+        const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Server error.';
+        $form.find('.save-feedback').html('<div class="alert alert-danger">'+msg+'</div>');
+      }
+    }).always(function(){
+      $footerBtn.prop('disabled', false).text('Save Changes');
+    });
+  });
+
+  // Optional: re-open a specific modal after a full POST->redirect (rare now)
   @php $autoId = session('auto_open') ?? ($autoOpenId ?? null); @endphp
   @if (!empty($autoId))
     $('#editModal-{{ $autoId }}').modal('show');
