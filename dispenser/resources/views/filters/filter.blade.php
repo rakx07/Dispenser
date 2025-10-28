@@ -34,8 +34,8 @@
                 <input type="text" name="q" id="q" value="{{ old('q', $q ?? '') }}" class="form-control" placeholder="e.g. 20201234 or Dela Cruz">
             </div>
             <div class="col-sm-6 col-lg-3 mb-2">
-                <label class="form-label">Course Code</label>
-                <input type="text" name="course" id="course" value="{{ old('course', $course ?? '') }}" class="form-control" list="courseCodeList" placeholder="Type the code only (e.g., BSIT)">
+                <label class="form-label">Course (code only, e.g., BSIT)</label>
+                <input type="text" name="course" id="course" value="{{ old('course', $course ?? '') }}" class="form-control" list="courseCodeList" placeholder="">
                 <datalist id="courseCodeList">
                     @foreach($courses as $c)
                         <option value="{{ $c->code }}"></option>
@@ -59,24 +59,24 @@
         </div>
     </form>
 
-    {{-- Results --}}
+    {{-- Results container (only this is swapped by AJAX) --}}
     <div id="results">
         <div class="card">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-sm table-striped align-middle mb-0">
                         <thead class="table-light">
-                            <tr>
-                                <th style="min-width:130px;">School ID</th>
-                                <th style="min-width:180px;">Name</th>
-                                <th class="d-none d-md-table-cell" style="min-width:120px;">Course</th>
-                                <th class="d-none d-lg-table-cell" style="min-width:200px;">Email</th>
-                                <th class="d-none d-xl-table-cell" style="min-width:140px;">Schoology</th>
-                                <th class="d-none d-xl-table-cell" style="min-width:140px;">Kumosoft</th>
-                                <th class="d-none d-lg-table-cell" style="min-width:120px;">SATP</th>
-                                <th class="d-none d-lg-table-cell" style="min-width:140px;">Voucher</th>
-                                <th class="text-center" style="width:90px;">Action</th>
-                            </tr>
+                        <tr>
+                            <th style="min-width:130px;">School ID</th>
+                            <th style="min-width:180px;">Name</th>
+                            <th class="d-none d-md-table-cell" style="min-width:120px;">Course</th>
+                            <th class="d-none d-lg-table-cell" style="min-width:200px;">Email</th>
+                            <th class="d-none d-xl-table-cell" style="min-width:140px;">Schoology</th>
+                            <th class="d-none d-xl-table-cell" style="min-width:140px;">Kumosoft</th>
+                            <th class="d-none d-lg-table-cell" style="min-width:120px;">SATP</th>
+                            <th class="d-none d-lg-table-cell" style="min-width:140px;">Voucher</th>
+                            <th class="text-center" style="width:90px;">Action</th>
+                        </tr>
                         </thead>
                         <tbody>
                         @forelse($students as $s)
@@ -128,9 +128,10 @@
                                                     Edit Credentials — {{ $s->school_id }} ({{ $s->lastname }}, {{ $s->firstname }})
                                                 </h5>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                  <span aria-hidden="true">&times;</span>
+                                                    <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
+
                                             <div class="modal-body">
                                                 @if ($justSavedForThis)
                                                     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -177,7 +178,7 @@
                                                     <div class="col-md-6">
                                                         <label class="form-label">Birthday</label>
                                                         <input type="date" name="birthday" class="form-control"
-                                                               value="{{ \Illuminate\Support\Str::of($s->birthday)->isNotEmpty() ? \Carbon\Carbon::parse($s->birthday)->format('Y-m-d') : '' }}">
+                                                               value="{{ optional(\Carbon\Carbon::parse($s->birthday))->format('Y-m-d') }}">
                                                     </div>
 
                                                     <div class="col-md-6">
@@ -189,14 +190,14 @@
                                                                 <i class="fas fa-magic"></i> Generate
                                                             </button>
                                                         </label>
-                                                        {{-- Visible (no name) --}}
+                                                        {{-- Visible (readonly) --}}
                                                         <input type="text"
                                                                id="voucher-display-{{ $s->school_id }}"
                                                                class="form-control"
                                                                value="{{ $voucher->voucher_code ?? '' }}"
                                                                placeholder="Click Generate"
                                                                readonly>
-                                                        {{-- Hidden (real field only set on Generate) --}}
+                                                        {{-- Hidden (set only on Generate) --}}
                                                         <input type="hidden"
                                                                id="voucher-{{ $s->school_id }}"
                                                                name="voucher_code"
@@ -216,6 +217,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
                                                 <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -235,7 +237,7 @@
                 </div>
             </div>
 
-            {{-- Pagination --}}
+            {{-- Pagination (keeps filters) --}}
             <div class="card-footer">
                 <div class="d-flex justify-content-center">
                     {{ $students->onEachSide(1)->appends(request()->query())->links() }}
@@ -262,92 +264,132 @@
     @media (max-width: 575.98px) {
         .table th, .table td { white-space: normal; }
     }
+    #ajax-spinner {
+        position: fixed;
+        right: 1rem; bottom: 1rem;
+        z-index: 1051; display: none;
+    }
 </style>
 @endpush
 
 @push('js')
 <script>
-(function () {
-  // Debounce helper
+$(function () {
+  // ===== helpers =====
   function debounce(fn, delay){ let t; return function(){ clearTimeout(t); t = setTimeout(fn.bind(this, ...arguments), delay); }; }
-
-  const form   = document.getElementById('filter-form');
-  const q      = document.getElementById('q');
-  const course = document.getElementById('course');
-  const only   = document.getElementById('only_with_creds');
-
-  // Build URL with current filters
-  function buildUrl(pageUrl) {
-    const base = pageUrl || form.getAttribute('action');
-    const params = new URLSearchParams();
-    if (q.value.trim() !== '')       params.set('q', q.value.trim());
-    if (course.value.trim() !== '')  params.set('course', course.value.trim());
-    if (only.checked)                params.set('only_with_creds', '1');
-    const qs = params.toString();
-    return qs ? `${base}?${qs}` : base;
+  function buildUrl(base, params){
+    const usp = new URLSearchParams(params);
+    const qs = usp.toString();
+    return qs ? base + '?' + qs : base;
+  }
+  function replaceResultsFromHtml(html){
+    // Extract #results from the returned HTML and replace only that block
+    const $html = $('<div>').html(html);
+    const $newResults = $html.find('#results');
+    if ($newResults.length) {
+      $('#results').replaceWith($newResults);
+    }
   }
 
-  // Navigate (full page load) so modals bind correctly
-  const go = debounce(function () {
-    const url = buildUrl();
-    if (window.location.href !== url) {
-      window.location.assign(url);
+  const $form   = $('#filter-form');
+  const $q      = $('#q');
+  const $course = $('#course');
+  const $only   = $('#only_with_creds');
+
+  // Show tiny spinner (optional)
+  function showSpin(){
+    if (!$('#ajax-spinner').length) {
+      $('body').append('<div id="ajax-spinner" class="btn btn-light"><i class="fas fa-spinner fa-spin"></i> Loading…</div>');
+      $('#ajax-spinner').css({position:'fixed',right:'1rem',bottom:'1rem',zIndex:1051,display:'none'});
     }
-  }, 250);
+    $('#ajax-spinner').fadeIn(100);
+  }
+  function hideSpin(){ $('#ajax-spinner').fadeOut(100); }
 
-  // “Every letter” live search, but via navigation (no AJAX swap)
-  q.addEventListener('keyup', go);
-  course.addEventListener('keyup', go);
-  only.addEventListener('change', go);
+  function runSearch(pushState){
+    const base = $form.attr('action');
+    const params = {
+      q: $q.val().trim(),
+      course: $course.val().trim(),
+      only_with_creds: $only.is(':checked') ? 1 : ''
+    };
 
-  // Submit button uses same navigation
-  form.addEventListener('submit', function (e) {
+    // Ask server for ajax=1 so we can grab just #results
+    const url = buildUrl(base, params) + (base.indexOf('?') >= 0 ? '&' : '?') + 'ajax=1';
+
+    showSpin();
+    $.get(url)
+      .done(function(html){
+        replaceResultsFromHtml(html);
+        if (pushState && window.history && window.history.pushState) {
+          window.history.pushState({}, '', buildUrl(base, params));
+        }
+      })
+      .always(hideSpin);
+  }
+
+  // Live search (every letter)
+  $q.on('keyup', debounce(function(){ runSearch(true); }, 250));
+  $course.on('keyup', debounce(function(){ runSearch(true); }, 250));
+  $only.on('change', function(){ runSearch(true); });
+
+  // Normal submit uses AJAX too
+  $form.on('submit', function(e){ e.preventDefault(); runSearch(true); });
+
+  // Intercept pagination and fetch next page into #results
+  $(document).on('click', '#results .pagination a', function(e){
     e.preventDefault();
-    window.location.assign(buildUrl());
+    const href = $(this).attr('href');
+    if (!href) return;
+    showSpin();
+    const url = href + (href.indexOf('?') >= 0 ? '&' : '?') + 'ajax=1';
+    $.get(url)
+      .done(function(html){
+        replaceResultsFromHtml(html);
+        if (window.history && window.history.pushState) {
+          const clean = href.replace(/[?&]ajax=1\b/, '');
+          window.history.pushState({}, '', clean);
+        }
+      })
+      .always(hideSpin);
   });
 
-  // Re-open success modal for the same student after save
+  // Delegated handler: Generate voucher (works after table refresh)
+  var csrf = '{{ csrf_token() }}';
+  $(document).on('click', '.generate-voucher', function () {
+    const $btn = $(this);
+    const sid = $btn.data('school-id');
+    const $display = $('#voucher-display-' + sid);
+    const $hidden  = $('#voucher-' + sid);
+
+    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generating…');
+
+    $.ajax({
+      url: "{{ route('filters.index') }}/" + encodeURIComponent(sid) + "/voucher/generate",
+      method: "POST",
+      data: { _token: csrf },
+    }).done(function(res){
+      if (res && res.success) {
+        $display.val(res.voucher_code);
+        $hidden.val(res.voucher_code); // only set hidden when generated
+        $('<div class="alert alert-success mt-2" role="alert">New voucher: <strong>'+res.voucher_code+'</strong></div>')
+          .insertAfter($display).delay(1200).fadeOut(300, function(){ $(this).remove(); });
+      } else {
+        alert(res && res.message ? res.message : 'Failed to generate voucher.');
+      }
+    }).fail(function(xhr){
+      const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Server error.';
+      alert(msg);
+    }).always(function(){
+      $btn.prop('disabled', false).html('<i class="fas fa-magic"></i> Generate');
+    });
+  });
+
+  // Re-open success modal for the same student after POST->redirect
   @php $autoId = session('auto_open') ?? ($autoOpenId ?? null); @endphp
   @if (!empty($autoId))
-    const m = document.getElementById('editModal-{{ $autoId }}');
-    if (m && window.jQuery) { jQuery(m).modal('show'); }
+    $('#editModal-{{ $autoId }}').modal('show');
   @endif
-
-  // CSRF for voucher generation
-  var csrf = '{{ csrf_token() }}';
-
-  // Generate voucher (jQuery needed for AdminLTE/Bootstrap 4)
-  if (window.jQuery) {
-    jQuery(document).on('click', '.generate-voucher', function () {
-      var $btn = jQuery(this);
-      var schoolId = $btn.data('school-id');
-      var $display = jQuery('#voucher-display-' + schoolId);
-      var $hidden  = jQuery('#voucher-' + schoolId);
-
-      $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generating…');
-
-      jQuery.ajax({
-        url: "{{ route('filters.index') }}/" + encodeURIComponent(schoolId) + "/voucher/generate",
-        type: "POST",
-        data: { _token: csrf },
-        success: function (res) {
-          if (res && res.success) {
-            $display.val(res.voucher_code);
-            $hidden.val(res.voucher_code); // submit this new code on Save
-          } else {
-            alert(res && res.message ? res.message : 'Failed to generate voucher.');
-          }
-        },
-        error: function (xhr) {
-          var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Server error.';
-          alert(msg);
-        },
-        complete: function () {
-          $btn.prop('disabled', false).html('<i class="fas fa-magic"></i> Generate');
-        }
-      });
-    });
-  }
-})();
+});
 </script>
 @endpush
