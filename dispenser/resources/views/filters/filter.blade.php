@@ -34,8 +34,8 @@
                 <input type="text" name="q" id="q" value="{{ old('q', $q ?? '') }}" class="form-control" placeholder="e.g. 20201234 or Dela Cruz">
             </div>
             <div class="col-sm-6 col-lg-3 mb-2">
-                <label class="form-label">Course</label>
-                <input type="text" name="course" id="course" value="{{ old('course', $course ?? '') }}" class="form-control" list="courseCodeList" placeholder="">
+                <label class="form-label">Course Code</label>
+                <input type="text" name="course" id="course" value="{{ old('course', $course ?? '') }}" class="form-control" list="courseCodeList" placeholder="Type the code only (e.g., BSIT)">
                 <datalist id="courseCodeList">
                     @foreach($courses as $c)
                         <option value="{{ $c->code }}"></option>
@@ -59,7 +59,7 @@
         </div>
     </form>
 
-    {{-- Results (replaced by AJAX) --}}
+    {{-- Results --}}
     <div id="results">
         <div class="card">
             <div class="card-body p-0">
@@ -177,7 +177,7 @@
                                                     <div class="col-md-6">
                                                         <label class="form-label">Birthday</label>
                                                         <input type="date" name="birthday" class="form-control"
-                                                               value="{{ optional(\Carbon\Carbon::parse($s->birthday))->format('Y-m-d') }}">
+                                                               value="{{ \Illuminate\Support\Str::of($s->birthday)->isNotEmpty() ? \Carbon\Carbon::parse($s->birthday)->format('Y-m-d') : '' }}">
                                                     </div>
 
                                                     <div class="col-md-6">
@@ -235,11 +235,10 @@
                 </div>
             </div>
 
-            {{-- Pagination (keeps current filters) --}}
+            {{-- Pagination --}}
             <div class="card-footer">
                 <div class="d-flex justify-content-center">
                     {{ $students->onEachSide(1)->appends(request()->query())->links() }}
-
                 </div>
                 <div class="text-center small text-muted">
                     Showing {{ $students->firstItem() ?? 0 }}–{{ $students->lastItem() ?? 0 }} of {{ $students->total() }} results
@@ -263,130 +262,92 @@
     @media (max-width: 575.98px) {
         .table th, .table td { white-space: normal; }
     }
-    #ajax-spinner {
-        position: fixed;
-        right: 1rem; bottom: 1rem;
-        z-index: 1051; display: none;
-    }
 </style>
 @endpush
 
 @push('js')
 <script>
-$(function () {
-    // Re-open the same student's modal after save to show inline success
-    @php $autoId = session('auto_open') ?? ($autoOpenId ?? null); @endphp
-    @if (!empty($autoId))
-        $('#editModal-{{ $autoId }}').modal('show');
-    @endif
+(function () {
+  // Debounce helper
+  function debounce(fn, delay){ let t; return function(){ clearTimeout(t); t = setTimeout(fn.bind(this, ...arguments), delay); }; }
 
-    // Debounce helper
-    function debounce(fn, delay) { var t; return function(){ clearTimeout(t); t = setTimeout(fn.bind(this, ...arguments), delay); }; }
+  const form   = document.getElementById('filter-form');
+  const q      = document.getElementById('q');
+  const course = document.getElementById('course');
+  const only   = document.getElementById('only_with_creds');
 
-    var $form   = $('#filter-form');
-    var $q      = $('#q');
-    var $course = $('#course');
-    var $only   = $('#only_with_creds');
+  // Build URL with current filters
+  function buildUrl(pageUrl) {
+    const base = pageUrl || form.getAttribute('action');
+    const params = new URLSearchParams();
+    if (q.value.trim() !== '')       params.set('q', q.value.trim());
+    if (course.value.trim() !== '')  params.set('course', course.value.trim());
+    if (only.checked)                params.set('only_with_creds', '1');
+    const qs = params.toString();
+    return qs ? `${base}?${qs}` : base;
+  }
 
-    function replaceResultsFromHtml(html) {
-        var $html = $('<div>').html(html);
-        var $newResults = $html.find('#results');
-        if ($newResults.length) {
-            $('#results').replaceWith($newResults);
-        } else {
-            // fallback: try to grab the table/card
-            var $card = $html.find('.card').first();
-            if ($card.length) $('#results').html($card);
-        }
+  // Navigate (full page load) so modals bind correctly
+  const go = debounce(function () {
+    const url = buildUrl();
+    if (window.location.href !== url) {
+      window.location.assign(url);
     }
+  }, 250);
 
-    function runSearch(pushState) {
-        var base = $form.attr('action');
-        var qs = {
-            q: $q.val(),
-            course: $course.val(),
-            only_with_creds: $only.is(':checked') ? 1 : ''
-        };
-        var url = base + '?' + $.param(qs) + '&ajax=1';
+  // “Every letter” live search, but via navigation (no AJAX swap)
+  q.addEventListener('keyup', go);
+  course.addEventListener('keyup', go);
+  only.addEventListener('change', go);
 
-        if (!$('#ajax-spinner').length) {
-            $('body').append('<div id="ajax-spinner" class="btn btn-light"><i class="fas fa-spinner fa-spin"></i> Loading…</div>');
+  // Submit button uses same navigation
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    window.location.assign(buildUrl());
+  });
+
+  // Re-open success modal for the same student after save
+  @php $autoId = session('auto_open') ?? ($autoOpenId ?? null); @endphp
+  @if (!empty($autoId))
+    const m = document.getElementById('editModal-{{ $autoId }}');
+    if (m && window.jQuery) { jQuery(m).modal('show'); }
+  @endif
+
+  // CSRF for voucher generation
+  var csrf = '{{ csrf_token() }}';
+
+  // Generate voucher (jQuery needed for AdminLTE/Bootstrap 4)
+  if (window.jQuery) {
+    jQuery(document).on('click', '.generate-voucher', function () {
+      var $btn = jQuery(this);
+      var schoolId = $btn.data('school-id');
+      var $display = jQuery('#voucher-display-' + schoolId);
+      var $hidden  = jQuery('#voucher-' + schoolId);
+
+      $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generating…');
+
+      jQuery.ajax({
+        url: "{{ route('filters.index') }}/" + encodeURIComponent(schoolId) + "/voucher/generate",
+        type: "POST",
+        data: { _token: csrf },
+        success: function (res) {
+          if (res && res.success) {
+            $display.val(res.voucher_code);
+            $hidden.val(res.voucher_code); // submit this new code on Save
+          } else {
+            alert(res && res.message ? res.message : 'Failed to generate voucher.');
+          }
+        },
+        error: function (xhr) {
+          var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Server error.';
+          alert(msg);
+        },
+        complete: function () {
+          $btn.prop('disabled', false).html('<i class="fas fa-magic"></i> Generate');
         }
-        $('#ajax-spinner').fadeIn(100);
-
-        $.get(url, function (data) {
-            replaceResultsFromHtml(data);
-        }).always(function(){
-            $('#ajax-spinner').fadeOut(100);
-        });
-
-        if (pushState && window.history && window.history.pushState) {
-            window.history.pushState({}, '', base + '?' + $.param(qs));
-        }
-    }
-
-    // Live search (every letter)
-    $q.on('keyup', debounce(function(){ runSearch(true); }, 250));
-    $course.on('keyup', debounce(function(){ runSearch(true); }, 250));
-    $only.on('change', function(){ runSearch(true); });
-    $form.on('submit', function(e){ e.preventDefault(); runSearch(true); });
-
-    // Intercept pagination clicks and load via AJAX (keeps smooth UX)
-    $(document).on('click', '#results .pagination a', function (e) {
-        e.preventDefault();
-        var url = $(this).attr('href');
-        if (!url) return;
-        if (!$('#ajax-spinner').length) {
-            $('body').append('<div id="ajax-spinner" class="btn btn-light"><i class="fas fa-spinner fa-spin"></i> Loading…</div>');
-        }
-        $('#ajax-spinner').fadeIn(100);
-        $.get(url + (url.indexOf('?') >= 0 ? '&' : '?') + 'ajax=1', function (data) {
-            replaceResultsFromHtml(data);
-            if (window.history && window.history.pushState) {
-                // reflect new page in URL, preserving filters
-                var cleanUrl = url.replace(/[?&]ajax=1\b/, '');
-                window.history.pushState({}, '', cleanUrl);
-            }
-        }).always(function(){
-            $('#ajax-spinner').fadeOut(100);
-        });
+      });
     });
-
-    // CSRF
-    var csrf = '{{ csrf_token() }}';
-
-    // Generate voucher (delegated; works after AJAX refresh)
-    $(document).on('click', '.generate-voucher', function () {
-        var $btn = $(this);
-        var schoolId = $btn.data('school-id');
-        var $display = $('#voucher-display-' + schoolId);
-        var $hidden  = $('#voucher-' + schoolId);
-
-        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generating…');
-
-        $.ajax({
-            url: "{{ route('filters.index') }}/" + encodeURIComponent(schoolId) + "/voucher/generate",
-            type: "POST",
-            data: { _token: csrf },
-            success: function (res) {
-                if (res && res.success) {
-                    $display.val(res.voucher_code);
-                    $hidden.val(res.voucher_code); // only set hidden when generated
-                    $('<div class="alert alert-success mt-2" role="alert">New voucher: <strong>' + res.voucher_code + '</strong></div>')
-                        .insertAfter($display).delay(1500).fadeOut(400, function(){ $(this).remove(); });
-                } else {
-                    alert(res && res.message ? res.message : 'Failed to generate voucher.');
-                }
-            },
-            error: function (xhr) {
-                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Server error.';
-                alert(msg);
-            },
-            complete: function () {
-                $btn.prop('disabled', false).html('<i class="fas fa-magic"></i> Generate');
-            }
-        });
-    });
-});
+  }
+})();
 </script>
 @endpush
