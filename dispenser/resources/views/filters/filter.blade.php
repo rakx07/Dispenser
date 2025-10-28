@@ -34,8 +34,8 @@
                 <input type="text" name="q" id="q" value="{{ old('q', $q ?? '') }}" class="form-control" placeholder="e.g. 20201234 or Dela Cruz">
             </div>
             <div class="col-sm-6 col-lg-3 mb-2">
-                <label class="form-label">Course (code only, e.g., BSIT)</label>
-                <input type="text" name="course" id="course" value="{{ old('course', $course ?? '') }}" class="form-control" list="courseCodeList" placeholder="">
+                <label class="form-label">Course (code only)</label>
+                <input type="text" name="course" id="course" value="{{ old('course', $course ?? '') }}" class="form-control" list="courseCodeList" placeholder="e.g., BSIT">
                 <datalist id="courseCodeList">
                     @foreach($courses as $c)
                         <option value="{{ $c->code }}"></option>
@@ -59,24 +59,24 @@
         </div>
     </form>
 
-    {{-- Results container (only this gets swapped by AJAX) --}}
+    {{-- Results (this wrapper gets replaced via AJAX) --}}
     <div id="results">
         <div class="card">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-sm table-striped align-middle mb-0">
                         <thead class="table-light">
-                        <tr>
-                            <th style="min-width:130px;">School ID</th>
-                            <th style="min-width:180px;">Name</th>
-                            <th class="d-none d-md-table-cell" style="min-width:120px;">Course</th>
-                            <th class="d-none d-lg-table-cell" style="min-width:200px;">Email</th>
-                            <th class="d-none d-xl-table-cell" style="min-width:140px;">Schoology</th>
-                            <th class="d-none d-xl-table-cell" style="min-width:140px;">Kumosoft</th>
-                            <th class="d-none d-lg-table-cell" style="min-width:120px;">SATP</th>
-                            <th class="d-none d-lg-table-cell" style="min-width:140px;">Voucher</th>
-                            <th class="text-center" style="width:90px;">Action</th>
-                        </tr>
+                            <tr>
+                                <th style="min-width:130px;">School ID</th>
+                                <th style="min-width:180px;">Name</th>
+                                <th class="d-none d-md-table-cell" style="min-width:120px;">Course</th>
+                                <th class="d-none d-lg-table-cell" style="min-width:200px;">Email</th>
+                                <th class="d-none d-xl-table-cell" style="min-width:140px;">Schoology</th>
+                                <th class="d-none d-xl-table-cell" style="min-width:140px;">Kumosoft</th>
+                                <th class="d-none d-lg-table-cell" style="min-width:120px;">SATP</th>
+                                <th class="d-none d-lg-table-cell" style="min-width:140px;">Voucher</th>
+                                <th class="text-center" style="width:90px;">Action</th>
+                            </tr>
                         </thead>
                         <tbody>
                         @forelse($students as $s)
@@ -87,26 +87,26 @@
                                 $schoology = $schoologys[$s->school_id] ?? null;
                                 $voucher   = $s->voucher_id ? ($vouchers[$s->voucher_id] ?? null) : null;
                             @endphp
-                            <tr>
+                            <tr id="row-{{ $s->school_id }}" data-sid="{{ $s->school_id }}">
                                 <td class="font-weight-bold">{{ $s->school_id }}</td>
-                                <td>{{ $s->lastname }}, {{ $s->firstname }} {{ $s->middlename }}</td>
-                                <td class="d-none d-md-table-cell">{{ optional($s->course)->code }}</td>
-                                <td class="d-none d-lg-table-cell">
+                                <td class="cell-name">{{ $s->lastname }}, {{ $s->firstname }} {{ $s->middlename }}</td>
+                                <td class="cell-course d-none d-md-table-cell">{{ optional($s->course)->code }}</td>
+                                <td class="cell-email d-none d-lg-table-cell">
                                     @if($email)
-                                        <div>{{ $email->email_address }}</div>
+                                        <div class="email-address">{{ $email->email_address }}</div>
                                         <div class="text-muted small">••••••</div>
                                     @else
                                         <span class="text-muted">—</span>
                                     @endif
                                 </td>
-                                <td class="d-none d-xl-table-cell">{{ $schoology->schoology_credentials ?? '—' }}</td>
-                                <td class="d-none d-xl-table-cell">{{ $kumo->kumosoft_credentials ?? '—' }}</td>
-                                <td class="d-none d-lg-table-cell">{{ $satp->satp_password ?? '—' }}</td>
-                                <td class="d-none d-lg-table-cell">
+                                <td class="cell-schoology d-none d-xl-table-cell">{{ $schoology->schoology_credentials ?? '—' }}</td>
+                                <td class="cell-kumosoft d-none d-xl-table-cell">{{ $kumo->kumosoft_credentials ?? '—' }}</td>
+                                <td class="cell-satp d-none d-lg-table-cell">{{ $satp->satp_password ?? '—' }}</td>
+                                <td class="cell-voucher d-none d-lg-table-cell">
                                     @if($voucher)
-                                        <span class="badge badge-success">{{ $voucher->voucher_code }}</span>
+                                        <span class="badge badge-success voucher-badge">{{ $voucher->voucher_code }}</span>
                                     @else
-                                        <span class="text-muted">—</span>
+                                        <span class="text-muted voucher-badge">—</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
@@ -116,73 +116,60 @@
                                 </td>
                             </tr>
 
-                            {{-- Edit Modal --}}
+                            {{-- Modal --}}
                             <div class="modal fade" id="editModal-{{ $s->school_id }}" tabindex="-1" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
                                     <div class="modal-content">
-                                        <form method="POST" action="{{ route('filters.update', $s->school_id) }}" class="cred-form">
+                                        <form method="POST"
+                                              action="{{ route('filters.update', $s->school_id) }}"
+                                              class="ajax-cred-form"
+                                              data-school-id="{{ $s->school_id }}">
                                             @csrf
                                             <div class="modal-header">
                                                 <h5 class="modal-title">
                                                     Edit Credentials — {{ $s->school_id }} ({{ $s->lastname }}, {{ $s->firstname }})
                                                 </h5>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
+                                                  <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
-
                                             <div class="modal-body">
-                                                {{-- Inline success / error feedback --}}
-                                                <div class="save-feedback"></div>
+                                                {{-- Inline feedback appears here --}}
+                                                <div class="save-feedback mb-3 d-none"></div>
 
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <label class="form-label">Email Address</label>
-                                                        <input type="email" name="email_address"
-                                                               class="form-control track-change"
-                                                               data-label="Email"
-                                                               value="{{ $email->email_address ?? '' }}"
-                                                               placeholder="student@domain.edu">
+                                                        <input type="email" name="email_address" class="form-control"
+                                                               value="{{ $email->email_address ?? '' }}" placeholder="student@domain.edu">
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Email Password</label>
-                                                        <input type="text" name="email_password"
-                                                               class="form-control track-change"
-                                                               data-label="Email Password"
-                                                               value="{{ $email->password ?? '' }}">
+                                                        <input type="text" name="email_password" class="form-control"
+                                                               value="{{ $email->password ?? '' }}" placeholder="">
                                                     </div>
 
                                                     <div class="col-md-6">
                                                         <label class="form-label">Schoology Credentials</label>
-                                                        <input type="text" name="schoology_credentials"
-                                                               class="form-control track-change"
-                                                               data-label="Schoology"
-                                                               value="{{ $schoology->schoology_credentials ?? '' }}"
-                                                               placeholder="username / password or token">
+                                                        <input type="text" name="schoology_credentials" class="form-control"
+                                                               value="{{ $schoology->schoology_credentials ?? '' }}" placeholder="username / password or token">
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Kumosoft Credentials</label>
-                                                        <input type="text" name="kumosoft_credentials"
-                                                               class="form-control track-change"
-                                                               data-label="Kumosoft"
-                                                               value="{{ $kumo->kumosoft_credentials ?? '' }}"
-                                                               placeholder="username / password">
+                                                        <input type="text" name="kumosoft_credentials" class="form-control"
+                                                               value="{{ $kumo->kumosoft_credentials ?? '' }}" placeholder="username / password">
                                                     </div>
 
                                                     <div class="col-md-6">
                                                         <label class="form-label">SATP Password</label>
-                                                        <input type="text" name="satp_password"
-                                                               class="form-control track-change"
-                                                               data-label="SATP"
-                                                               value="{{ $satp->satp_password ?? '' }}">
+                                                        <input type="text" name="satp_password" class="form-control"
+                                                               value="{{ $satp->satp_password ?? '' }}" placeholder="">
                                                     </div>
 
                                                     <div class="col-md-6">
                                                         <label class="form-label">Birthday</label>
-                                                        <input type="date" name="birthday"
-                                                               class="form-control track-change"
-                                                               data-label="Birthday"
-                                                               value="{{ optional(\Carbon\Carbon::parse($s->birthday))->format('Y-m-d') }}">
+                                                        <input type="date" name="birthday" class="form-control"
+                                                               value="{{ $s->birthday ? \Carbon\Carbon::parse($s->birthday)->format('Y-m-d') : '' }}">
                                                     </div>
 
                                                     <div class="col-md-6">
@@ -194,22 +181,20 @@
                                                                 <i class="fas fa-magic"></i> Generate
                                                             </button>
                                                         </label>
-                                                        {{-- visible readonly --}}
+                                                        {{-- Display field (readonly) --}}
                                                         <input type="text"
                                                                id="voucher-display-{{ $s->school_id }}"
                                                                class="form-control"
                                                                value="{{ $voucher->voucher_code ?? '' }}"
                                                                placeholder="Click Generate"
                                                                readonly>
-                                                        {{-- hidden real field (set only when generated) --}}
+                                                        {{-- Hidden actual field (only set when generating or typing programmatically) --}}
                                                         <input type="hidden"
                                                                id="voucher-{{ $s->school_id }}"
                                                                name="voucher_code"
-                                                               class="track-change"
-                                                               data-label="Voucher"
                                                                value="">
                                                         <small class="form-text text-muted">
-                                                            Clicking <strong>Generate</strong> assigns the next available voucher and frees the old one.
+                                                            Clicking <strong>Generate</strong> assigns the next available voucher and frees any old one automatically.
                                                         </small>
                                                     </div>
 
@@ -223,7 +208,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
                                                 <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -243,7 +227,7 @@
                 </div>
             </div>
 
-            {{-- Pagination (keeps filters) --}}
+            {{-- Pagination (keeps current filters) --}}
             <div class="card-footer">
                 <div class="d-flex justify-content-center">
                     {{ $students->onEachSide(1)->appends(request()->query())->links() }}
@@ -281,222 +265,203 @@
 @push('js')
 <script>
 $(function () {
-  // ===== helpers =====
-  function debounce(fn, delay){ let t; return function(){ clearTimeout(t); t = setTimeout(fn.bind(this, ...arguments), delay); }; }
-  function buildUrl(base, params){
-    const usp = new URLSearchParams(params); const qs = usp.toString();
-    return qs ? base + '?' + qs : base;
-  }
-  function replaceResultsFromHtml(html){
-    // Extract #results from the returned HTML and replace only that block
-    const $html = $('<div>').html(html);
-    const $newResults = $html.find('#results');
-    if ($newResults.length) {
-      $('#results').replaceWith($newResults);
+    // Debounce helper
+    function debounce(fn, delay) { let t; return function(){ clearTimeout(t); t = setTimeout(fn.bind(this, ...arguments), delay); }; }
+
+    var $form   = $('#filter-form');
+    var $q      = $('#q');
+    var $course = $('#course');
+    var $only   = $('#only_with_creds');
+    var csrf    = '{{ csrf_token() }}';
+
+    function replaceResultsFromHtml(html) {
+        var $html = $('<div>').html(html);
+        var $newResults = $html.find('#results');
+        if ($newResults.length) {
+            $('#results').replaceWith($newResults);
+        } else {
+            // fallback: just swap the first card found
+            var $card = $html.find('.card').first();
+            if ($card.length) $('#results').html($card);
+        }
     }
-  }
-  function mask(val){ return val ? '••••••' : '—'; }
 
-  // ===== search/pagination (AJAX replace #results only) =====
-  const $form   = $('#filter-form');
-  const $q      = $('#q');
-  const $course = $('#course');
-  const $only   = $('#only_with_creds');
-
-  function showSpin(){
-    if (!$('#ajax-spinner').length) {
-      $('body').append('<div id="ajax-spinner" class="btn btn-light" style="position:fixed;right:1rem;bottom:1rem;z-index:1051;display:none"><i class="fas fa-spinner fa-spin"></i> Loading…</div>');
+    function showSpinner() {
+        if (!$('#ajax-spinner').length) {
+            $('body').append('<div id="ajax-spinner" class="btn btn-light"><i class="fas fa-spinner fa-spin"></i> Loading…</div>');
+        }
+        $('#ajax-spinner').fadeIn(100);
     }
-    $('#ajax-spinner').fadeIn(100);
-  }
-  function hideSpin(){ $('#ajax-spinner').fadeOut(100); }
+    function hideSpinner(){ $('#ajax-spinner').fadeOut(100); }
 
-  function runSearch(pushState){
-    const base = $form.attr('action');
-    const params = {
-      q: $q.val().trim(),
-      course: $course.val().trim(),
-      only_with_creds: $only.is(':checked') ? 1 : ''
-    };
-    const url = buildUrl(base, params) + (base.includes('?') ? '&' : '?') + 'ajax=1';
+    function currentQuery() {
+        return {
+            q: $q.val(),
+            course: $course.val(),
+            only_with_creds: $only.is(':checked') ? 1 : ''
+        };
+    }
 
-    showSpin();
-    $.get(url).done(function(html){
-      replaceResultsFromHtml(html);
-      if (pushState && window.history && window.history.pushState) {
-        window.history.pushState({}, '', buildUrl(base, params));
-      }
-    }).always(hideSpin);
-  }
+    function runSearch(pushState) {
+        var base = $form.attr('action');
+        var qs   = currentQuery();
+        var url  = base + '?' + $.param(qs) + '&ajax=1';
 
-  // Live search (every letter)
-  $q.on('keyup', debounce(function(){ runSearch(true); }, 250));
-  $course.on('keyup', debounce(function(){ runSearch(true); }, 250));
-  $only.on('change', function(){ runSearch(true); });
+        showSpinner();
+        $.get(url, function (data) {
+            replaceResultsFromHtml(data);
+        }).always(hideSpinner);
 
-  // Normal submit uses AJAX too
-  $form.on('submit', function(e){ e.preventDefault(); runSearch(true); });
+        if (pushState && window.history && window.history.pushState) {
+            window.history.pushState({}, '', base + '?' + $.param(qs));
+        }
+    }
 
-  // Intercept pagination and fetch next page into #results
-  $(document).on('click', '#results .pagination a', function(e){
-    e.preventDefault();
-    const href = $(this).attr('href'); if (!href) return;
-    showSpin();
-    const url = href + (href.includes('?') ? '&' : '?') + 'ajax=1';
-    $.get(url).done(function(html){
-      replaceResultsFromHtml(html);
-      if (window.history && window.history.pushState) {
-        window.history.pushState({}, '', href.replace(/[?&]ajax=1\b/, ''));
-      }
-    }).always(hideSpin);
-  });
+    // Live search (every letter)
+    $q.on('keyup', debounce(function(){ runSearch(true); }, 250));
+    $course.on('keyup', debounce(function(){ runSearch(true); }, 250));
+    $only.on('change', function(){ runSearch(true); });
+    $form.on('submit', function(e){ e.preventDefault(); runSearch(true); });
 
-  // ===== voucher: delegated (works after table refresh) =====
-  var csrf = '{{ csrf_token() }}';
-  $(document).on('click', '.generate-voucher', function () {
-    const $btn = $(this);
-    const sid = $btn.data('school-id');
-    const $display = $('#voucher-display-' + sid);
-    const $hidden  = $('#voucher-' + sid);
-
-    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generating…');
-
-    $.ajax({
-      url: "{{ route('filters.index') }}/" + encodeURIComponent(sid) + "/voucher/generate",
-      method: "POST",
-      data: { _token: csrf },
-    }).done(function(res){
-      if (res && res.success) {
-        $display.val(res.voucher_code);
-        $hidden.val(res.voucher_code); // set hidden so Save will persist
-        $('<div class="alert alert-success mt-2" role="alert">New voucher: <strong>'+res.voucher_code+'</strong></div>')
-          .insertAfter($display).delay(1200).fadeOut(300, function(){ $(this).remove(); });
-      } else {
-        alert(res && res.message ? res.message : 'Failed to generate voucher.');
-      }
-    }).fail(function(xhr){
-      const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Server error.';
-      alert(msg);
-    }).always(function(){
-      $btn.prop('disabled', false).html('<i class="fas fa-magic"></i> Generate');
-    });
-  });
-
-  // ===== capture original values when a modal opens (for exact "changed" list) =====
-  $(document).on('shown.bs.modal', '.modal', function () {
-    // store original values for change detection
-    $(this).find('.track-change').each(function(){
-      const $i = $(this);
-      $i.data('orig', ($i.val() || '')); // save original
-    });
-    // clear old feedback
-    $(this).find('.save-feedback').empty();
-  });
-
-  // ===== AJAX submit: update creds without reload; show success in modal; update row =====
-  $(document).on('submit', '.cred-form', function(e){
-    e.preventDefault();
-    const $form = $(this);
-    const $modal = $form.closest('.modal');
-    const $footerBtn = $form.find('button[type="submit"]');
-    const action = $form.attr('action');
-
-    // compute WHICH labels changed by comparing to originals
-    const changedLabels = [];
-    $form.find('.track-change').each(function(){
-      const $i = $(this);
-      const before = ($i.data('orig') ?? '');
-      const after  = ($i.val() || '');
-      if (before !== after && (after !== '' || before !== '')) {
-        const label = $i.data('label') || $i.attr('name');
-        changedLabels.push(label);
-      }
+    // Intercept pagination clicks (AJAX paginate the table area only)
+    $(document).on('click', '#results .pagination a', function (e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        if (!url) return;
+        showSpinner();
+        $.get(url + (url.indexOf('?') >= 0 ? '&' : '?') + 'ajax=1', function (data) {
+            replaceResultsFromHtml(data);
+            if (window.history && window.history.pushState) {
+                var cleanUrl = url.replace(/[?&]ajax=1\b/, '');
+                window.history.pushState({}, '', cleanUrl);
+            }
+        }).always(hideSpinner);
     });
 
-    $footerBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving…');
-    $form.find('.is-invalid').removeClass('is-invalid');
-    $form.find('.invalid-feedback').remove();
+    // Generate voucher (delegated)
+    $(document).on('click', '.generate-voucher', function () {
+        var $btn = $(this);
+        var sid  = $btn.data('school-id');
+        var $display = $('#voucher-display-' + sid);
+        var $hidden  = $('#voucher-' + sid);
 
-    $.ajax({
-      url: action,
-      method: 'POST',
-      data: $form.serialize(),
-      headers: { 'X-Requested-With': 'XMLHttpRequest' } // optional hint
-    }).done(function(_res){
-      // success UI inside modal
-      const list = changedLabels.length ? changedLabels.join(', ') : 'No fields changed';
-      const $fb = $form.find('.save-feedback');
-      $fb.html(
-        '<div class="alert alert-success alert-dismissible fade show" role="alert">'+
-          '<strong>Changes saved.</strong> Successfully changed: <strong>'+ $('<div>').text(list).html() +'</strong>'+
-          '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'+
-            '<span aria-hidden="true">&times;</span>'+
-          '</button>'+
-        '</div>'
-      );
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generating…');
 
-      // update the table row cells to reflect new values (no reload)
-      const sid = action.split('/').pop(); // school_id from route .../filters/{school_id}
-      const $row = $('button[data-target="#editModal-'+sid+'"]').closest('tr');
-      if ($row.length) {
-        // email column (d-lg)
-        const emailAddr = $form.find('input[name="email_address"]').val();
-        const emailPwd  = $form.find('input[name="email_password"]').val();
-        const emailHtml = emailAddr
-          ? '<div>'+ $('<div>').text(emailAddr).html() +'</div><div class="text-muted small">'+mask(emailPwd)+'</div>'
-          : '<span class="text-muted">—</span>';
-        $row.find('td').eq(3).html(emailHtml); // indexes match thead order
-
-        // schoology (d-xl)
-        const sch = $form.find('input[name="schoology_credentials"]').val();
-        $row.find('td').eq(4).text(sch || '—');
-
-        // kumosoft (d-xl)
-        const kumo = $form.find('input[name="kumosoft_credentials"]').val();
-        $row.find('td').eq(5).text(kumo || '—');
-
-        // satp (d-lg)
-        const satp = $form.find('input[name="satp_password"]').val();
-        $row.find('td').eq(6).text(satp || '—');
-
-        // voucher (d-lg)
-        const voucherCode = $form.find('input[name="voucher_code"]').val() || $('#voucher-display-'+sid).val();
-        const vHtml = voucherCode
-          ? '<span class="badge badge-success">'+$('<div>').text(voucherCode).html()+'</span>'
-          : '<span class="text-muted">—</span>';
-        $row.find('td').eq(7).html(vHtml);
-      }
-
-      // reset originals to new values so subsequent edits compute correctly
-      $form.find('.track-change').each(function(){
-        $(this).data('orig', ($(this).val() || ''));
-      });
-    }).fail(function(xhr){
-      if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
-        // validation errors: mark fields
-        const errs = xhr.responseJSON.errors;
-        Object.keys(errs).forEach(function(name){
-          const $i = $form.find('[name="'+name+'"]');
-          if ($i.length) {
-            $i.addClass('is-invalid');
-            $('<div class="invalid-feedback">'+errs[name][0]+'</div>').insertAfter($i);
-          }
+        $.ajax({
+            url: "{{ route('filters.index') }}/" + encodeURIComponent(sid) + "/voucher/generate",
+            type: "POST",
+            data: { _token: csrf },
+            success: function (res) {
+                if (res && res.success) {
+                    $display.val(res.voucher_code);
+                    $hidden.val(res.voucher_code);
+                    $('<div class="alert alert-success mt-2" role="alert">New voucher: <strong>' + res.voucher_code + '</strong></div>')
+                        .insertAfter($display).delay(1500).fadeOut(400, function(){ $(this).remove(); });
+                } else {
+                    alert(res && res.message ? res.message : 'Failed to generate voucher.');
+                }
+            },
+            error: function (xhr) {
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Server error.';
+                alert(msg);
+            },
+            complete: function () {
+                $btn.prop('disabled', false).html('<i class="fas fa-magic"></i> Generate');
+            }
         });
-        $form.find('.save-feedback').html('<div class="alert alert-danger">Please correct the highlighted fields.</div>');
-      } else {
-        const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Server error.';
-        $form.find('.save-feedback').html('<div class="alert alert-danger">'+msg+'</div>');
-      }
-    }).always(function(){
-      $footerBtn.prop('disabled', false).text('Save Changes');
     });
-  });
 
-  // Optional: re-open a specific modal after a full POST->redirect (rare now)
-  @php $autoId = session('auto_open') ?? ($autoOpenId ?? null); @endphp
-  @if (!empty($autoId))
-    $('#editModal-{{ $autoId }}').modal('show');
-  @endif
+    // AJAX submit for each modal form (delegated)
+    $(document).on('submit', '.ajax-cred-form', function (e) {
+        e.preventDefault();
+
+        var $form   = $(this);
+        var url     = $form.attr('action');
+        var $modal  = $form.closest('.modal');
+        var $footer = $modal.find('.modal-footer');
+        var $btn    = $footer.find('button[type="submit"]');
+        var $fb     = $form.find('.save-feedback');
+        var sid     = $form.data('school-id');
+        var formData = $form.serialize();
+
+        // reset feedback
+        $fb.removeClass('d-none alert alert-success alert-danger').empty();
+
+        // disable button while saving
+        $btn.prop('disabled', true).data('orig', $btn.html())
+            .html('<i class="fas fa-spinner fa-spin"></i> Saving…');
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: formData,
+            success: function (res) {
+                if (res && res.success) {
+                    // Success message inside modal
+                    var changedTxt = res.changed_text || 'Saved.';
+                    var msg = (changedTxt.indexOf('No fields changed') === 0)
+                        ? 'No fields changed.'
+                        : 'Successfully changed: <strong>' + changedTxt + '</strong>';
+                    $fb.addClass('alert alert-success').html('<strong>Changes saved.</strong> ' + msg);
+
+                    // Update the row behind the modal
+                    var snap = res.snapshot || {};
+                    var $row = $('#row-' + sid);
+
+                    if (snap.email_address !== undefined) {
+                        var $cell = $row.find('.cell-email');
+                        if (snap.email_address) {
+                            $cell.html('<div class="email-address">'+snap.email_address+'</div><div class="text-muted small">••••••</div>');
+                        } else {
+                            $cell.html('<span class="text-muted">—</span>');
+                        }
+                    }
+                    if (snap.schoology_credentials !== undefined) {
+                        $row.find('.cell-schoology').text(snap.schoology_credentials || '—');
+                    }
+                    if (snap.kumosoft_credentials !== undefined) {
+                        $row.find('.cell-kumosoft').text(snap.kumosoft_credentials || '—');
+                    }
+                    if (snap.satp_password !== undefined) {
+                        $row.find('.cell-satp').text(snap.satp_password || '—');
+                    }
+                    if (snap.voucher_code !== undefined) {
+                        var $vc = $row.find('.cell-voucher .voucher-badge');
+                        if (snap.voucher_code) {
+                            $row.find('.cell-voucher').html('<span class="badge badge-success voucher-badge">'+snap.voucher_code+'</span>');
+                        } else {
+                            $row.find('.cell-voucher').html('<span class="text-muted voucher-badge">—</span>');
+                        }
+                        // keep modal fields in sync
+                        $('#voucher-' + sid).val(snap.voucher_code || '');
+                        $('#voucher-display-' + sid).val(snap.voucher_code || '');
+                    }
+                    if (snap.birthday !== undefined) {
+                        $form.find('[name="birthday"]').val(snap.birthday || '');
+                    }
+
+                    // Auto-close after a short delay (remove if you prefer to keep it open)
+                    setTimeout(function(){ $modal.modal('hide'); }, 1200);
+
+                } else {
+                    $fb.addClass('alert alert-danger').text((res && res.message) ? res.message : 'Save failed.');
+                }
+            },
+            error: function (xhr) {
+                let msg = 'Save failed.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                } else if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                    const errs = xhr.responseJSON.errors;
+                    msg = Object.values(errs).flat().join('<br>');
+                }
+                $fb.addClass('alert alert-danger').html(msg);
+            },
+            complete: function () {
+                $btn.prop('disabled', false).html($btn.data('orig'));
+            }
+        });
+    });
 });
 </script>
 @endpush
