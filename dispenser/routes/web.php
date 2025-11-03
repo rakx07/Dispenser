@@ -138,4 +138,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/filters/{school_id}', [FilterController::class, 'update'])->name('filters.update');
     Route::post('/filters/{school_id}/voucher/generate', [FilterController::class, 'generateVoucher'])
     ->name('filters.voucher.generate');
+    Route::get('filters/{school_id}/edit', [FilterController::class, 'edit'])
+    ->name('filters.edit');
+    
 });
