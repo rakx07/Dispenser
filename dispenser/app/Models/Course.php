@@ -8,17 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Course extends Model
 {
     use HasFactory;
-    protected $table = 'course';
-        
-    protected $fillable = [
-        'code',
-        'name',
-        'department_id',
-        'status',
-    ];
 
-    public function students()
-    {
-        return $this->hasMany(Student::class, 'course_id');
-    }
+    // Your DB uses `course` (singular), not the Laravel default `courses`
+    protected $table = 'course';
+
+    protected $primaryKey = 'id';
+    public $timestamps = false; // set true if you actually have created_at/updated_at
+
+    protected $fillable = [
+        'code', 'name',
+    ];
 }

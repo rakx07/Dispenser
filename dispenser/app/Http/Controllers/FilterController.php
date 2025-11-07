@@ -42,17 +42,35 @@ class FilterController extends Controller
                 });
             })
             ->orderBy('lastname')->orderBy('firstname')
-            ->paginate($perPage)
-            ->withQueryString();
+            ->paginate($perPage);
+
+        // Compat for hybrid Laravel installs
+        if (method_exists($students, 'withQueryString')) {
+            $students = $students->withQueryString();
+        } else {
+            $students->appends($request->query());
+        }
 
         // Load related creds in one shot
         $schoolIds  = $students->getCollection()->pluck('school_id')->filter()->values();
         $voucherIds = $students->getCollection()->pluck('voucher_id')->filter()->values();
 
-        $emails     = Email::whereIn('sch_id_number', $schoolIds)->get()->keyBy('sch_id_number');
-        $satps      = Satpaccount::whereIn('school_id', $schoolIds)->get()->keyBy('school_id');
-        $kumos      = Kumosoft::whereIn('school_id', $schoolIds)->get()->keyBy('school_id');
-        $schoologys = SchoologyCredential::whereIn('school_id', $schoolIds)->get()->keyBy('school_id');
+        $emails     = $schoolIds->isNotEmpty()
+            ? Email::whereIn('sch_id_number', $schoolIds)->get()->keyBy('sch_id_number')
+            : collect();
+
+        $satps      = $schoolIds->isNotEmpty()
+            ? Satpaccount::whereIn('school_id', $schoolIds)->get()->keyBy('school_id')
+            : collect();
+
+        $kumos      = $schoolIds->isNotEmpty()
+            ? Kumosoft::whereIn('school_id', $schoolIds)->get()->keyBy('school_id')
+            : collect();
+
+        $schoologys = $schoolIds->isNotEmpty()
+            ? SchoologyCredential::whereIn('school_id', $schoolIds)->get()->keyBy('school_id')
+            : collect();
+
         $vouchers   = $voucherIds->isNotEmpty()
             ? Voucher::whereIn('id', $voucherIds)->get()->keyBy('id')
             : collect();
@@ -68,7 +86,7 @@ class FilterController extends Controller
             $students->setCollection($filtered);
         }
 
-        // When exactly one result and a query is present, auto-open that modal (non-AJAX flow)
+        // Auto-open when exactly one result
         $autoOpenId = null;
         if ($q !== '' && $students->total() === 1) {
             $only = $students->getCollection()->first();
@@ -77,7 +95,6 @@ class FilterController extends Controller
 
         $courses = Course::orderBy('name')->get(['id','code','name']);
 
-        // Return full view (JS will extract & replace just #results for AJAX cases)
         return view('filters.filter', [
             'q'           => $q,
             'course'      => $courseCode,
@@ -93,6 +110,34 @@ class FilterController extends Controller
         ]);
     }
 
+    public function edit(string $school_id)
+    {
+        $student = Student::with('course')->where('school_id', $school_id)->firstOrFail();
+
+        // Preload related credentials for the form
+        $email     = Email::where('sch_id_number', $school_id)->first();
+        $satp      = Satpaccount::where('school_id', $school_id)->first();
+        $kumo      = Kumosoft::where('school_id', $school_id)->first();
+        $schoology = SchoologyCredential::where('school_id', $school_id)->first();
+
+        $voucher = null;
+        if (!is_null($student->voucher_id)) {
+            $voucher = Voucher::find($student->voucher_id);
+        }
+
+        $courses = Course::orderBy('name')->get(['id','code','name']); // for dropdown
+
+        return view('filters.edit', [
+            'student'   => $student,
+            'email'     => $email,
+            'satp'      => $satp,
+            'kumo'      => $kumo,
+            'schoology' => $schoology,
+            'voucher'   => $voucher,
+            'courses'   => $courses,
+        ]);
+    }
+
     public function update(Request $request, string $school_id)
     {
         $request->validate([
@@ -104,6 +149,8 @@ class FilterController extends Controller
             'voucher_code'           => ['nullable','string'],
             'birthday'               => ['nullable','date'],
             'free_old_voucher'       => ['nullable','boolean'],
+            // DB uses singular `course`
+            'course_id'              => ['nullable','integer','exists:course,id'],
         ]);
 
         $student = Student::where('school_id', $school_id)->first();
@@ -126,6 +173,15 @@ class FilterController extends Controller
                     $changed[] = 'Birthday';
                     $rowOut['birthday'] = $student->birthday ?: '';
                 }
+            }
+
+            // Course (via dropdown)
+            if ($request->filled('course_id') && (int)$student->course_id !== (int)$request->input('course_id')) {
+                $student->course_id = (int) $request->input('course_id');
+                $student->save();
+                $changed[] = 'Course';
+                $student->load('course');
+                $rowOut['course_code'] = optional($student->course)->code ?: '';
             }
 
             // EMAIL (create/update only when at least one email field was sent)
@@ -165,7 +221,7 @@ class FilterController extends Controller
                 $rowOut['schoology_credentials'] = $sch->schoology_credentials ?? '';
             }
 
-            // Kumosoft (allow empty string, never NULL) — fixes your NULL constraint error
+            // Kumosoft (allow empty string, never NULL)
             if ($request->has('kumosoft_credentials')) {
                 $ks  = Kumosoft::firstOrNew(['school_id' => $school_id]);
                 $was = $ks->exists;
@@ -177,7 +233,7 @@ class FilterController extends Controller
                 $rowOut['kumosoft_credentials'] = $ks->kumosoft_credentials ?? '';
             }
 
-            // Voucher assign/unassign
+            // Voucher assign/unassign (NEVER free old voucher)
             $voucherCode = trim((string) $request->input('voucher_code', ''));
             $freeOld     = (bool) $request->boolean('free_old_voucher');
 
@@ -187,15 +243,13 @@ class FilterController extends Controller
                     DB::rollBack();
                     return $this->finishUpdateResponse($request, false, 'Voucher code not found.', $school_id);
                 }
+                // Prevent assigning a voucher already given to another student
                 if ((int) $newVoucher->is_given === 1 && (int) $student->voucher_id !== (int) $newVoucher->id) {
                     DB::rollBack();
-                    return $this->finishUpdateResponse($request, false, 'Voucher code is already assigned.', $school_id);
+                    return $this->finishUpdateResponse($request, false, 'Voucher code is already assigned to another student.', $school_id);
                 }
 
-                if (!is_null($student->voucher_id) && (int) $student->voucher_id !== (int) $newVoucher->id) {
-                    Voucher::where('id', $student->voucher_id)->update(['is_given' => 0]);
-                }
-
+                // DO NOT free old voucher. Old remains is_given = 1 permanently.
                 $student->voucher_id = $newVoucher->id;
                 $student->save();
 
@@ -206,10 +260,10 @@ class FilterController extends Controller
                 $rowOut['voucher_code'] = $newVoucher->voucher_code;
             } elseif ($freeOld) {
                 if (!is_null($student->voucher_id)) {
-                    Voucher::where('id', $student->voucher_id)->update(['is_given' => 0]);
+                    // Only detach; do NOT change voucher->is_given (stays 1)
                     $student->voucher_id = null;
                     $student->save();
-                    $changed[] = 'Voucher (unassigned)';
+                    $changed[] = 'Voucher (unassigned; original kept as used)';
                     $rowOut['voucher_code'] = '';
                 }
             }
@@ -260,16 +314,14 @@ class FilterController extends Controller
         try {
             DB::beginTransaction();
 
+            // Pick the next available (unused) voucher
             $newVoucher = Voucher::where('is_given', 0)->lockForUpdate()->first();
             if (!$newVoucher) {
                 DB::rollBack();
                 return Response::json(['success' => false, 'message' => 'No available vouchers.'], 422);
             }
 
-            if (!is_null($student->voucher_id) && (int) $student->voucher_id !== (int) $newVoucher->id) {
-                Voucher::where('id', $student->voucher_id)->update(['is_given' => 0]);
-            }
-
+            // DO NOT free the student's old voucher if any. Old remains used forever.
             $student->voucher_id = $newVoucher->id;
             $student->save();
 
@@ -287,31 +339,4 @@ class FilterController extends Controller
             return Response::json(['success' => false, 'message' => 'Server error: '.$e->getMessage()], 500);
         }
     }
-    // app/Http/Controllers/FilterController.php
-
-public function edit(string $school_id)
-{
-    $student = Student::with('course')->where('school_id', $school_id)->firstOrFail();
-
-    // Preload related credentials for the form
-    $email     = Email::where('sch_id_number', $school_id)->first();
-    $satp      = Satpaccount::where('school_id', $school_id)->first();
-    $kumo      = Kumosoft::where('school_id', $school_id)->first();
-    $schoology = SchoologyCredential::where('school_id', $school_id)->first();
-
-    $voucher = null;
-    if (!is_null($student->voucher_id)) {
-        $voucher = Voucher::find($student->voucher_id);
-    }
-
-    return view('filters.edit', [
-        'student'   => $student,
-        'email'     => $email,
-        'satp'      => $satp,
-        'kumo'      => $kumo,
-        'schoology' => $schoology,
-        'voucher'   => $voucher,
-    ]);
-}
-
 }
