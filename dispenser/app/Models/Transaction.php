@@ -11,16 +11,15 @@ class Transaction extends Model
 
     protected $table = 'transactions';
 
-    protected $fillable = [
-        'student_id', 
-        'accessed_at'
+    protected $fillable = ['student_id', 'accessed_at'];
+
+    // Nice-to-have: lets you format in Blade easily
+    protected $casts = [
+        'accessed_at' => 'datetime',
     ];
 
     public $timestamps = true;
 
-    /**
-     * Relationship: A transaction belongs to a student.
-     */
     public function student()
     {
         return $this->belongsTo(Student::class, 'student_id');

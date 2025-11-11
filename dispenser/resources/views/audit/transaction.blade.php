@@ -12,7 +12,7 @@
     </div>
 
     <div class="mb-3">
-        <p>Total Transactions: <strong>{{ $totalTransactions }}</strong></p>
+        <p class="mb-2">Total Transactions: <strong>{{ $totalTransactions }}</strong></p>
         <input type="text" id="search" class="form-control" placeholder="Search by ID, name or course...">
     </div>
 
@@ -26,20 +26,23 @@
 @section('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+(function() {
+    // CSRF setup for all AJAX (needed for POST to /record)
+    $.ajaxSetup({
+        headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+    });
+
+    // Live search
     $('#search').on('keyup', function () {
         let query = $(this).val();
-
         $.ajax({
             url: "{{ route('transactions.search') }}",
             type: "GET",
-            data: { query: query },
-            success: function (data) {
-                $('#search-results').html(data);
-            },
-            error: function () {
-                $('#search-results').html('<p class="text-danger">Error loading results.</p>');
-            }
+            data: { query },
+            success: function (html) { $('#search-results').html(html); },
+            error: function () { $('#search-results').html('<p class="text-danger">Error loading results.</p>'); }
         });
     });
+})();
 </script>
 @endsection

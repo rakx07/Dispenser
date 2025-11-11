@@ -10,57 +10,70 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TransactionController extends Controller
 {
+    /**
+     * Create a transaction EVERY time credentials are accessed.
+     * Expects: POST student_id
+     * Returns: JSON
+     */
     public function recordShowPassword(Request $request)
     {
-        $request->validate([
-            'student_id' => 'required|exists:students,id'
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
         ]);
 
-        $student = Student::findOrFail($request->student_id);
+        Transaction::create([
+            'student_id'  => $validated['student_id'],
+            'accessed_at' => now(),
+        ]);
 
-        $existingTransaction = Transaction::where('student_id', $student->id)->first();
-
-        if (!$existingTransaction) {
-            Transaction::create([
-                'student_id'  => $student->id,
-                'accessed_at' => now(),
-            ]);
-
-            return response()->json(['success' => true, 'message' => 'Transaction recorded successfully']);
-        }
-
-        return response()->json(['success' => false, 'message' => 'Transaction already exists']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Transaction recorded.',
+        ]);
     }
 
+    /**
+     * Paginated list page
+     */
     public function index()
     {
         $transactions = Transaction::with(['student.course'])
-                            ->latest()
-                            ->paginate(10);
+            ->latest()
+            ->paginate(10);
 
         $totalTransactions = Transaction::count();
 
         return view('audit.transaction', compact('transactions', 'totalTransactions'));
     }
 
+    /**
+     * Excel export (requires maatwebsite/excel)
+     */
     public function export()
     {
         return Excel::download(new TransactionsExport, 'student_transactions.xlsx');
     }
 
+    /**
+     * AJAX search (kept tightly grouped to avoid loose ORs)
+     */
     public function search(Request $request)
     {
-        $query = $request->get('query');
+        $query = (string) $request->get('query', '');
 
         $transactions = Transaction::with(['student.course'])
-            ->whereHas('student', function ($q) use ($query) {
-                $q->where('school_id', 'like', "%$query%")
-                  ->orWhere('firstname', 'like', "%$query%")
-                  ->orWhere('lastname', 'like', "%$query%")
-                  ->orWhere('middlename', 'like', "%$query%");
-            })
-            ->orWhereHas('student.course', function ($q) use ($query) {
-                $q->where('name', 'like', "%$query%");
+            ->when($query !== '', function ($builder) use ($query) {
+                $builder->where(function ($q) use ($query) {
+                    $q->whereHas('student', function ($sq) use ($query) {
+                        $sq->where('school_id', 'like', "%{$query}%")
+                           ->orWhere('firstname', 'like', "%{$query}%")
+                           ->orWhere('lastname', 'like', "%{$query}%")
+                           ->orWhere('middlename', 'like', "%{$query}%");
+                    })
+                    ->orWhereHas('student.course', function ($cq) use ($query) {
+                        $cq->where('name', 'like', "%{$query}%");
+                    });
+                });
             })
             ->latest()
             ->paginate(10);
