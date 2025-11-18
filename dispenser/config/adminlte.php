@@ -365,6 +365,11 @@ return [
             'url' => 'emails/create',
             'icon' => 'fas fa-fw fa-plus',
         ],
+        [
+            'text' => 'Release Voucher',
+            'url'  => 'release-voucher',
+            'icon' => 'fas fa-ticket-alt',
+        ],
         // [
         //     'text' => 'Edit Student',
         //     'url' => 'student/edit',

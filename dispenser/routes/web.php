@@ -11,6 +11,7 @@ use App\Http\Controllers\FilterController;
 use App\Http\Controllers\CredentialDisplayController;
 
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\ReleaseVoucherController;
 
 // Home and welcome route
 Route::get('/', [StudentController::class, 'welcomeview'])->name('welcome');
@@ -141,4 +142,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('filters/{school_id}/edit', [FilterController::class, 'edit'])
     ->name('filters.edit');
     
+
+    Route::prefix('release-voucher')->group(function () {
+    Route::get('/', [ReleaseVoucherController::class, 'index'])
+        ->name('release-voucher.index');
+
+    Route::post('/generate', [ReleaseVoucherController::class, 'generate'])
+        ->name('release-voucher.generate');
+
+    Route::post('/release', [ReleaseVoucherController::class, 'release'])
+        ->name('release-voucher.release');
+
+    Route::post('/print', [ReleaseVoucherController::class, 'print'])
+        ->name('release-voucher.print');
+});
 });
