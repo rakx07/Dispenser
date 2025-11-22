@@ -149,8 +149,8 @@ class FilterController extends Controller
             'voucher_code'           => ['nullable','string'],
             'birthday'               => ['nullable','date'],
             'free_old_voucher'       => ['nullable','boolean'],
-            // DB uses singular `course`
-            'course_id'              => ['nullable','integer','exists:course,id'],
+            // simpler & avoids DB-level validation errors
+            'course_id'              => ['nullable','integer'],
         ]);
 
         $student = Student::where('school_id', $school_id)->first();
@@ -189,8 +189,12 @@ class FilterController extends Controller
                 $email = Email::firstOrNew(['sch_id_number' => $school_id]);
                 $was   = $email->exists;
 
-                if ($request->has('email_address'))  $email->email_address = (string) $request->input('email_address', '');
-                if ($request->has('email_password')) $email->password      = (string) $request->input('email_password', '');
+                if ($request->has('email_address'))  {
+                    $email->email_address = (string) $request->input('email_address', '');
+                }
+                if ($request->has('email_password')) {
+                    $email->password = (string) $request->input('email_password', '');
+                }
 
                 $email->save();
                 $changed[] = $was ? 'Email (updated)' : 'Email (added)';

@@ -154,15 +154,27 @@
                 showFeedback(true, '<strong>✅ Changes saved.</strong>');
 
                 if (window.opener) {
-                    window.opener.postMessage({ __filterUpdate: true, sid: sid }, '*');
-                    window.opener.location.reload();
+                    // send updated row + message back to main filter page
+                    window.opener.postMessage({
+                        __filterUpdate: true,
+                        sid: sid,
+                        row: res.row || {},
+                        changed_text: res.changed_text || null
+                    }, '*');
                 }
-                setTimeout(() => window.close(), 800);
+
+                setTimeout(function() {
+                    window.close();
+                }, 800);
             } else {
                 showFeedback(false, res.message || 'Save failed.');
             }
-        }).fail(function(){
-            showFeedback(false, 'Server error.');
+        }).fail(function(xhr){
+            var msg = 'Server error.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                msg = xhr.responseJSON.message;
+            }
+            showFeedback(false, msg);
         }).always(function(){
             $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Save Changes');
         });

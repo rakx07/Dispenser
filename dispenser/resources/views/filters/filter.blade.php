@@ -232,7 +232,7 @@ $(function () {
             if (d.row.voucher_code !== undefined) {
                 var v = d.row.voucher_code || '';
                 $row.find('.cell-voucher').html(
-                    v ? '<span class="badge badge-success">' + v + '</span>' : '<span class="text-muted">—</span>'
+                    v ? '<span class="badge badge-success voucher-code">' + v + '</span>' : '<span class="text-muted voucher-code">—</span>'
                 );
             }
             if (d.row.birthday !== undefined) {
@@ -243,10 +243,12 @@ $(function () {
         // Show the global success toast
         $('#global-success-text').text(d.changed_text || 'Changes saved.');
         $('#global-success').removeClass('d-none').addClass('show');
-        setTimeout(() => $('#global-success').alert('close'), 4000);
+        setTimeout(function () {
+            $('#global-success').alert('close');
+        }, 4000);
     });
 
-    // Re-open modal support was removed since edits open in new window.
 });
 </script>
 @endpush
+
