@@ -141,16 +141,16 @@ class FilterController extends Controller
     public function update(Request $request, string $school_id)
     {
         $request->validate([
-            'email_address'          => ['nullable','email'],
-            'email_password'         => ['nullable','string'],
-            'satp_password'          => ['nullable','string'],
-            'schoology_credentials'  => ['nullable','string'],
-            'kumosoft_credentials'   => ['nullable','string'],
-            'voucher_code'           => ['nullable','string'],
-            'birthday'               => ['nullable','date'],
-            'free_old_voucher'       => ['nullable','boolean'],
-            // simpler & avoids DB-level validation errors
-            'course_id'              => ['nullable','integer'],
+            'email_address'         => ['nullable','email'],
+            'email_password'        => ['nullable','string'],
+            'satp_password'         => ['nullable','string'],
+            'schoology_credentials' => ['nullable','string'],
+            'kumosoft_credentials'  => ['nullable','string'],
+            'voucher_code'          => ['nullable','string'],
+            'birthday'              => ['nullable','date'],
+            'free_old_voucher'      => ['nullable','boolean'],
+            // keep simple to avoid table-name issues
+            'course_id'             => ['nullable','integer'],
         ]);
 
         $student = Student::where('school_id', $school_id)->first();
@@ -189,7 +189,13 @@ class FilterController extends Controller
                 $email = Email::firstOrNew(['sch_id_number' => $school_id]);
                 $was   = $email->exists;
 
-                if ($request->has('email_address'))  {
+                // If this is a NEW email row, copy name from students table
+                if (!$was) {
+                    $email->first_name = $student->firstname ?? '';
+                    $email->last_name  = $student->lastname  ?? '';
+                }
+
+                if ($request->has('email_address')) {
                     $email->email_address = (string) $request->input('email_address', '');
                 }
                 if ($request->has('email_password')) {
