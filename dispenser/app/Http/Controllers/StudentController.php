@@ -239,6 +239,11 @@ public function handleVoucherAndSatp(Request $request)
         return redirect()->back()->with('error', 'Student record not found or information does not match.');
     }
 
+    if ((int) $student->status !== 1) {
+        return redirect()->back()->with('error', 'Your account is not active. Please proceed to MIS Office.');
+    }
+
+
     $satpAccount = Satpaccount::where('school_id', $idNumber)->first();
     $emailRecord = Email::where('sch_id_number', $idNumber)->first();
     $schoology = SchoologyCredential::where('school_id', $idNumber)->first();
