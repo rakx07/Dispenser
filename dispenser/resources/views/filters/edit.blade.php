@@ -88,6 +88,38 @@
                         <input type="text" name="satp_password" class="form-control"
                                value="{{ $satp->satp_password ?? '' }}">
                     </div>
+                    {{-- ACCOUNT STATUS --}}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label d-block">Account Status</label>
+
+                        {{-- Hidden so unchecked sends 0 --}}
+                        <input type="hidden" name="status" value="0">
+
+                        <div class="custom-control custom-switch">
+                            <input
+                                type="checkbox"
+                                class="custom-control-input"
+                                id="status"
+                                name="status"
+                                value="1"
+                                {{ (int)$student->status === 1 ? 'checked' : '' }}
+                            >
+                            <label class="custom-control-label" for="status">
+                                <span id="status-text"
+                                    class="{{ (int)$student->status === 1 ? 'text-success' : 'text-danger' }}">
+                                    {{ (int)$student->status === 1 ? 'Active' : 'Inactive' }}
+                                </span>
+                            </label>
+                        </div>
+
+                        <small class="form-text text-muted">
+                            Inactive students cannot use their account.
+                        </small>
+                    </div>
+
+
+
+
 
                     {{-- VOUCHER CODE + GENERATE BUTTON BELOW --}}
                     <div class="col-md-6 mb-3">
@@ -179,6 +211,17 @@
             $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Save Changes');
         });
     });
+
+    // Status toggle text
+    $('#status').on('change', function(){
+        let on = $(this).is(':checked');
+
+        $('#status-text')
+            .text(on ? 'Active' : 'Inactive')
+            .removeClass('text-success text-danger')
+            .addClass(on ? 'text-success' : 'text-danger');
+    });
+
 
     // Voucher Generate Button
     $('#btn-g-generate').on('click', function(){

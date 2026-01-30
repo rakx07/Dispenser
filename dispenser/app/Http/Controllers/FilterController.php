@@ -151,6 +151,7 @@ class FilterController extends Controller
             'free_old_voucher'      => ['nullable','boolean'],
             // keep simple to avoid table-name issues
             'course_id'             => ['nullable','integer'],
+            'status'                => ['nullable','boolean'],
         ]);
 
         $student = Student::where('school_id', $school_id)->first();
@@ -242,6 +243,24 @@ class FilterController extends Controller
                 $changed[] = $was ? 'Kumosoft (updated)' : 'Kumosoft (added)';
                 $rowOut['kumosoft_credentials'] = $ks->kumosoft_credentials ?? '';
             }
+
+            // STATUS (Active / Inactive)
+            if ($request->has('status')) {
+                $newStatus = (int) $request->input('status', 1);
+                $newStatus = $newStatus === 1 ? 1 : 0;
+
+                if ((int)$student->status !== $newStatus) {
+                    $student->status = $newStatus;
+                    $student->save();
+
+                    $changed[] = $newStatus ? 'Account Activated' : 'Account Deactivated';
+                    $rowOut['status'] = $student->status;
+                    $rowOut['status_text'] = $student->status ? 'Active' : 'Inactive';
+                }
+            }
+
+
+
 
             // Voucher assign/unassign (NEVER free old voucher)
             $voucherCode = trim((string) $request->input('voucher_code', ''));
