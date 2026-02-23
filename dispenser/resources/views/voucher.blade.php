@@ -105,6 +105,7 @@
                     <h4>Kumosoft Credentials</h4>
                     <p><strong>Kumosoft Username:</strong> {{ $student->school_id ?? 'Not Available' }}</p>
                     <p><strong>Kumosoft Password:</strong> <span id="kumosoft-password">********</span></p>
+                     <p><strong>Kumosoft Link:</strong> https://sms.ndmu.edu.ph</p>
                 </div>
             </div>
             @endif
