@@ -8,7 +8,7 @@ use App\Models\Course;
 use App\Models\Voucher;
 use App\Models\Email;
 use App\Models\Satpaccount;
-use App\Models\Kumosoft; // ✅ should be here
+use App\Models\Kumosoft;
 use App\Models\SchoologyCredential;
 use Illuminate\Http\Request;
 use App\Imports\StudentImport;
@@ -16,11 +16,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Exports\StudentsExport;
-use App\Models\CredentialDisplaySetting; // ← Add at the top
-
-
+use App\Models\CredentialDisplaySetting;
 use Carbon\Carbon;
-
 
 class StudentController extends Controller
 {
@@ -53,8 +50,9 @@ class StudentController extends Controller
 
                 $downloadUrl = asset("storage/{$filename}");
 
-                return redirect()->back()->with('status', "Import complete. {$import->skipped} student(s) skipped. ")
-                                       ->with('download_skipped', $downloadUrl);
+                return redirect()->back()
+                    ->with('status', "Import complete. {$import->skipped} student(s) skipped. ")
+                    ->with('download_skipped', $downloadUrl);
             }
 
             return redirect()->back()->with('status', 'File imported successfully!');
@@ -117,7 +115,6 @@ class StudentController extends Controller
         }
 
         $course = Course::where('code', $request->input('courseSelect'))->first();
-
         if (!$course) {
             return back()->withErrors(['courseSelect' => 'Invalid course selected.']);
         }
@@ -201,9 +198,7 @@ class StudentController extends Controller
             }
 
             DB::commit();
-
             return response()->json(['success' => 'Student added successfully!'], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Failed to add student: ' . $e->getMessage());
@@ -211,7 +206,7 @@ class StudentController extends Controller
         }
     }
 
-public function handleVoucherAndSatp(Request $request)
+    public function handleVoucherAndSatp(Request $request)
 {
     $request->validate([
         'idNumber' => 'required|string',
@@ -220,16 +215,33 @@ public function handleVoucherAndSatp(Request $request)
         'courseSelect' => 'required|string',
     ]);
 
-    $idNumber = trim($request->input('idNumber'));
+    $idNumber = trim($request->input('idNumber'));              // can be EIS ID or Kumosoft ID
     $lastname = strtolower(trim($request->input('lastname')));
     $birthday = Carbon::parse($request->input('birthday'))->format('Y-m-d');
-    $course = Course::where('code', $request->input('courseSelect'))->first();
 
+    $course = Course::where('code', $request->input('courseSelect'))->first();
     if (!$course) {
         return redirect()->back()->with('error', 'Invalid course selected.');
     }
 
-    $student = Student::where('school_id', $idNumber)
+    /**
+     * ✅ Accept BOTH:
+     * - EIS ID  (students.school_id)
+     * - Kumosoft ID (kumosofts.kumosoft_school_id) -> map to eis_school_id
+     */
+    $eisIdToUse = $idNumber;
+
+    // If typed ID is not a student EIS ID, try mapping from Kumosoft ID -> EIS ID
+    $existsInStudents = Student::where('school_id', $eisIdToUse)->exists();
+    if (!$existsInStudents) {
+        $kmap = Kumosoft::where('kumosoft_school_id', $idNumber)->first();
+        if ($kmap && !empty($kmap->eis_school_id)) {
+            $eisIdToUse = $kmap->eis_school_id;
+        }
+    }
+
+    // Strict student check remains the same (lastname + birthday + course)
+    $student = Student::where('school_id', $eisIdToUse)
         ->whereRaw('LOWER(lastname) = ?', [$lastname])
         ->where('birthday', $birthday)
         ->where('course_id', $course->id)
@@ -243,33 +255,51 @@ public function handleVoucherAndSatp(Request $request)
         return redirect()->back()->with('error', 'Your account is not active. Please proceed to MIS Office.');
     }
 
+    // IMPORTANT: use EIS ID for fetching other credentials
+    $satpAccount = Satpaccount::where('school_id', $eisIdToUse)->first();
+    $emailRecord = Email::where('sch_id_number', $eisIdToUse)->first();
+    $schoology   = SchoologyCredential::where('school_id', $eisIdToUse)->first();
 
-    $satpAccount = Satpaccount::where('school_id', $idNumber)->first();
-    $emailRecord = Email::where('sch_id_number', $idNumber)->first();
-    $schoology = SchoologyCredential::where('school_id', $idNumber)->first();
-    $kumosoft = Kumosoft::where('school_id', $idNumber)->first();
+    /**
+     * ✅ Kumosoft record:
+     * - primary: eis_school_id = EIS ID
+     * - fallback: kumosoft_school_id = typed ID (in case kiosk typed kumosoft id)
+     */
+    $kumosoft = Kumosoft::where('eis_school_id', $eisIdToUse)
+        ->orWhere('kumosoft_school_id', $idNumber)
+        ->first();
 
     $satp_password = $satpAccount ? $satpAccount->satp_password : null;
+
     $voucher = $student->voucher_id
         ? Voucher::find($student->voucher_id)
         : $this->generateNewVoucherForStudent($student);
 
-    // 🔐 Get display settings
+    // Display settings
     $displaySettings = CredentialDisplaySetting::all()->keyBy('section');
 
     return view('voucher', [
-    'student' => $student,
-    'satp_password' => $satp_password,
-    'voucher' => $voucher,
-    'email' => $emailRecord->email_address ?? null,
-    'password' => $emailRecord->password ?? null,
-    'schoology_credentials' => optional($schoology)->schoology_credentials,
-    'kumosoft_credentials' => optional($kumosoft)->kumosoft_credentials, // ✅ fix here
-    'displaySettings' => $displaySettings,
-]);
+        'student' => $student,
+        'satp_password' => $satp_password,
+        'voucher' => $voucher,
 
+        'email' => $emailRecord->email_address ?? null,
+        'password' => $emailRecord->password ?? null,
+
+        'schoology_credentials' => optional($schoology)->schoology_credentials,
+
+        // Backward compatible (if older code still uses it somewhere)
+        'kumosoft_credentials' => optional($kumosoft)->kumosoft_credentials,
+
+        // ✅ New fields for kiosk display
+        'kumosoft_eis_id'   => $student->school_id,
+        'kumosoft_id'       => optional($kumosoft)->kumosoft_school_id,
+        'kumosoft_email'    => optional($kumosoft)->email,
+        'kumosoft_password' => optional($kumosoft)->password,
+
+        'displaySettings' => $displaySettings,
+    ]);
 }
-
 
     public function showVoucher()
     {
@@ -299,7 +329,6 @@ public function handleVoucherAndSatp(Request $request)
             $voucher->save();
 
             DB::commit();
-
             return $voucher;
         } catch (\Exception $e) {
             DB::rollback();
@@ -314,8 +343,8 @@ public function handleVoucherAndSatp(Request $request)
         $students = Student::with(['course', 'satp', 'schoology', 'email'])
             ->when($query, function ($q) use ($query) {
                 $q->where('firstname', 'LIKE', "%{$query}%")
-                  ->orWhere('lastname', 'LIKE', "%{$query}%")
-                  ->orWhere('school_id', 'LIKE', "%{$query}%");
+                    ->orWhere('lastname', 'LIKE', "%{$query}%")
+                    ->orWhere('school_id', 'LIKE', "%{$query}%");
             })->paginate(10);
 
         return view('students.search', compact('students'));
@@ -328,8 +357,8 @@ public function handleVoucherAndSatp(Request $request)
         $students = Student::with(['course', 'satp', 'schoology', 'email'])
             ->when($query, function ($q) use ($query) {
                 $q->where('school_id', 'LIKE', "%{$query}%")
-                  ->orWhere('firstname', 'LIKE', "%{$query}%")
-                  ->orWhere('lastname', 'LIKE', "%{$query}%");
+                    ->orWhere('firstname', 'LIKE', "%{$query}%")
+                    ->orWhere('lastname', 'LIKE', "%{$query}%");
             })
             ->paginate(10);
 
@@ -337,7 +366,7 @@ public function handleVoucherAndSatp(Request $request)
     }
 
     public function exportExcel()
-{
-    return Excel::download(new StudentsExport, 'students_with_kumosoft.xlsx');
-}
+    {
+        return Excel::download(new StudentsExport, 'students_with_kumosoft.xlsx');
+    }
 }

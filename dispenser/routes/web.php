@@ -83,6 +83,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('students/import', [StudentController::class, 'index']);
     Route::post('students/import', [StudentController::class, 'import']);
 
+    // New Kumosoft upload 2-24-2026
+    Route::get('/kumosoft/import/failed/{filename}', [KumosoftController::class, 'downloadFailed'])
+    ->name('kumosoft.failed.download');
+    Route::get('/kumosoft/template/download', [KumosoftController::class, 'downloadTemplate'])
+    ->name('kumosoft.template.download');
+
     Route::get('/edit/{id}', [StudentController::class, 'edit'])->name('student.edit');
     Route::put('/update/{id}', [StudentController::class, 'update'])->name('student.update');
     Route::delete('/delete/{id}', [StudentController::class, 'destroy'])->name('student.destroy');
