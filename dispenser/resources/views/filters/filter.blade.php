@@ -7,7 +7,7 @@
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
     <div>
         <h1 class="mb-0" style="font-weight:900; color:#0B3D2E;">Filter & Edit Student Credentials</h1>
-        <div class="text-muted small">Search students and manage credentials (Email / Schoology / Kumosoft / SATP / Voucher).</div>
+        <div class="text-muted small">Search students and manage credentials (Schoology / Kumosoft / SATP / Voucher).</div>
     </div>
 
     <a href="{{ route('home') }}" class="btn btn-outline-secondary">
@@ -106,7 +106,6 @@
         --paper:#FFFBF0;
     }
 
-    /* NDMU card styling */
     .card-ndmu{
         border-radius:16px;
         border:2px solid rgba(11,61,46,.22);
@@ -126,7 +125,6 @@
         color:#fff;
     }
 
-    /* Responsive table improvements */
     .table th, .table td{
         vertical-align:middle;
         padding:.65rem .75rem;
@@ -136,19 +134,8 @@
     }
     .table td.text-left{ text-align:left !important; }
 
-    @media (max-width: 991.98px){
-        .table th, .table td{ padding:.55rem .6rem; }
-    }
-    @media (max-width: 575.98px){
-        .table th, .table td{ white-space:normal; }
-    }
+    .table-responsive{ overflow-x:auto !important; }
 
-    /* Ensure horizontal scroll works */
-    .table-responsive{
-        overflow-x:auto !important;
-    }
-
-    /* Loading */
     #ajax-spinner{
         position:fixed;
         right:1rem;
@@ -159,7 +146,6 @@
         border:1px solid rgba(11,61,46,.25);
     }
 
-    /* global success toast */
     #global-success{
         position:fixed;
         top:80px;
@@ -237,131 +223,151 @@ $(function () {
         }).always(function(){ $('#ajax-spinner').fadeOut(80); });
     });
 
-    // postMessage update handler (kept)
-    window.addEventListener('message', function (ev) {
-        if (!ev || !ev.data || ev.data.__filterUpdate !== true) return;
+    // ===============================
+    // MODAL SAVE (AJAX)  ✅ THIS FIXES "Save does nothing"
+    // ===============================
+    $(document).on('submit', '.ajax-cred-form', function(e){
+        e.preventDefault();
 
-        var d = ev.data;
-        var sid = d.sid;
-        if (!sid) return;
+        var $form = $(this);
+        var sid   = $form.data('sid');
+        var url   = $form.attr('action');
 
-        var $row = $('#row-' + sid);
-        if (!$row.length) return;
+        var $fb = $form.find('.save-feedback');
+        $fb.addClass('d-none').removeClass('alert-success alert-danger').text('');
 
-        if (d.row) {
-            if (d.row.email_address !== undefined) {
-                $row.find('.cell-email').html(
-                    d.row.email_address
-                        ? '<div class="email-address">' + d.row.email_address + '</div><div class="text-muted small">••••••</div>'
-                        : '<span class="text-muted">—</span>'
-                );
-            }
-            if (d.row.schoology_credentials !== undefined) {
-                $row.find('.cell-schoology').text(d.row.schoology_credentials || '—');
-            }
+        var $btn = $form.find('button[type="submit"]');
+        var oldBtnHtml = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving');
 
-            // Kumosoft
-            if (d.row.kumosoft_school_id !== undefined) {
-                $row.find('.cell-kumosoft-id').text(d.row.kumosoft_school_id || '—');
-            }
-            if (d.row.kumosoft_password !== undefined) {
-                $row.find('.cell-kumosoft-pass').text(d.row.kumosoft_password || '—');
-            }
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: $form.serialize(),
+            success: function(resp){
+                if(!resp || resp.success !== true){
+                    $fb.removeClass('d-none').addClass('alert alert-danger').text((resp && resp.message) ? resp.message : 'Save failed.');
+                    return;
+                }
 
-            if (d.row.satp_password !== undefined) {
-                $row.find('.cell-satp').text(d.row.satp_password || '—');
-            }
-            if (d.row.voucher_code !== undefined) {
-                var v = d.row.voucher_code || '';
-                $row.find('.cell-voucher').html(
-                    v ? '<span class="badge badge-success voucher-code">' + v + '</span>' : '<span class="text-muted voucher-code">—</span>'
-                );
-            }
-            if (d.row.birthday !== undefined) {
-                $row.find('.cell-bday').text(d.row.birthday || '');
-            }
-        }
+                // Update row cells without refresh
+                var $row = $('#row-' + sid);
+                if($row.length && resp.row){
 
-        $('#global-success-text').text(d.changed_text || 'Changes saved.');
-        $('#global-success').removeClass('d-none').addClass('show');
-        setTimeout(function () { $('#global-success').alert('close'); }, 3500);
+                    if(resp.row.course_code !== undefined){
+                        $row.find('.cell-course').text(resp.row.course_code || '—');
+                    }
+
+                    if(resp.row.schoology_credentials !== undefined){
+                        $row.find('.cell-schoology').text(resp.row.schoology_credentials || '—');
+                    }
+
+                    if(resp.row.kumosoft_school_id !== undefined){
+                        $row.find('.cell-kumosoft-id').text(resp.row.kumosoft_school_id || '—');
+                    }
+                    if(resp.row.kumosoft_password !== undefined){
+                        $row.find('.cell-kumosoft-pass').text(resp.row.kumosoft_password || '—');
+                    }
+
+                    if(resp.row.satp_password !== undefined){
+                        $row.find('.cell-satp').text(resp.row.satp_password || '—');
+                    }
+
+                    if(resp.row.voucher_code !== undefined){
+                        var v = resp.row.voucher_code || '';
+                        $row.find('.cell-voucher').html(
+                            v ? '<span class="badge badge-success voucher-code">' + v + '</span>' : '<span class="text-muted voucher-code">—</span>'
+                        );
+                    }
+
+                    if(resp.row.birthday !== undefined){
+                        $row.find('.cell-bday').text(resp.row.birthday || '');
+                    }
+
+                    if(resp.row.status_text !== undefined){
+                        $row.find('.cell-status').html(
+                            (resp.row.status_text === 'Active')
+                                ? '<span class="badge badge-success">Active</span>'
+                                : '<span class="badge badge-danger">Inactive</span>'
+                        );
+                    }
+                }
+
+                // Feedback
+                $fb.removeClass('d-none').addClass('alert alert-success').text(resp.message || 'Changes saved.');
+
+                // Global toast
+                $('#global-success-text').text(resp.changed_text || 'Changes saved.');
+                $('#global-success').removeClass('d-none').addClass('show');
+                setTimeout(function () { $('#global-success').alert('close'); }, 2500);
+
+                // Optional: close modal after short delay
+                setTimeout(function(){
+                    $('#editModal-' + sid).modal('hide');
+                }, 350);
+
+            },
+            error: function(xhr){
+                var msg = 'Server error.';
+                try {
+                    var j = JSON.parse(xhr.responseText);
+                    if(j && j.message) msg = j.message;
+                } catch(e){}
+
+                $fb.removeClass('d-none').addClass('alert alert-danger').text(msg + ' (HTTP ' + xhr.status + ')');
+            },
+            complete: function(){
+                $btn.prop('disabled', false).html(oldBtnHtml);
+            }
+        });
     });
 
-});
+    // ===============================
+    // Voucher Generate (AJAX)
+    // ===============================
+    $(document).on('click', '.generate-voucher', function (e) {
+        e.preventDefault();
 
+        var $btn = $(this);
+        var url  = $btn.data('url');
+        var sid  = $btn.data('school-id');
 
-// ===============================
-// Voucher Generate (AJAX)
-// ===============================
-$(document).on('click', '.generate-voucher', function (e) {
-    e.preventDefault();
+        var token = $('meta[name="csrf-token"]').attr('content');
+        if (!token) token = $('#editModal-' + sid).find('input[name="_token"]').val();
 
-    var $btn = $(this);
-    var url  = $btn.data('url');
-    var sid  = $btn.data('school-id');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
 
-    if (!url || !sid) {
-        console.error('Generate button missing data-url or data-school-id');
-        return;
-    }
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: { _token: token },
+            success: function (resp) {
+                if (!resp || resp.success !== true) {
+                    alert((resp && resp.message) ? resp.message : 'Failed to generate voucher.');
+                    return;
+                }
 
-    // CSRF token (AdminLTE usually has meta tag)
-    var token = $('meta[name="csrf-token"]').attr('content');
-    if (!token) {
-        // fallback: token from modal form
-        token = $('#editModal-' + sid).find('input[name="_token"]').val();
-    }
+                var code = resp.voucher_code || '';
 
-    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                $('#voucher-display-' + sid).val(code);
+                $('#voucher-' + sid).val(code);
 
-    $.ajax({
-        url: url,
-        method: 'POST',
-        data: { _token: token },
-        success: function (resp) {
-            if (!resp || resp.success !== true) {
-                alert((resp && resp.message) ? resp.message : 'Failed to generate voucher.');
-                return;
+                var $row = $('#row-' + sid);
+                if ($row.length) {
+                    $row.find('.cell-voucher').html(
+                        code ? '<span class="badge badge-success voucher-code">' + code + '</span>' : '<span class="text-muted voucher-code">—</span>'
+                    );
+                }
+            },
+            error: function (xhr) {
+                alert('Error generating voucher. (HTTP ' + xhr.status + ')');
+            },
+            complete: function () {
+                $btn.prop('disabled', false).html('<i class="fas fa-magic"></i> Generate');
             }
-
-            var code = resp.voucher_code || '';
-
-            // Fill modal fields
-            $('#voucher-display-' + sid).val(code);
-            $('#voucher-' + sid).val(code);
-
-            // Update row instantly
-            var $row = $('#row-' + sid);
-            if ($row.length) {
-                $row.find('.cell-voucher').html(
-                    code
-                        ? '<span class="badge badge-success voucher-code">' + code + '</span>'
-                        : '<span class="text-muted voucher-code">—</span>'
-                );
-            }
-
-            // Optional modal feedback area
-            var $fb = $('#editModal-' + sid).find('.save-feedback');
-            if ($fb.length) {
-                $fb.removeClass('d-none alert-danger').addClass('alert-success')
-                   .text('Voucher generated: ' + code);
-            }
-        },
-        error: function (xhr) {
-            console.error(xhr.responseText || xhr.statusText);
-
-            var msg = 'Error generating voucher.';
-            try {
-                var j = JSON.parse(xhr.responseText);
-                if (j && j.message) msg = j.message;
-            } catch(e){}
-
-            alert(msg + ' (HTTP ' + xhr.status + ')');
-        },
-        complete: function () {
-            $btn.prop('disabled', false).html('<i class="fas fa-magic"></i> Generate');
-        }
+        });
     });
+
 });
 </script>
 @endpush

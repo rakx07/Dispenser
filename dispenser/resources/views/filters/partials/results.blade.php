@@ -1,4 +1,5 @@
 {{-- resources/views/filters/partials/results.blade.php --}}
+<div id="results">
 <div class="card card-ndmu">
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -9,7 +10,9 @@
                         <th style="min-width:130px;">School ID</th>
                         <th style="min-width:240px;">Name</th>
                         <th class="d-none d-md-table-cell" style="min-width:120px;">Course</th>
-                        <th class="d-none d-lg-table-cell" style="min-width:220px;">Email</th>
+
+                        {{-- ✅ Email REMOVED from table --}}
+
                         <th class="d-none d-xl-table-cell" style="min-width:140px;">Schoology</th>
                         <th style="min-width:240px;">Kumosoft</th>
                         <th class="d-none d-lg-table-cell" style="min-width:120px;">SATP</th>
@@ -23,7 +26,7 @@
                 <tbody>
                 @forelse($students as $s)
                     @php
-                        $email     = $emails[$s->school_id] ?? null;
+                        $email     = $emails[$s->school_id] ?? null; // for modal only
                         $satp      = $satps[$s->school_id] ?? null;
                         $kumo      = $kumos[$s->school_id] ?? null;
                         $schoology = $schoologys[$s->school_id] ?? null;
@@ -39,53 +42,40 @@
                             </div>
                             <div class="text-muted small">{{ $s->middlename }}</div>
 
-                            {{-- Mobile mini details --}}
                             <div class="d-md-none mt-2 small">
-                                <div><b>Course:</b> {{ optional($s->course)->code ?? '—' }}</div>
+                                <div><b>Course:</b> <span class="cell-course">{{ optional($s->course)->code ?? '—' }}</span></div>
                                 <div><b>Kumosoft ID:</b> <span class="cell-kumosoft-id">{{ $kumo->kumosoft_school_id ?? '—' }}</span></div>
                                 <div><b>Kumosoft Pass:</b> <span class="cell-kumosoft-pass">{{ $kumo->password ?? '—' }}</span></div>
                             </div>
                         </td>
 
-                        <td class="d-none d-md-table-cell">
+                        <td class="d-none d-md-table-cell cell-course">
                             {{ optional($s->course)->code ?? '—' }}
-                        </td>
-
-                        <td class="d-none d-lg-table-cell cell-email">
-                            @if($email)
-                                <div class="email-address">{{ $email->email_address }}</div>
-                                <div class="text-muted small">••••••</div>
-                            @else
-                                <span class="text-muted">—</span>
-                            @endif
                         </td>
 
                         <td class="d-none d-xl-table-cell cell-schoology">
                             {{ $schoology->schoology_credentials ?? '—' }}
                         </td>
 
-                        {{-- ✅ Kumosoft: show ID + password (direct) --}}
                         <td>
                             @if($kumo)
                                 <div class="kumo-mini">
                                     <div class="top">
                                         <span class="badge badge-light"
-                                            style="border:1px solid rgba(11,61,46,.25); color:#0B3D2E; font-weight:900;">
+                                              style="border:1px solid rgba(11,61,46,.25); color:#0B3D2E; font-weight:900;">
                                             ID
                                         </span>
-                                        <span class="cell-kumosoft-id"
-                                            style="font-weight:900; color:#0B3D2E;">
+                                        <span class="cell-kumosoft-id" style="font-weight:900; color:#0B3D2E;">
                                             {{ $kumo->kumosoft_school_id ?? '—' }}
                                         </span>
                                     </div>
 
                                     <div class="sub mt-1">
                                         <span class="badge badge-light"
-                                            style="border:1px solid rgba(227,199,122,.65); color:#0B3D2E; font-weight:900;">
+                                              style="border:1px solid rgba(227,199,122,.65); color:#0B3D2E; font-weight:900;">
                                             PASS
                                         </span>
-                                        <span class="cell-kumosoft-pass"
-                                            style="font-weight:900; color:#111;">
+                                        <span class="cell-kumosoft-pass" style="font-weight:900; color:#111;">
                                             {{ $kumo->password ?? '—' }}
                                         </span>
                                     </div>
@@ -111,7 +101,7 @@
                             {{ $s->birthday ? \Carbon\Carbon::parse($s->birthday)->format('Y-m-d') : '' }}
                         </td>
 
-                        <td class="d-none d-lg-table-cell text-center">
+                        <td class="d-none d-lg-table-cell text-center cell-status">
                             @if((int)$s->status === 1)
                                 <span class="badge badge-success">Active</span>
                             @else
@@ -119,7 +109,6 @@
                             @endif
                         </td>
 
-                        {{-- ✅ Action --}}
                         <td class="text-center col-action">
                             <button type="button"
                                     class="btn btn-sm btn-ndmu btn-action"
@@ -130,13 +119,10 @@
                         </td>
                     </tr>
 
-                    {{-- =========================
-                         EDIT MODAL
-                    ========================== --}}
+                    {{-- MODAL --}}
                     <div class="modal fade" id="editModal-{{ $s->school_id }}" tabindex="-1" role="dialog" aria-hidden="true">
                         <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
                             <div class="modal-content">
-
                                 <form class="ajax-cred-form"
                                       method="POST"
                                       action="{{ route('filters.update', $s->school_id) }}"
@@ -157,7 +143,6 @@
 
                                         <div class="row">
 
-                                            {{-- COURSE / PROGRAM --}}
                                             <div class="col-12 col-md-6">
                                                 <label class="form-label" style="font-weight:800;">Course / Program</label>
                                                 <select name="course_id" class="form-control">
@@ -170,7 +155,6 @@
                                                 </select>
                                             </div>
 
-                                            {{-- STATUS --}}
                                             <div class="col-12 col-md-6">
                                                 <label class="form-label" style="font-weight:800;">Account Status</label>
                                                 <select name="status" class="form-control">
@@ -179,7 +163,7 @@
                                                 </select>
                                             </div>
 
-                                            {{-- EMAIL --}}
+                                            {{-- EMAIL (modal only) --}}
                                             <div class="col-12 col-md-6 mt-3">
                                                 <label class="form-label" style="font-weight:800;">Email Address</label>
                                                 <input type="email" name="email_address" class="form-control"
@@ -187,53 +171,48 @@
                                             </div>
                                             <div class="col-12 col-md-6 mt-3">
                                                 <label class="form-label" style="font-weight:800;">Email Password</label>
-                                                <input type="text" name="email_password" class="form-control" value="">
-                                                <small class="text-muted">Leave blank to keep existing</small>
+                                                <input type="text" name="email_password" class="form-control"
+                                                    value="{{ old('email_password', $email->password ?? '') }}">
+                                                <small class="text-muted">Edit if you want to change</small>
                                             </div>
 
-                                            {{-- SCHOOLOGY --}}
                                             <div class="col-12 col-md-6 mt-3">
                                                 <label class="form-label" style="font-weight:800;">Schoology Credentials</label>
                                                 <input type="text" name="schoology_credentials" class="form-control"
-                                                       value="{{ $schoology->schoology_credentials ?? '' }}">
+                                                      value="{{ old('schoology_credentials', $schoology->schoology_credentials ?? '') }}">
                                             </div>
 
-                                            {{-- ✅ KUMOSOFT ID --}}
                                             <div class="col-12 col-md-6 mt-3">
                                                 <label class="form-label" style="font-weight:800;">Kumosoft ID (kumosoft_school_id)</label>
                                                 <input type="text" name="kumosoft_school_id" class="form-control"
                                                        value="{{ $kumo->kumosoft_school_id ?? '' }}" placeholder="Kumosoft ID">
                                             </div>
 
-                                            {{-- ✅ KUMOSOFT PASSWORD --}}
                                             <div class="col-12 col-md-6 mt-3">
                                                 <label class="form-label" style="font-weight:800;">Kumosoft Password</label>
-                                                <input type="text" name="kumosoft_password" class="form-control" value="">
-                                                <small class="text-muted">Leave blank to keep existing</small>
+                                                <input type="text" name="kumosoft_password" class="form-control"
+                                                    value="{{ old('kumosoft_password', $kumo->password ?? '') }}">
+                                                <small class="text-muted">Edit if you want to change</small>
                                             </div>
 
-                                            {{-- ✅ Legacy string --}}
                                             <div class="col-12 col-md-6 mt-3">
                                                 <label class="form-label" style="font-weight:800;">Kumosoft Legacy (kumosoft_credentials)</label>
                                                 <input type="text" name="kumosoft_credentials" class="form-control"
                                                        value="{{ $kumo->kumosoft_credentials ?? '' }}" placeholder="optional legacy string">
                                             </div>
 
-                                            {{-- SATP --}}
                                             <div class="col-12 col-md-6 mt-3">
                                                 <label class="form-label" style="font-weight:800;">SATP Password</label>
                                                 <input type="text" name="satp_password" class="form-control"
-                                                       value="{{ $satp->satp_password ?? '' }}">
+                                                 value="{{ old('satp_password', $satp->satp_password ?? '') }}">
                                             </div>
 
-                                            {{-- BDAY --}}
                                             <div class="col-12 col-md-6 mt-3">
                                                 <label class="form-label" style="font-weight:800;">Birthday</label>
                                                 <input type="date" name="birthday" class="form-control"
                                                        value="{{ $s->birthday ? \Carbon\Carbon::parse($s->birthday)->format('Y-m-d') : '' }}">
                                             </div>
 
-                                            {{-- VOUCHER --}}
                                             <div class="col-12 col-md-6 mt-3">
                                                 <label class="form-label d-flex align-items-center justify-content-between" style="font-weight:800;">
                                                     <span>Voucher Code</span>
@@ -279,14 +258,13 @@
                                         <button type="submit" class="btn btn-ndmu">Save Changes</button>
                                     </div>
                                 </form>
-
                             </div>
                         </div>
                     </div>
 
                 @empty
                     <tr>
-                        <td colspan="11" class="text-center text-muted py-4">No results. Try another filter.</td>
+                        <td colspan="10" class="text-center text-muted py-4">No results. Try another filter.</td>
                     </tr>
                 @endforelse
                 </tbody>
@@ -316,8 +294,6 @@
     color:#374151;
     line-height:1.2;
 }
-
-/* Make Action column compact */
 .table th.col-action,
 .table td.col-action{
     width:90px !important;
@@ -332,3 +308,4 @@
     line-height:1.1 !important;
 }
 </style>
+</div>
