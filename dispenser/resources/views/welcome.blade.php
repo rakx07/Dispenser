@@ -257,7 +257,7 @@
                 </div>
             </div>
             <div class="mini-badge">
-                Private kiosk • Do not share your credentials !!!
+                Private kiosk • Do not share your credentials.
             </div>
         </div>
 
