@@ -169,10 +169,11 @@ $(function () {
         $only   = $('#only_with_creds');
 
     function replaceResultsFromHtml(html){
-        var $html = $('<div>').html(html),
-            $new  = $html.find('#results');
-        if ($new.length) $('#results').replaceWith($new);
-    }
+    var $html = $('<div>').html(html),
+        $new  = $html.find('#results').first();
+
+    if ($new.length) $('#results').replaceWith($new);
+}
 
     function ensureSpinner(){
         if(!$('#ajax-spinner').length){
