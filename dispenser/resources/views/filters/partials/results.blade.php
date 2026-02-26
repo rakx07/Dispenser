@@ -8,10 +8,10 @@
                 <thead class="table-light">
                     <tr>
                         <th style="min-width:130px;">School ID</th>
-                        <th style="min-width:240px;">Name</th>
-                        <th class="d-none d-md-table-cell" style="min-width:120px;">Course</th>
+                        <th style="min-width:280px;">Name</th>
 
-                        {{-- Email is intentionally removed from table --}}
+                        {{-- ✅ Course column changed to EMAIL --}}
+                        <th class="d-none d-md-table-cell" style="min-width:220px;">Email</th>
 
                         <th class="d-none d-xl-table-cell" style="min-width:140px;">Schoology</th>
                         <th style="min-width:240px;">Kumosoft</th>
@@ -26,31 +26,63 @@
                 <tbody>
                 @forelse($students as $s)
                     @php
-                        $email     = $emails[$s->school_id] ?? null; // modal only
+                        $email     = $emails[$s->school_id] ?? null; // modal + table
                         $satp      = $satps[$s->school_id] ?? null;
                         $kumo      = $kumos[$s->school_id] ?? null;
                         $schoology = $schoologys[$s->school_id] ?? null;
                         $voucher   = $s->voucher_id ? ($vouchers[$s->voucher_id] ?? null) : null;
+
+                        $courseCode = optional($s->course)->code ?? '—';
                     @endphp
 
                     <tr id="row-{{ $s->school_id }}">
                         <td class="font-weight-bold">{{ $s->school_id }}</td>
 
+                        {{-- ✅ NAME column (now includes course under name) --}}
                         <td class="text-left">
                             <div style="font-weight:900; color:#0B3D2E;">
                                 {{ $s->lastname }}, {{ $s->firstname }}
                             </div>
-                            <div class="text-muted small">{{ $s->middlename }}</div>
 
+                            <div class="text-muted small">
+                                {{ $s->middlename }}
+                            </div>
+
+                            <div class="small" style="margin-top:2px;">
+                                <b>Course:</b> <span class="cell-course">{{ $courseCode }}</span>
+                            </div>
+
+                            {{-- ✅ Mobile extra info --}}
                             <div class="d-md-none mt-2 small">
-                                <div><b>Course:</b> <span class="cell-course">{{ optional($s->course)->code ?? '—' }}</span></div>
-                                <div><b>Kumosoft ID:</b> <span class="cell-kumosoft-id">{{ $kumo->kumosoft_school_id ?? '—' }}</span></div>
-                                <div><b>Kumosoft Pass:</b> <span class="cell-kumosoft-pass">{{ $kumo->password ?? '—' }}</span></div>
+                                <div>
+                                    <b>Email:</b>
+                                    <span class="cell-email">{{ $email->email_address ?? '—' }}</span>
+                                </div>
+                                <div>
+                                    <b>Email Pass:</b>
+                                    <span class="cell-email-pass">{{ $email->password ?? '—' }}</span>
+                                </div>
+
+                                <div class="mt-1">
+                                    <b>Kumosoft ID:</b>
+                                    <span class="cell-kumosoft-id">{{ $kumo->kumosoft_school_id ?? '—' }}</span>
+                                </div>
+                                <div>
+                                    <b>Kumosoft Pass:</b>
+                                    <span class="cell-kumosoft-pass">{{ $kumo->password ?? '—' }}</span>
+                                </div>
                             </div>
                         </td>
 
-                        <td class="d-none d-md-table-cell cell-course">
-                            {{ optional($s->course)->code ?? '—' }}
+                        {{-- ✅ EMAIL column (replaces course column) --}}
+                        <td class="d-none d-md-table-cell text-left">
+                            <div class="cell-email" style="font-weight:800; color:#0B3D2E;">
+                                {{ $email->email_address ?? '—' }}
+                            </div>
+                            <div class="small text-muted">
+                                <span style="font-weight:700;">Pass:</span>
+                                <span class="cell-email-pass">{{ $email->password ?? '—' }}</span>
+                            </div>
                         </td>
 
                         <td class="d-none d-xl-table-cell cell-schoology">
@@ -197,7 +229,7 @@
                                 </select>
                             </div>
 
-                            {{-- EMAIL (modal only) --}}
+                            {{-- EMAIL --}}
                             <div class="col-12 col-md-6 mt-3">
                                 <label class="form-label" style="font-weight:800;">Email Address</label>
                                 <input type="email" name="email_address" class="form-control"
